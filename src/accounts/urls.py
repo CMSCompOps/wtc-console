@@ -16,5 +16,4 @@ urlpatterns = [
     url(_(r'^status/email/$'),
         accounts.views.UserEmailConfirmationStatusView.as_view(),
         name='status'),
-
 ]

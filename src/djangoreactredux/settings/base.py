@@ -22,6 +22,9 @@ INSTALLED_APPS = (
     'django.contrib.admin',
 
     'rest_framework',
+    'rest_framework_mongoengine',
+    'mongoengine.django.mongo_auth',
+
     'knox',
     'django_extensions',
 
@@ -73,7 +76,13 @@ USE_TZ = True
 
 AUTH_USER_MODEL = 'accounts.User'
 
-ACCOUNT_ACTIVATION_DAYS = 7  # days
+# MONGOENGINE_USER_DOCUMENT = 'accounts.User'
+#
+# AUTHENTICATION_BACKENDS = (
+#     'mongoengine.django.auth.MongoEngineBackend',
+# )
+
+ACCOUNT_ACTIVATION_DAYS = 14  # days
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_root')

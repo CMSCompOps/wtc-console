@@ -11,6 +11,16 @@ services:
             - 5432
         volumes:
           - ./docker/postgres/data:/var/lib/postgresql
+    mongo:
+        restart: always
+        image: mongo:4.0.0
+        expose:
+            - 8081
+        volumes:
+          - ./docker/mongo/data:/data/db
+        environment:
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: root
     django:
         restart: always
         build:

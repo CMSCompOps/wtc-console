@@ -1,7 +1,7 @@
 FROM ubuntu:14.04
 MAINTAINER Filipe Garcia <filipe.garcia@seedstarslabs.com>
 
-COPY ./docker/web/web-entrypoint.sh /
+COPY ./docker/django/web-entrypoint.sh /
 COPY ./package.json /django/package.json
 
 WORKDIR /django

@@ -74,21 +74,12 @@ class User(AbstractBaseUser):
     To be active, the user must register and confirm his email.
     """
 
-    GENDER_MALE = 'M'
-    GENDER_FEMALE = 'F'
-    GENDER_CHOICES = (
-        (GENDER_MALE, 'Male'),
-        (GENDER_FEMALE, 'Female')
-    )
-
     # we want primary key to be called id so need to ignore pytlint
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # pylint: disable=invalid-name
 
     first_name = models.CharField(_('First Name'), max_length=50)
     last_name = models.CharField(_('Last Name'), max_length=50)
     email = models.EmailField(_('Email address'), unique=True)
-
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, default=GENDER_MALE)
 
     confirmed_email = models.BooleanField(default=False)
 

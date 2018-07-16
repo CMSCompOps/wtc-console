@@ -19,12 +19,21 @@ services:
             - 5433:5432
         volumes:
             - ./docker/postgres/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+    mongo:
+        extends:
+            file: docker-common.yml
+            service: mongo
+        ports:
+            - 8081:8081
+        volumes:
+            - ./docker/postgres/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
     backend:
         extends:
             file: docker-common.yml
             service: django
         links:
             - postgres
+            - mongo
         entrypoint:
             - /django-entrypoint.sh
         expose:

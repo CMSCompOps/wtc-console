@@ -1,8 +1,6 @@
 Django==1.11.4
 django-extensions==1.8.1
 
-django-disposable-email-checker==1.2.1
-
 # PostgresSQL
 psycopg2==2.7.3
 
@@ -11,6 +9,11 @@ whitenoise==3.3.0
 
 # Rest Framework
 djangorestframework==3.6.4
+
+# MongoDB + Mongo Engine
+pymongo==2.7.1
+mongoengine==0.9
+django-rest-framework-mongoengine==3.3.0
 
 # Sentry
 raven==6.1.0
