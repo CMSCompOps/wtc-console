@@ -19,15 +19,16 @@ src/static_root/
 # Python compiled byte code
 *.pyc
 
-# SQLite3 database
+# Databases
 *.sqlite
+docker/mongo/data/*
+docker/oracle/data/*
 
-# MongoDB
-docker/mongo
 
 # Node modules
 node_modules/
 yarn.lock
+yarn-error.log
 npm-debug.log
 
 # Coverage 

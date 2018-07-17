@@ -17,6 +17,24 @@ DATABASES = {
         'PASSWORD': 'password',
         'HOST': 'postgres',
         'PORT': 5432,
+    },
+    'servers': {
+        'ENGINE': 'django.db.backends.oracle',
+        'NAME': 'xe',
+        'USER': 'a_user',
+        'PASSWORD': 'a_password',
+        'HOST': '',
+        'PORT': '',
+    },
+}
+
+MONGODB_DATABASES = {
+    'default': {
+        'NAME': 'wtc-console',
+        'HOST': 'mongo',
+        'PORT': 8081,
+        'USER': 'root',
+        'PASSWORD': 'root',
     }
 }
 
