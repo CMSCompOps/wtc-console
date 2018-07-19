@@ -17,7 +17,7 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': 5433,
     },
-    'workflows': WOKFLOW_DB,
+    'workflows': WORKFLOW_DB,
 }
 
 MONGODB_DATABASES = {

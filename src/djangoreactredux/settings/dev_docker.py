@@ -12,7 +12,7 @@ DATABASES = {
         'HOST': 'postgres',
         'PORT': 5432,
     },
-    'workflows': WOKFLOW_DB,
+    'workflows': WORKFLOW_DB,
 }
 
 MONGODB_DATABASES = {

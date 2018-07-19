@@ -22,7 +22,8 @@ src/static_root/
 # Databases
 *.sqlite
 docker/mongo/data/*
-#src/djangoreactredux/settings/local.py
+# do not commit credentials kept in local.py
+**/local.py
 
 
 # Node modules
