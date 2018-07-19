@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+export TNS_ADMIN=/oracle-admin/
+
 until cd src
 do
     echo "Waiting for django volume..."

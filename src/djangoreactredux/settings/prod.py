@@ -18,13 +18,11 @@ DATABASES = {
         'HOST': 'postgres',
         'PORT': 5432,
     },
-    'servers': {
+    'workflows': {
         'ENGINE': 'django.db.backends.oracle',
-        'NAME': 'xe',
-        'USER': 'a_user',
-        'PASSWORD': 'a_password',
-        'HOST': '',
-        'PORT': '',
+        'NAME': 'dbname',
+        'USER': 'user',
+        'PASSWORD': 'pass',
     },
 }
 

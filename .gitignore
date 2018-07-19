@@ -22,7 +22,7 @@ src/static_root/
 # Databases
 *.sqlite
 docker/mongo/data/*
-docker/oracle/data/*
+#src/djangoreactredux/settings/local.py
 
 
 # Node modules
@@ -48,5 +48,6 @@ shippable/
 # not include scripts because they come from external module
 scripts/
 
-# temporary files (if needed)
+# local files
 tmp/
+oracle-admin/

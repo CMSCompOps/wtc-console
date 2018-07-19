@@ -11,7 +11,7 @@ class ProtectedView extends React.Component {
         data: PropTypes.string,
         token: PropTypes.string.isRequired,
         actions: PropTypes.shape({
-            dataFetchProtectedData: PropTypes.func.isRequired
+            fetchWorkflows: PropTypes.func.isRequired
         }).isRequired
     };
 
@@ -24,10 +24,14 @@ class ProtectedView extends React.Component {
     // Render methods should be a pure function of props and state.
     componentWillMount() {
         const token = this.props.token;
-        this.props.actions.dataFetchProtectedData(token);
+        this.props.actions.fetchWorkflows(token);
     }
 
     render() {
+        const {data} = this.props;
+
+        console.log('received workflows', );
+
         return (
             <div className="protected">
                 <div className="container">

@@ -29,7 +29,8 @@ INSTALLED_APPS = (
     'django_extensions',
 
     'accounts',
-    'base'
+    'base',
+    'workflows',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -116,3 +117,5 @@ REST_KNOX = {
     'AUTH_TOKEN_CHARACTER_LENGTH': 64,
     'USER_SERIALIZER': 'knox.serializers.UserSerializer'
 }
+
+DATABASE_ROUTERS = ['lib.dbrouter.DbRouter']

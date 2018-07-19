@@ -1,14 +1,6 @@
 version: '3'
 
 services:
-    nginx:
-        restart: always
-        image: nginx:1.11.6-alpine
-        ports:
-            - 8000:8000
-        volumes:
-            - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
-            - ./django
     postgres:
         restart: always
         image: postgres:9.5.4
@@ -31,28 +23,3 @@ services:
         environment:
           MONGO_INITDB_ROOT_USERNAME: root
           MONGO_INITDB_ROOT_PASSWORD: root
-    backend:
-        restart: always
-        build:
-            context: .
-            dockerfile: ./docker/django/Dockerfile
-        volumes:
-            - .:/django
-        links:
-            - postgres
-            - mongo
-        entrypoint:
-            - /django-entrypoint.sh
-        expose:
-            - 8000
-    frontend:
-        restart: always
-        build:
-            context: .
-            dockerfile: ./docker/web/Dockerfile
-        volumes:
-            - .:/django
-        links:
-            - backend
-        entrypoint:
-            - /web-entrypoint.sh

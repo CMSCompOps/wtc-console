@@ -1,6 +1,7 @@
 import mongoengine
 
 from djangoreactredux.settings.dev import *  # NOQA (ignore all errors on this line)
+from djangoreactredux.settings.local import *
 
 DATABASES = {
     'default': {
@@ -11,14 +12,7 @@ DATABASES = {
         'HOST': 'postgres',
         'PORT': 5432,
     },
-    # 'servers': {
-    #     'ENGINE': 'django.db.backends.oracle',
-    #     'NAME': 'xe',
-    #     'USER': 'a_user',
-    #     'PASSWORD': 'a_password',
-    #     'HOST': '',
-    #     'PORT': '',
-    # },
+    'workflows': WOKFLOW_DB,
 }
 
 MONGODB_DATABASES = {

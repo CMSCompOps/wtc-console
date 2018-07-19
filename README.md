@@ -186,13 +186,51 @@ Here are some screenshots of the boilerplate project.
 * If you are annoyed by docker creating files belonging to root (which is Docker's intended behaviour), you can run `# chown -hR $(whoami) .` before firing up the server.
 
 
-## Contributing
+## Development setup without docker
 
-We welcome contributions from the community, given that they respect these basic guidelines:
+### Setup and start databases containers (except oracle)
 
-* All Tests & Static Analysis passing;
-* 100% code coverage;
+`docker-compose build`
 
-Prior to any pull-request, we advise to [open an issue](https://github.com/Seedstars/django-react-redux-base/issues). This is because, although we are happy to merge your code, we must make sure the changes don't impact our way of doing things, thus resulting on a declined PR, and your time wasted.
+`docker-compose up`
 
-If you want to tackle any open issue, well..... Just go for it! :)
+### Setup oracle client and tns config (tnsnames.ora)
+
+Install instant oracle client. Then add tns config to path.
+
+Add db credentials to local.py
+
+`export TNS_ADMIN=/path-to-project/oracle-admin/`
+
+### Setup and start backend Django
+
+`pip3 install -r py-requirements/dev.txt`
+
+`cd src`
+
+`python3 manage.py migrate --settings=djangoreactredux.settings.dev_docker`
+
+`python3 manage.py loaddata fixtures.json --settings=djangoreactredux.settings.dev_docker`
+
+`python3 manage.py runserver 0.0.0.0:8000 --settings=djangoreactredux.settings.dev`
+
+### Build and start front-end development server
+
+`yarn`
+
+`npm run dev`
+
+
+## Local startup
+
+`docker-compose up`
+
+`export TNS_ADMIN=/path-to-project/oracle-admin/`
+
+`cd src`
+
+`python3 manage.py runserver 0.0.0.0:8000 --settings=djangoreactredux.settings.dev`
+
+`yarn`
+
+`npm run dev`

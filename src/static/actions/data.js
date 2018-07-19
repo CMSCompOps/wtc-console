@@ -3,29 +3,22 @@ import { push } from 'react-router-redux';
 
 import { SERVER_URL } from '../utils/config';
 import { checkHttpStatus, parseJSON } from '../utils';
-import { DATA_FETCH_PROTECTED_DATA_REQUEST, DATA_RECEIVE_PROTECTED_DATA } from '../constants';
+import { FETCH_WORKFLOWS_REQUEST, FETCH_WORKFLOWS_SUCCESS, FETCH_WORKFLOWS_FAILURE } from '../constants';
 import { authLoginUserFailure } from './auth';
 
 
-export function dataReceiveProtectedData(data) {
-    return {
-        type: DATA_RECEIVE_PROTECTED_DATA,
-        payload: {
-            data
-        }
-    };
+function success(type, payload) {
+    return { type, payload };
 }
 
-export function dataFetchProtectedDataRequest() {
-    return {
-        type: DATA_FETCH_PROTECTED_DATA_REQUEST
-    };
+function request(type) {
+    return { type };
 }
 
-export function dataFetchProtectedData(token) {
+function fetchProtectedData(token, url, requestType, successType) {
     return (dispatch, state) => {
-        dispatch(dataFetchProtectedDataRequest());
-        return fetch(`${SERVER_URL}/api/v1/getdata/`, {
+        dispatch(request(requestType));
+        return fetch(`${SERVER_URL}${url}`, {
             credentials: 'include',
             headers: {
                 Accept: 'application/json',
@@ -35,7 +28,7 @@ export function dataFetchProtectedData(token) {
             .then(checkHttpStatus)
             .then(parseJSON)
             .then((response) => {
-                dispatch(dataReceiveProtectedData(response.data));
+                dispatch(success(successType, response.data));
             })
             .catch((error) => {
                 if (error && typeof error.response !== 'undefined' && error.response.status === 401) {
@@ -56,4 +49,8 @@ export function dataFetchProtectedData(token) {
                 return Promise.resolve(); // TODO: we need a promise here because of the tests, find a better way
             });
     };
+}
+
+export function fetchWorkflows(token) {
+    return fetchProtectedData(token, '/api/v1/workflows/workflow/', FETCH_WORKFLOWS_REQUEST, FETCH_WORKFLOWS_SUCCESS);
 }
