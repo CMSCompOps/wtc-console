@@ -56,3 +56,13 @@ services:
             - backend
         entrypoint:
             - /web-entrypoint.sh
+    rabbitmq:
+        restart: always
+        image: rabbitmq:alpine
+        hostname: "wtc-rabbit"
+        expose:
+            - 5672
+        ports:
+            - 5672:5672
+        volumes:
+          - ./docker/rabbitmq/data:/var/lib/rabbitmq/mnesia

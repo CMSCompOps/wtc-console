@@ -23,3 +23,13 @@ services:
         environment:
           MONGO_INITDB_ROOT_USERNAME: root
           MONGO_INITDB_ROOT_PASSWORD: root
+    rabbitmq:
+        restart: always
+        image: rabbitmq:alpine
+        hostname: "wtc-rabbit"
+        expose:
+            - 5672
+        ports:
+            - 5672:5672
+        volumes:
+          - ./docker/rabbitmq/data:/var/lib/rabbitmq/mnesia

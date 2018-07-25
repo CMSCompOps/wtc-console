@@ -25,6 +25,8 @@ docker/mongo/data/*
 # do not commit credentials kept in local.py
 **/local.py
 
+#RabbitMQ
+docker/rabbitmq/data/*
 
 # Node modules
 node_modules/
@@ -52,3 +54,7 @@ scripts/
 # local files
 tmp/
 oracle-admin/
+
+# Celery
+**/celerybeat-schedule
+**/celery.log

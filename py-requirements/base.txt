@@ -18,6 +18,9 @@ django-rest-framework-mongoengine==3.3.0
 # Oracle
 cx_Oracle==6.4.1
 
+# Celery tasks
+celery==4.2.0
+
 # Sentry
 raven==6.1.0
 
@@ -28,3 +31,4 @@ python-dateutil==2.6.1
 git+https://github.com/Seedstars/django-rest-logger.git
 
 django-rest-knox==3.0.3
+requests==2.18.3

@@ -186,7 +186,7 @@ Here are some screenshots of the boilerplate project.
 * If you are annoyed by docker creating files belonging to root (which is Docker's intended behaviour), you can run `# chown -hR $(whoami) .` before firing up the server.
 
 
-## Development setup without docker
+## Development setup
 
 ### Setup and start databases containers (except oracle)
 
@@ -227,10 +227,9 @@ Add db credentials to local.py
 
 `export TNS_ADMIN=/path-to-project/oracle-admin/`
 
+`npm run dev`
+
 `cd src`
 
-`python3 manage.py runserver 0.0.0.0:8000 --settings=djangoreactredux.settings.dev`
+`bin/start_dev.sh`
 
-`yarn`
-
-`npm run dev`
