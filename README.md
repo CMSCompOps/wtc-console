@@ -231,5 +231,10 @@ Add db credentials to local.py
 
 `cd src`
 
-`bin/start_dev.sh`
+`./bin/start_dev.sh`
+
+
+## To stop celery workers use
+
+`./bin/stop_dev.sh`
 

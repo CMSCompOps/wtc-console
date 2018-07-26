@@ -9,6 +9,7 @@
 # Random files
 *~
 \#*
+*.pid
 
 virtualenv/
 venv/
