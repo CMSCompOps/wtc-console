@@ -18,7 +18,7 @@ DATABASES = {
         'HOST': 'postgres',
         'PORT': 5432,
     },
-    'workflows': {
+    'unified': {
         'ENGINE': 'django.db.backends.oracle',
         'NAME': 'dbname',
         'USER': 'user',

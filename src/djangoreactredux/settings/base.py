@@ -30,6 +30,7 @@ INSTALLED_APPS = (
 
     'accounts',
     'base',
+    'unified',
     'workflows',
 )
 

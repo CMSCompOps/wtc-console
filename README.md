@@ -208,7 +208,7 @@ Add db credentials to local.py
 
 `cd src`
 
-`python3 manage.py migrate --settings=djangoreactredux.settings.dev_docker`
+`python3 manage.py migrate --settings=djangoreactredux.settings.dev`
 
 `python3 manage.py loaddata fixtures.json --settings=djangoreactredux.settings.dev_docker`
 
@@ -237,4 +237,10 @@ Add db credentials to local.py
 ## To stop celery workers use
 
 `./bin/stop_dev.sh`
+
+
+## Django migrations
+
+After changing models create database migrations with:
+`python3 manage.py makemigrations workflows`
 

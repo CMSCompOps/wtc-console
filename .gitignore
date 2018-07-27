@@ -54,8 +54,11 @@ scripts/
 
 # local files
 tmp/
-oracle-admin/
+oracle-admin/*
 
 # Celery
 **/celerybeat-schedule
 **/celery.log
+
+# Certificates
+cert/*

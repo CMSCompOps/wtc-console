@@ -1,8 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 import os
 from celery import Celery
-from celery.schedules import crontab
-from django.conf import settings
 
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'djangoreactredux.settings.dev')
@@ -19,12 +17,16 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks()
 
 app.conf.beat_schedule = {
-    'printout-task': {
-        'task': 'workflows.tasks.printout',
-        'args': ('hell yes',),
-        'schedule': 5.0,
+    'fetch-new-workflows-from-unified-task': {
+        'task': 'workflows.tasks.fetch_new_workflows_from_unified',
+        'schedule': 600.0, # every minute
+    },
+    'update-workflows-from-request-manager-task': {
+        'task': 'workflows.tasks.update_workflows_from_request_manager',
+        'schedule': 600.0, # every 10 minutes
     },
 }
+
 app.conf.timezone = 'UTC'
 
 

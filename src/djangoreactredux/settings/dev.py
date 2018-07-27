@@ -17,7 +17,7 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': 5433,
     },
-    'workflows': WORKFLOW_DB,
+    'unified': UNIFIED_DB,
 }
 
 MONGODB_DATABASES = {
