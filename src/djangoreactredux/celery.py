@@ -19,11 +19,11 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     'fetch-new-workflows-from-unified-task': {
         'task': 'workflows.tasks.fetch_new_workflows_from_unified',
-        'schedule': 600.0, # every minute
+        'schedule': 1 * 60.0, # every minute
     },
     'update-workflows-from-request-manager-task': {
         'task': 'workflows.tasks.update_workflows_from_request_manager',
-        'schedule': 600.0, # every 10 minutes
+        'schedule': 10 * 60.0, # every 10 minutes
     },
 }
 
