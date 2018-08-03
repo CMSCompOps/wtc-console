@@ -1,8 +1,8 @@
 import React from 'react';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
 import classNames from 'classnames';
-import { push } from 'react-router-redux';
+import {push} from 'react-router-redux';
 import t from 'tcomb-form';
 import PropTypes from 'prop-types';
 
@@ -47,36 +47,29 @@ class LoginView extends React.Component {
     constructor(props) {
         super(props);
 
-        const redirectRoute = this.props.location ? this.extractRedirect(this.props.location.search) || '/' : '/';
         this.state = {
             formValues: {
                 email: '',
                 password: ''
             },
-            redirectTo: redirectRoute
         };
     }
 
     componentWillMount() {
         if (this.props.isAuthenticated) {
-            this.props.dispatch(push('/'));
+            this.props.dispatch(push('/workflows'));
         }
     }
 
     onFormChange = (value) => {
-        this.setState({ formValues: value });
-    };
-
-    extractRedirect = (string) => {
-        const match = string.match(/next=(.*)/);
-        return match ? match[1] : '/';
+        this.setState({formValues: value});
     };
 
     login = (e) => {
         e.preventDefault();
         const value = this.loginForm.getValue();
         if (value) {
-            this.props.actions.authLoginUser(value.email, value.password, this.state.redirectTo);
+            this.props.actions.authLoginUser(value.email, value.password);
         }
     };
 
@@ -106,15 +99,17 @@ class LoginView extends React.Component {
                 <div className="login-container margin-top-medium">
                     {statusText}
                     <form onSubmit={this.login}>
-                        <Form ref={(ref) => { this.loginForm = ref; }}
-                            type={Login}
-                            options={LoginFormOptions}
-                            value={this.state.formValues}
-                            onChange={this.onFormChange}
+                        <Form ref={(ref) => {
+                            this.loginForm = ref;
+                        }}
+                              type={Login}
+                              options={LoginFormOptions}
+                              value={this.state.formValues}
+                              onChange={this.onFormChange}
                         />
                         <button disabled={this.props.isAuthenticating}
-                            type="submit"
-                            className="btn btn-default btn-block"
+                                type="submit"
+                                className="btn btn-default btn-block"
                         >
                             Submit
                         </button>
@@ -141,4 +136,4 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(LoginView);
-export { LoginView as LoginViewNotConnected };
+export {LoginView as LoginViewNotConnected};

@@ -29,23 +29,16 @@ class App extends React.Component {
         this.props.dispatch(push('/'));
     };
 
-    goToLogin = () => {
-        this.props.dispatch(push('/login'));
-    };
-
-    goToProtected = () => {
-        this.props.dispatch(push('/protected'));
+    goToWorkflows = () => {
+        this.props.dispatch(push('/workflows'));
     };
 
     render() {
         const homeClass = classNames({
             active: this.props.location && this.props.location.pathname === '/'
         });
-        const protectedClass = classNames({
-            active: this.props.location && this.props.location.pathname === '/protected'
-        });
-        const loginClass = classNames({
-            active: this.props.location && this.props.location.pathname === '/login'
+        const workflowsClass = classNames({
+            active: this.props.location && this.props.location.pathname === '/workflows'
         });
 
         return (
@@ -65,20 +58,15 @@ class App extends React.Component {
                                 <span className="icon-bar" />
                             </button>
                             <a className="navbar-brand" onClick={this.goToIndex}>
-                                Django React Redux Demo
+                                WTC Console
                             </a>
                         </div>
                         <div className="collapse navbar-collapse" id="top-navbar">
                             {this.props.isAuthenticated ?
                                 <ul className="nav navbar-nav navbar-right">
-                                    <li className={homeClass}>
-                                        <a className="js-go-to-index-button" onClick={this.goToIndex}>
-                                            <i className="fa fa-home" /> Home
-                                        </a>
-                                    </li>
-                                    <li className={protectedClass}>
-                                        <a className="js-go-to-protected-button" onClick={this.goToProtected}>
-                                            <i className="fa fa-lock" /> Protected
+                                    <li className={workflowsClass}>
+                                        <a className="js-go-to-protected-button" onClick={this.goToWorkflows}>
+                                            <i className="fa fa-lock" /> Workflows
                                         </a>
                                     </li>
                                     <li>
@@ -90,12 +78,7 @@ class App extends React.Component {
                                 :
                                 <ul className="nav navbar-nav navbar-right">
                                     <li className={homeClass}>
-                                        <a className="js-go-to-index-button" onClick={this.goToIndex}>
-                                            <i className="fa fa-home" /> Home
-                                        </a>
-                                    </li>
-                                    <li className={loginClass}>
-                                        <a className="js-login-button" onClick={this.goToLogin}>
+                                        <a className="js-login-button" onClick={this.goToIndex}>
                                             <i className="fa fa-home" /> Login
                                         </a>
                                     </li>

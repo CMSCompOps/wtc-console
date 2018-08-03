@@ -1,4 +1,3 @@
-export HomeView from './Home/index';
 export LoginView from './Login/index';
-export ProtectedView from './Protected/index';
+export WorkflowsView from './Workflows/index';
 export NotFoundView from './NotFound/index';

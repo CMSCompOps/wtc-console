@@ -50,12 +50,12 @@ export function authLogout() {
 export function authLogoutAndRedirect() {
     return (dispatch, state) => {
         dispatch(authLogout());
-        dispatch(push('/login'));
+        dispatch(push('/'));
         return Promise.resolve(); // TODO: we need a promise here because of the tests, find a better way
     };
 }
 
-export function authLoginUser(email, password, redirect = '/') {
+export function authLoginUser(email, password, redirect = '/workflows') {
     return (dispatch) => {
         dispatch(authLoginUserRequest());
         const auth = btoa(`${email}:${password}`);
