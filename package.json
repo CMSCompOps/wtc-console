@@ -67,6 +67,7 @@
     "resolve-url-loader": "2.1.0",
     "sass-loader": "6.0.6",
     "style-loader": "0.18.2",
+    "styled-components": "^3.4.0",
     "tcomb-form": "0.9.17",
     "url-loader": "0.5.9",
     "webpack": "3.5.5",

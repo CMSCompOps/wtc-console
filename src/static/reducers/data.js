@@ -9,6 +9,7 @@ const initialState = {
 };
 
 export default function dataReducer(state = initialState, action) {
+    console.log('action in reducer', action);
     switch (action.type) {
         case FETCH_WORKFLOWS_REQUEST:
             return {...state,
@@ -16,7 +17,7 @@ export default function dataReducer(state = initialState, action) {
             };
         case FETCH_WORKFLOWS_SUCCESS:
             return {...state,
-                data: action.payload.data,
+                data: action.payload,
                 isFetching: false,
             };
 
