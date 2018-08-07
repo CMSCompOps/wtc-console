@@ -1,4 +1,3 @@
-import datetime
 from django.db import models
 
 
@@ -19,7 +18,7 @@ class Site(models.Model):
 
 
 class WorkflowSiteStatus(models.Model):
-    workflow = models.ForeignKey(Workflow, on_delete=models.CASCADE, null=True)
+    workflow = models.ForeignKey(Workflow, related_name='statuses', on_delete=models.CASCADE, null=True)
     site = models.ForeignKey(Site, on_delete=models.CASCADE, null=True)
     site_workflow_name = models.CharField(max_length=400, null=True)
     success_count = models.IntegerField(default=0)

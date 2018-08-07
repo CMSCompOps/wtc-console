@@ -66,7 +66,7 @@ class App extends React.Component {
                                 <ul className="nav navbar-nav navbar-right">
                                     <li className={workflowsClass}>
                                         <a className="js-go-to-protected-button" onClick={this.goToWorkflows}>
-                                            <i className="fa fa-lock" /> Workflows
+                                            Workflows
                                         </a>
                                     </li>
                                     <li>

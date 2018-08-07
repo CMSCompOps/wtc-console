@@ -1,10 +1,12 @@
 import { combineReducers } from 'redux';
 import { routerReducer } from 'react-router-redux';
 import authReducer from './auth';
-import dataReducer from './data';
+import workflowsReducer from './workflows';
+import workflowReducer from './workflow';
 
 export default combineReducers({
     auth: authReducer,
-    data: dataReducer,
+    workflow: workflowReducer,
+    workflows: workflowsReducer,
     routing: routerReducer
 });

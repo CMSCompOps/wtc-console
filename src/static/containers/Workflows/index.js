@@ -5,27 +5,28 @@ import PropTypes from 'prop-types';
 
 import * as actionCreators from '../../actions/data';
 import getListDataType from '../../types/ListData';
-import WorkflowType from '../../types/Workflow';
-import DataTable from '../../components/DataTable';
+import WorkflowsType from '../../types/Workflows';
+import PagedDataTable from '../../components/PagedDataTable';
 import {getReadableTimestamp} from '../../utils/dates';
 
 class WorkflowsView extends React.Component {
+
     static propTypes = {
         isFetching: PropTypes.bool.isRequired,
-        data: getListDataType(WorkflowType),
+        data: getListDataType(WorkflowsType),
         token: PropTypes.string.isRequired,
         actions: PropTypes.shape({
             fetchWorkflows: PropTypes.func.isRequired,
-        }).isRequired
+        }).isRequired,
     };
 
     static defaultProps = {
-        data: '',
+        data: null,
     };
 
     componentWillMount() {
         const {token} = this.props;
-        this.props.actions.fetchWorkflows(token, 2, 20);
+        this.props.actions.fetchWorkflows(token, 1, 20);
     }
 
     onChangePage = (page) => {
@@ -36,15 +37,13 @@ class WorkflowsView extends React.Component {
     render() {
         const {isFetching, data} = this.props;
 
-        console.log('received workflows',);
-
         return (
             <div className="protected">
                 <div className="container">
                     <h1 className="text-center margin-bottom-medium">Workflows</h1>
                     {isFetching || !data
                         ? <p className="text-center">Loading data...</p>
-                        : <DataTable
+                        : <PagedDataTable
                             data={data}
                             columns={[
                                 {key: 'name', title: 'Workflow', width: '45%'},
@@ -63,8 +62,8 @@ class WorkflowsView extends React.Component {
 
 const mapStateToProps = (state) => {
     return {
-        data: state.data.data,
-        isFetching: state.data.isFetching
+        data: state.workflows.data,
+        isFetching: state.workflows.isFetching
     };
 };
 

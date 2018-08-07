@@ -8,8 +8,7 @@ const initialState = {
     isFetching: false
 };
 
-export default function dataReducer(state = initialState, action) {
-    console.log('action in reducer', action);
+export default function workflowsReducer(state = initialState, action) {
     switch (action.type) {
         case FETCH_WORKFLOWS_REQUEST:
             return {...state,

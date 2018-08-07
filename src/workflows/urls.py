@@ -1,8 +1,6 @@
-from django.conf.urls import url
-from django.utils.translation import ugettext_lazy as _
+from rest_framework.routers import DefaultRouter
+from workflows.views import WorkflowsViewSet
 
-import workflows.views
-
-urlpatterns = [
-    url(_(r'^workflow/$'), workflows.views.WorkflowView.as_view(), name='workflow'),
-]
+router = DefaultRouter()
+router.register(r'workflows', WorkflowsViewSet, base_name='workflow')
+urlpatterns = router.urls
