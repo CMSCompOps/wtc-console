@@ -15,7 +15,15 @@ class WorkflowsViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_field = 'name'
 
     def list(self, request, *args, **kwargs):
-        workflows = Workflow.objects.all().order_by('-updated')
+        order_key = self.request.query_params.get('order_key', None)
+        order_desc = self.request.query_params.get('order_desc', None)
+
+        order_by = '-updated'
+        if order_key:
+            order_by = '-' if order_desc == 'true' else ''
+            order_by += order_key.replace('.', '__')
+
+        workflows = Workflow.objects.all().order_by(order_by)
 
         page = self.paginate_queryset(workflows)
         if page is not None:

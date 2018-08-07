@@ -10,6 +10,7 @@ import WorkflowsType from '../../types/Workflows';
 import PagedDataTable from '../../components/PagedDataTable';
 import {getReadableTimestamp} from '../../utils/dates';
 
+const DEFAULT_PAGE_SIZE = 20;
 class WorkflowsView extends React.Component {
 
     static propTypes = {
@@ -26,10 +27,30 @@ class WorkflowsView extends React.Component {
         data: null,
     };
 
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            sortedBy: null,
+            desc: false,
+        };
+    }
+
     componentWillMount() {
         const {token} = this.props;
-        this.props.actions.fetchWorkflows(token, 1, 20);
+        this.props.actions.fetchWorkflows(token, 1, DEFAULT_PAGE_SIZE);
     }
+
+    sortData = (key, desc) => {
+        const {token} = this.props;
+        this.props.actions.fetchWorkflows(token, 1, DEFAULT_PAGE_SIZE, key, desc);
+
+        this.setState({
+            ...this.state,
+            sortedBy: key,
+            desc: desc,
+        });
+    };
 
     goToDetails = (id) => {
         this.props.history.push(`/workflows/${id}`);
@@ -37,11 +58,12 @@ class WorkflowsView extends React.Component {
 
     onChangePage = (page) => {
         const {token} = this.props;
-        this.props.actions.fetchWorkflows(token, page, 20);
+        this.props.actions.fetchWorkflows(token, page, DEFAULT_PAGE_SIZE);
     };
 
     render() {
         const {isFetching, data} = this.props;
+        const {sortedBy, desc} = this.state;
 
         return (
             <div className="protected">
@@ -60,6 +82,9 @@ class WorkflowsView extends React.Component {
                             onChangePage={this.onChangePage}
                             idColumn={'name'}
                             onClickFn={this.goToDetails}
+                            sortFn={this.sortData}
+                            sortedBy={sortedBy}
+                            desc={desc}
                         />
                     }
                 </div>

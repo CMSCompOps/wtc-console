@@ -7,10 +7,10 @@ import {
 import {fetchProtectedData} from './api'
 
 
-export function fetchWorkflows(token, page, size) {
+export function fetchWorkflows(token, page, size, orderBy, orderDesc) {
     return fetchProtectedData(
         token,
-        `/api/v1/workflows/workflows/?page=${page || 1}&page_size=${size || 20}`,
+        `/api/v1/workflows/workflows/?page=${page || 1}&page_size=${size || 20}&order_key=${orderBy || ''}&order_desc=${!!orderDesc}`,
         FETCH_WORKFLOWS_REQUEST,
         FETCH_WORKFLOWS_SUCCESS,
     );
