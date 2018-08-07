@@ -18,11 +18,12 @@ const HeaderCell = styled.th`
     border: 1px solid white;
     width: ${props => props.width || 'auto'};
     vertical-align: middle;
+    cursor: ${props => props.isLink ? 'pointer' : 'auto'};
 `;
 
 const Row = styled.tr`
     background: #c6e3df;
-    cursor: pointer;
+    cursor: ${props => props.isLink ? 'pointer' : 'auto'};
     height: 20px;
 
     &:hover {
@@ -38,6 +39,11 @@ const Cell = styled.td`
     vertical-align: middle;
 `;
 
+const SortIcon = styled.i`
+    font-size: 10px;
+    padding-left: 3px;
+`;
+
 export default class DataTable extends React.Component {
     static propTypes = {
         data: PropTypes.array.isRequired,
@@ -47,6 +53,11 @@ export default class DataTable extends React.Component {
             width: PropTypes.string,
             transformFn: PropTypes.func,
         })).isRequired,
+        idColumn: PropTypes.string,
+        onClickFn: PropTypes.func,
+        sortFn: PropTypes.func,
+        sortedBy: PropTypes.string,
+        desc: PropTypes.bool,
     };
 
     getCellValue = (col, row) => {
@@ -57,14 +68,30 @@ export default class DataTable extends React.Component {
             : val;
     };
 
+    renderSortIcon = (desc) => {
+        return (
+            desc
+                ? <SortIcon className="fa fa-chevron-down"/>
+                : <SortIcon className="fa fa-chevron-up"/>
+        )
+    };
+
     renderHeader = () => {
-        const {columns} = this.props;
+        const {columns, sortFn, sortedBy, desc} = this.props;
 
         return (
             <thead>
             <HeaderRow>
                 {columns.map((col, idx) =>
-                    <HeaderCell key={idx} width={col.width}>{col.title}</HeaderCell>
+                    <HeaderCell
+                        key={idx}
+                        width={col.width}
+                        isLink={!!sortFn}
+                        onClick={() => !!sortFn && sortFn(col.key, !desc)}
+                    >
+                        {col.title}
+                        {sortedBy === col.key && this.renderSortIcon(desc)}
+                    </HeaderCell>
                 )}
             </HeaderRow>
             </thead>
@@ -72,14 +99,18 @@ export default class DataTable extends React.Component {
     };
 
     render() {
-        const {columns, data} = this.props;
+        const {columns, data, idColumn, onClickFn} = this.props;
 
         return (
             <Table>
                 {this.renderHeader()}
                 <tbody>
                 {data.map((row, idx) =>
-                    <Row key={`row_${idx}`}>
+                    <Row
+                        key={`row_${idx}`}
+                        isLink={!!onClickFn}
+                        onClick={() => !!onClickFn && onClickFn(_.get(row, idColumn))}
+                    >
                         {columns.map(col =>
                             <Cell key={`cell_${idx}_${col.key}`}>{this.getCellValue(col, row)}</Cell>
                         )}

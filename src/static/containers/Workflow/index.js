@@ -3,12 +3,13 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { withRouter } from 'react-router';
+import {withRouter} from 'react-router';
 
 import WorkflowType from '../../types/Workflow';
 import * as actionCreators from '../../actions/data';
 import {getReadableTimestamp} from '../../utils/dates';
 import DataTable from '../../components/DataTable';
+import {sortItems} from '../../utils/sort';
 
 
 const Details = styled.div`
@@ -54,14 +55,39 @@ class WorkflowView extends React.Component {
         data: null,
     };
 
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            sortedBy: null,
+            desc: false,
+        };
+    }
+
     componentWillMount() {
         const {token, match} = this.props;
         console.log('Match:', match);
         this.props.actions.fetchWorkflow(token, match.params.id);
     }
 
+    sortData = (key, desc) => {
+        this.setState({
+            ...this.state,
+            sortedBy: key,
+            desc: desc,
+        });
+    };
+
+    getSortedStatuses = () => {
+        const {data} = this.props;
+        const {sortedBy, desc} = this.state;
+
+        return sortItems(data.statuses, sortedBy, desc);
+    };
+
     render() {
         const {isFetching, data} = this.props;
+        const {sortedBy, desc} = this.state;
 
         return (
             <div className="protected">
@@ -93,13 +119,16 @@ class WorkflowView extends React.Component {
                                 </Field>
                             </Fields>
                             <DataTable
-                                data={data.statuses}
+                                data={this.getSortedStatuses()}
                                 columns={[
                                     {key: 'site', title: 'Site'},
-                                    {key: 'success_count', title: 'Completed', width: '100px'},
-                                    {key: 'failed_count', title: 'Failed', width: '100px'},
+                                    {key: 'success_count', title: 'Completed', width: '110px'},
+                                    {key: 'failed_count', title: 'Failed', width: '110px'},
                                 ]}
                                 onChangePage={this.onChangePage}
+                                sortFn={this.sortData}
+                                sortedBy={sortedBy}
+                                desc={desc}
                             />
                         </Details>
                     }

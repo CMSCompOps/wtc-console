@@ -38,6 +38,8 @@ export default class PagedDataTable extends React.Component {
             transformFn: PropTypes.func,
         })).isRequired,
         onChangePage: PropTypes.func,
+        idColumn: PropTypes.string,
+        onClickFn: PropTypes.func,
     };
 
     renderPager = () => {
@@ -60,10 +62,15 @@ export default class PagedDataTable extends React.Component {
     };
 
     render() {
-        const {columns, data} = this.props;
+        const {columns, data, idColumn, onClickFn} = this.props;
         return (
             <Wrapper>
-                <DataTable data={data.results} columns={columns}/>
+                <DataTable
+                    data={data.results}
+                    columns={columns}
+                    idColumn={idColumn}
+                    onClickFn={onClickFn}
+                />
                 {this.renderPager()}
             </Wrapper>
         );

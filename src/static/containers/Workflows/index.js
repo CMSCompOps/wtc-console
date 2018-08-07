@@ -2,6 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
+import { withRouter } from 'react-router';
 
 import * as actionCreators from '../../actions/data';
 import getListDataType from '../../types/ListData';
@@ -18,6 +19,7 @@ class WorkflowsView extends React.Component {
         actions: PropTypes.shape({
             fetchWorkflows: PropTypes.func.isRequired,
         }).isRequired,
+        history: PropTypes.object.isRequired,
     };
 
     static defaultProps = {
@@ -28,6 +30,10 @@ class WorkflowsView extends React.Component {
         const {token} = this.props;
         this.props.actions.fetchWorkflows(token, 1, 20);
     }
+
+    goToDetails = (id) => {
+        this.props.history.push(`/workflows/${id}`);
+    };
 
     onChangePage = (page) => {
         const {token} = this.props;
@@ -52,6 +58,8 @@ class WorkflowsView extends React.Component {
                                 {key: 'updated', title: 'Last updated', width: '150px', transformFn: getReadableTimestamp},
                             ]}
                             onChangePage={this.onChangePage}
+                            idColumn={'name'}
+                            onClickFn={this.goToDetails}
                         />
                     }
                 </div>
@@ -73,5 +81,5 @@ const mapDispatchToProps = (dispatch) => {
     };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WorkflowsView);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(WorkflowsView));
 export {WorkflowsView as WorkflowsViewNotConnected};
