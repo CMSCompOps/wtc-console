@@ -27,7 +27,6 @@ const Input = styled.input`
     border: 1px solid #828282;
     font-size: 14px;
     padding: 3px 6px;
-    margin-right: 5px;
     height: 24px;
 `;
 
@@ -37,6 +36,7 @@ const Button = styled.button`
     background-color: #e7e7e7;
     font-size: 14px;
     padding: 4px 5px;
+    margin-left: 5px;
     height: 24px;
 `;
 
@@ -106,6 +106,14 @@ class WorkflowsView extends React.Component {
         e.preventDefault();
     };
 
+    clear = () => {
+        this.setState({
+            ...this.state,
+            page: 1,
+            filter: '',
+        }, this.updateLocationAndFetchData);
+    };
+
     sortData = (sortedBy, desc) => {
         this.setState({
             ...this.state,
@@ -140,6 +148,7 @@ class WorkflowsView extends React.Component {
                             value={filter}
                             onChange={e => this.setState({...this.state, filter: e.target.value})}/>
                         <Button type={'submit'}>Search</Button>
+                        <Button onClick={this.clear}>Clear</Button>
                     </Filter>
                     {isFetching || !data
                         ? <p className="text-center">Loading data...</p>
