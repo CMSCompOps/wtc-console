@@ -38,6 +38,15 @@ const Value = styled.p`
     font-size: 14px;
 `;
 
+const BackIcon = styled.i`
+    position: absolute;
+    display: block;
+    float: left;
+    font-size: 24px;
+    padding: 12px;
+    cursor: pointer;
+`;
+
 class WorkflowView extends React.Component {
 
     static propTypes = {
@@ -85,6 +94,10 @@ class WorkflowView extends React.Component {
         return sortItems(data.statuses, sortedBy, desc);
     };
 
+    goBack = () => {
+        this.props.history.goBack();
+    };
+
     render() {
         const {isFetching, data} = this.props;
         const {sortedBy, desc} = this.state;
@@ -92,7 +105,10 @@ class WorkflowView extends React.Component {
         return (
             <div className="protected">
                 <div className="container">
-                    <h1 className="text-center margin-bottom-medium">Workflow</h1>
+                    <h1 className="text-center margin-bottom-medium">
+                        <BackIcon className="fa fa-chevron-left" onClick={this.goBack}/>
+                        Workflow
+                    </h1>
                     {isFetching || !data
                         ? <p className="text-center">Loading data...</p>
                         : <Details>
@@ -101,14 +117,14 @@ class WorkflowView extends React.Component {
                                     <Title>Name:</Title>
                                     <Value>{data.name}</Value>
                                 </Field>
-                                <Field>
+                                {data.prep && <Field>
                                     <Title>Prep:</Title>
                                     <Value>{data.prep.name}</Value>
-                                </Field>
-                                <Field>
+                                </Field>}
+                                {data.prep && <Field>
                                     <Title>Campaign:</Title>
                                     <Value>{data.prep.campaign}</Value>
-                                </Field>
+                                </Field>}
                                 <Field>
                                     <Title>Created:</Title>
                                     <Value>{getReadableTimestamp(data.created)}</Value>

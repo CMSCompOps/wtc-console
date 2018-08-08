@@ -2,6 +2,7 @@ from rest_framework import viewsets, mixins
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from knox.auth import TokenAuthentication
+from django.db.models import Q
 
 from workflows.models import Prep, Site, Workflow, WorkflowSiteStatus
 from workflows.serializers import WorkflowSerializer, WorkflowDetailsSerializer
@@ -15,6 +16,7 @@ class WorkflowsViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_field = 'name'
 
     def list(self, request, *args, **kwargs):
+        filter = self.request.query_params.get('filter', None)
         order_key = self.request.query_params.get('order_key', None)
         order_desc = self.request.query_params.get('order_desc', None)
 
@@ -24,6 +26,13 @@ class WorkflowsViewSet(viewsets.ReadOnlyModelViewSet):
             order_by += order_key.replace('.', '__')
 
         workflows = Workflow.objects.all().order_by(order_by)
+
+        if filter:
+            workflows = workflows.filter(
+                Q(name__icontains=filter) |
+                Q(prep__name__icontains=filter) |
+                Q(prep__campaign__icontains=filter)
+            )
 
         page = self.paginate_queryset(workflows)
         if page is not None:
