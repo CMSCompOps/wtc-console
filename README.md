@@ -146,37 +146,6 @@ Backend (django/python tests)
 
 Please take into account that test_local_backend.sh runs py.test with `--nomigrations --reuse-db` flags to allow it be performant. Any time you add a migration please remove those flags next time you run the script.
 
-### Static analysis
-
-
-Frontend (javascript static analysis)
-
-* `$ ./scripts/static_validate_frontend.sh`
-
-Backend (django/python static analysis)
-
-* `$ ./scripts/static_validate_backend.sh`
-
-## Deployment in Production
-
-We deploy all our production code using Kubernetes. Explaining how to do deployments is beyond the scope of this boilerplate. 
-
-Here's a great article from digital ocean on how to deploy django project in a VM: https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-16-04 
-
-
-
-## Screenshots
-
-Here are some screenshots of the boilerplate project.
-
-![Screenshot01][1]  
-
-[1]: ./screenshots/screenshot_01.png
-
-![Screenshot02][2]  
-
-[2]: ./screenshots/screenshot_02.png
-
 
 ## Gotchas in Docker
 
@@ -243,4 +212,21 @@ Add db credentials to local.py
 
 After changing models create database migrations with:
 `python3 manage.py makemigrations workflows`
+
+
+## Production setup
+
+Requirements:
+- Python 3.7
+- PostgreSQL
+- Oracle client
+
+Create prod.py in `src/djangoreactredux/settings/` directory by using _prod_template.py_ settings template file and update the fields with prod values.
+
+
+## Production deployment
+
+Run:
+
+`./src/bin/deploy_prod.sh`
 
