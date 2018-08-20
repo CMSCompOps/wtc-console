@@ -7,7 +7,7 @@ import qs from 'query-string';
 
 import * as actionCreators from '../../actions/data';
 import getListDataType from '../../types/ListData';
-import WorkflowsType from '../../types/Workflows';
+import PrepType from '../../types/Prep';
 import PagedDataTable from '../../components/PagedDataTable';
 import {getReadableTimestamp} from '../../utils/dates';
 import {getUrlParamsString} from '../../utils/url';
@@ -15,16 +15,16 @@ import Filter from '../../components/Filter';
 
 
 const DEFAULT_PAGE_SIZE = 20;
-const PATH = '/workflows';
+const PATH = '/preps';
 
-class WorkflowsView extends React.Component {
+class PrepsView extends React.Component {
 
     static propTypes = {
         isFetching: PropTypes.bool.isRequired,
-        data: getListDataType(WorkflowsType),
+        data: getListDataType(PrepType),
         token: PropTypes.string.isRequired,
         actions: PropTypes.shape({
-            fetchWorkflows: PropTypes.func.isRequired,
+            fetchPreps: PropTypes.func.isRequired,
         }).isRequired,
         history: PropTypes.object.isRequired,
         location: PropTypes.object.isRequired,
@@ -54,7 +54,7 @@ class WorkflowsView extends React.Component {
     fetchData = () => {
         const {token} = this.props;
         const {page, filter, sortedBy, desc} = this.state;
-        this.props.actions.fetchWorkflows(token, page, DEFAULT_PAGE_SIZE, filter, sortedBy, desc);
+        this.props.actions.fetchPreps(token, page, DEFAULT_PAGE_SIZE, filter, sortedBy, desc);
     };
 
     updateLocation = () => {
@@ -99,7 +99,7 @@ class WorkflowsView extends React.Component {
     };
 
     goToDetails = (id) => {
-        this.props.history.push(`/workflows/${id}`);
+        this.props.history.push(`/preps/${id}`);
     };
 
     render() {
@@ -109,16 +109,17 @@ class WorkflowsView extends React.Component {
         return (
             <div className="protected">
                 <div className="container">
-                    <h1 className="text-center margin-bottom-medium">Workflows</h1>
+                    <h1 className="text-center margin-bottom-medium">Preps</h1>
+
                     <Filter onFilter={this.filter} initialValue={filter}/>
+
                     {isFetching || !data
                         ? <p className="text-center">Loading data...</p>
                         : <PagedDataTable
                             data={data}
                             columns={[
-                                {key: 'name', title: 'Workflow', width: '45%'},
-                                {key: 'prep.name', title: 'Prep'},
-                                {key: 'prep.campaign', title: 'Campaign'},
+                                {key: 'name', title: 'Prep'},
+                                {key: 'campaign', title: 'Campaign'},
                                 {
                                     key: 'updated',
                                     title: 'Last updated',
@@ -142,8 +143,8 @@ class WorkflowsView extends React.Component {
 
 const mapStateToProps = (state) => {
     return {
-        data: state.workflows.data,
-        isFetching: state.workflows.isFetching
+        data: state.preps.data,
+        isFetching: state.preps.isFetching
     };
 };
 
@@ -153,5 +154,5 @@ const mapDispatchToProps = (dispatch) => {
     };
 };
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(WorkflowsView));
-export {WorkflowsView as WorkflowsViewNotConnected};
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(PrepsView));
+export {PrepsView as PrepsViewNotConnected};

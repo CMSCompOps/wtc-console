@@ -35,3 +35,17 @@ class WorkflowDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Workflow
         fields = ['name', 'prep', 'created', 'updated', 'statuses']
+
+
+class WorkflowListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Workflow
+        fields = ['name', 'created', 'updated']
+
+
+class PrepDetailsSerializer(serializers.ModelSerializer):
+    workflows = WorkflowListSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Prep
+        fields = ['name', 'campaign', 'created', 'updated', 'workflows']

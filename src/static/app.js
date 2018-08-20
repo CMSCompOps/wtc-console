@@ -29,6 +29,10 @@ class App extends React.Component {
         this.props.dispatch(push('/'));
     };
 
+    goToPreps = () => {
+        this.props.dispatch(push('/preps'));
+    };
+
     goToWorkflows = () => {
         this.props.dispatch(push('/workflows'));
     };
@@ -39,6 +43,9 @@ class App extends React.Component {
         });
         const workflowsClass = classNames({
             active: this.props.location && this.props.location.pathname === '/workflows'
+        });
+        const prepsClass = classNames({
+            active: this.props.location && this.props.location.pathname === '/preps'
         });
 
         return (
@@ -65,6 +72,11 @@ class App extends React.Component {
                         <div className="collapse navbar-collapse" id="top-navbar">
                             {this.props.isAuthenticated ?
                                 <ul className="nav navbar-nav navbar-right">
+                                    <li className={prepsClass}>
+                                        <a className="js-go-to-protected-button" onClick={this.goToPreps}>
+                                            Preps
+                                        </a>
+                                    </li>
                                     <li className={workflowsClass}>
                                         <a className="js-go-to-protected-button" onClick={this.goToWorkflows}>
                                             Workflows

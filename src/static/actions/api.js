@@ -27,7 +27,6 @@ export function fetchProtectedData(token, url, requestType, successType) {
             .then(checkHttpStatus)
             .then(parseJSON)
             .then(response => {
-                console.log('Response after parsing');
                 dispatch(success(successType, response));
             })
             .catch((error) => {

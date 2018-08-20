@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import {withRouter} from 'react-router';
 
-import WorkflowType from '../../types/Workflow';
+import PrepDetailsType from '../../types/PrepDetails';
 import * as actionCreators from '../../actions/data';
 import {getReadableTimestamp} from '../../utils/dates';
 import DataTable from '../../components/DataTable';
@@ -39,16 +39,17 @@ const Value = styled.p`
     font-size: 14px;
 `;
 
-class WorkflowView extends React.Component {
+class PrepView extends React.Component {
 
     static propTypes = {
         isFetching: PropTypes.bool.isRequired,
-        data: WorkflowType,
+        data: PrepDetailsType,
         token: PropTypes.string.isRequired,
         actions: PropTypes.shape({
-            fetchWorkflow: PropTypes.func.isRequired,
+            fetchPrep: PropTypes.func.isRequired,
         }).isRequired,
         match: PropTypes.object.isRequired,
+        history: PropTypes.object.isRequired,
     };
 
     static defaultProps = {
@@ -66,7 +67,7 @@ class WorkflowView extends React.Component {
 
     componentWillMount() {
         const {token, match} = this.props;
-        this.props.actions.fetchWorkflow(token, match.params.id);
+        this.props.actions.fetchPrep(token, match.params.id);
     }
 
     sortData = (key, desc) => {
@@ -77,11 +78,15 @@ class WorkflowView extends React.Component {
         });
     };
 
-    getSortedStatuses = () => {
+    getSortedWorkflows = () => {
         const {data} = this.props;
         const {sortedBy, desc} = this.state;
 
-        return sortItems(data.statuses, sortedBy, desc);
+        return sortItems(data.workflows, sortedBy, desc);
+    };
+
+    goToWorkflowDetails = (id) => {
+        this.props.history.push(`/workflows/${id}`);
     };
 
     render() {
@@ -91,7 +96,7 @@ class WorkflowView extends React.Component {
         return (
             <div className="protected">
                 <div className="container">
-                    <NavHeader title={'Workflow'}/>
+                    <NavHeader title={'Prep'}/>
                     {isFetching || !data
                         ? <p className="text-center">Loading data...</p>
                         : <Details>
@@ -100,14 +105,10 @@ class WorkflowView extends React.Component {
                                     <Title>Name:</Title>
                                     <Value>{data.name}</Value>
                                 </Field>
-                                {data.prep && <Field>
-                                    <Title>Prep:</Title>
-                                    <Value>{data.prep.name}</Value>
-                                </Field>}
-                                {data.prep && <Field>
+                                <Field>
                                     <Title>Campaign:</Title>
-                                    <Value>{data.prep.campaign}</Value>
-                                </Field>}
+                                    <Value>{data.campaign}</Value>
+                                </Field>
                                 <Field>
                                     <Title>Created:</Title>
                                     <Value>{getReadableTimestamp(data.created)}</Value>
@@ -118,13 +119,15 @@ class WorkflowView extends React.Component {
                                 </Field>
                             </Fields>
                             <DataTable
-                                data={this.getSortedStatuses()}
+                                data={this.getSortedWorkflows()}
                                 columns={[
-                                    {key: 'site', title: 'Site'},
-                                    {key: 'success_count', title: 'Completed', width: '110px'},
-                                    {key: 'failed_count', title: 'Failed', width: '110px'},
+                                    {key: 'name', title: 'Workflow'},
+                                    {key: 'created', title: 'Created', width: '150px', transformFn: getReadableTimestamp},
+                                    {key: 'updated', title: 'Updated', width: '150px', transformFn: getReadableTimestamp},
                                 ]}
                                 onChangePage={this.onChangePage}
+                                idColumn={'name'}
+                                onClickFn={this.goToWorkflowDetails}
                                 sortFn={this.sortData}
                                 sortedBy={sortedBy}
                                 desc={desc}
@@ -139,8 +142,8 @@ class WorkflowView extends React.Component {
 
 const mapStateToProps = (state) => {
     return {
-        data: state.workflow.data,
-        isFetching: state.workflow.isFetching
+        data: state.prep.data,
+        isFetching: state.prep.isFetching
     };
 };
 
@@ -150,5 +153,5 @@ const mapDispatchToProps = (dispatch) => {
     };
 };
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(WorkflowView));
-export {WorkflowView as WorkflowViewNotConnected};
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(PrepView));
+export {PrepView as PrepViewNotConnected};

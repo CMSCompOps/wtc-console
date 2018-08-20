@@ -220,6 +220,7 @@ Requirements:
 - Python 3.7
 - PostgreSQL
 - Oracle client
+- RabbitMQ
 
 Create prod.py in `src/djangoreactredux/settings/` directory by using _prod_template.py_ settings template file and update the fields with prod values.
 

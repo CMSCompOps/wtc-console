@@ -103,7 +103,7 @@ def update_workflows_from_request_manager():
                 if 'AgentJobInfo' not in stat:
                     continue
 
-                prep, _ = Prep.objects.get_or_create(name=prep_id, defaults={'campaign': stat['Campaign']})
+                prep, _ = Prep.objects.update_or_create(name=prep_id, defaults={'campaign': stat['Campaign']})
                 new_wf, _ = Workflow.objects.update_or_create(name=stat['RequestName'], defaults={'prep': prep})
                 # delete old states statuses data
                 WorkflowSiteStatus.objects.filter(workflow__name=new_wf.name).delete()
