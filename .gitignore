@@ -24,7 +24,8 @@ src/static_root/
 *.sqlite
 docker/mongo/data/*
 # do not commit credentials kept in local.py
-**/local.py
+src/djangoreactredux/settings/local.py
+src/djangoreactredux/settings/prod.py
 
 #RabbitMQ
 docker/rabbitmq/data/*
