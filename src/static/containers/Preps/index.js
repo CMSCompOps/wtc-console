@@ -120,6 +120,7 @@ class PrepsView extends React.Component {
                             columns={[
                                 {key: 'name', title: 'Prep'},
                                 {key: 'campaign', title: 'Campaign'},
+                                {key: 'workflows_count', title: 'Cnt', width: '50px'},
                                 {
                                     key: 'updated',
                                     title: 'Last updated',

@@ -37,6 +37,7 @@ const Cell = styled.td`
     border: 1px solid white;
     word-break: break-all;
     vertical-align: middle;
+    text-align ${props => props.align || 'left'}
 `;
 
 const SortIcon = styled.i`
@@ -105,17 +106,20 @@ export default class DataTable extends React.Component {
             <Table>
                 {this.renderHeader()}
                 <tbody>
-                {data.map((row, idx) =>
-                    <Row
-                        key={`row_${idx}`}
-                        isLink={!!onClickFn}
-                        onClick={() => !!onClickFn && onClickFn(_.get(row, idColumn))}
-                    >
-                        {columns.map(col =>
-                            <Cell key={`cell_${idx}_${col.key}`}>{this.getCellValue(col, row)}</Cell>
-                        )}
-                    </Row>
-                )}
+                {data.length > 0
+                    ? data.map((row, idx) =>
+                        <Row
+                            key={`row_${idx}`}
+                            isLink={!!onClickFn}
+                            onClick={() => !!onClickFn && onClickFn(_.get(row, idColumn))}
+                        >
+                            {columns.map(col =>
+                                <Cell key={`cell_${idx}_${col.key}`}>{this.getCellValue(col, row)}</Cell>
+                            )}
+                        </Row>
+                    )
+                    : <Row><Cell align={'center'} colSpan={columns.length}>No items</Cell></Row>
+                }
                 </tbody>
             </Table>
         );

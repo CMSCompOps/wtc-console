@@ -77,11 +77,11 @@ class WorkflowView extends React.Component {
         });
     };
 
-    getSortedStatuses = () => {
+    getSortedTasks = () => {
         const {data} = this.props;
         const {sortedBy, desc} = this.state;
 
-        return sortItems(data.statuses, sortedBy, desc);
+        return sortItems(data.tasks, sortedBy, desc);
     };
 
     render() {
@@ -117,18 +117,34 @@ class WorkflowView extends React.Component {
                                     <Value>{getReadableTimestamp(data.updated)}</Value>
                                 </Field>
                             </Fields>
+
+                            <h4 className="text-center">Tasks</h4>
+
                             <DataTable
-                                data={this.getSortedStatuses()}
+                                data={this.getSortedTasks()}
                                 columns={[
-                                    {key: 'site', title: 'Site'},
-                                    {key: 'success_count', title: 'Completed', width: '110px'},
-                                    {key: 'failed_count', title: 'Failed', width: '110px'},
+                                    {key: 'name', title: 'Name'},
+                                    {key: 'job_type', title: 'Job type', width: '100px'},
+                                    {key: 'created', title: 'Created', width: '150px', transformFn: getReadableTimestamp},
+                                    {key: 'updated', title: 'Updated', width: '150px', transformFn: getReadableTimestamp},
                                 ]}
                                 onChangePage={this.onChangePage}
                                 sortFn={this.sortData}
                                 sortedBy={sortedBy}
                                 desc={desc}
                             />
+                            {/*<DataTable*/}
+                                {/*data={this.getSortedStatuses()}*/}
+                                {/*columns={[*/}
+                                    {/*{key: 'site', title: 'Site'},*/}
+                                    {/*{key: 'success_count', title: 'Completed', width: '110px'},*/}
+                                    {/*{key: 'failed_count', title: 'Failed', width: '110px'},*/}
+                                {/*]}*/}
+                                {/*onChangePage={this.onChangePage}*/}
+                                {/*sortFn={this.sortData}*/}
+                                {/*sortedBy={sortedBy}*/}
+                                {/*desc={desc}*/}
+                            {/*/>*/}
                         </Details>
                     }
                 </div>

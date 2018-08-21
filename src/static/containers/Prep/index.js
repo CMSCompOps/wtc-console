@@ -122,6 +122,7 @@ class PrepView extends React.Component {
                                 data={this.getSortedWorkflows()}
                                 columns={[
                                     {key: 'name', title: 'Workflow'},
+                                    {key: 'tasks_count', title: 'Cnt', width: '50px'},
                                     {key: 'created', title: 'Created', width: '150px', transformFn: getReadableTimestamp},
                                     {key: 'updated', title: 'Updated', width: '150px', transformFn: getReadableTimestamp},
                                 ]}

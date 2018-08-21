@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from knox.auth import TokenAuthentication
 from django.db.models import Q
 
-from workflows.models import Prep, Site, Workflow, WorkflowSiteStatus
+from workflows.models import Prep, Site, Workflow
 from workflows.serializers import PrepSerializer, PrepDetailsSerializer, WorkflowSerializer, WorkflowDetailsSerializer
 
 
