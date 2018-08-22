@@ -118,8 +118,8 @@ class PrepsView extends React.Component {
                         : <PagedDataTable
                             data={data}
                             columns={[
-                                {key: 'name', title: 'Prep'},
-                                {key: 'campaign', title: 'Campaign'},
+                                {key: 'name', title: 'Prep', flex: 1},
+                                {key: 'campaign', title: 'Campaign', flex: 1},
                                 {key: 'workflows_count', title: 'Cnt', width: '50px'},
                                 {
                                     key: 'updated',

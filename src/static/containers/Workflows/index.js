@@ -116,9 +116,9 @@ class WorkflowsView extends React.Component {
                         : <PagedDataTable
                             data={data}
                             columns={[
-                                {key: 'name', title: 'Workflow', width: '45%'},
-                                {key: 'prep.name', title: 'Prep'},
-                                {key: 'prep.campaign', title: 'Campaign'},
+                                {key: 'name', title: 'Workflow', flex: 2},
+                                {key: 'prep.name', title: 'Prep', flex: 1},
+                                {key: 'prep.campaign', title: 'Campaign', flex: 1},
                                 {
                                     key: 'updated',
                                     title: 'Last updated',

@@ -120,8 +120,9 @@ class PrepView extends React.Component {
                             </Fields>
                             <DataTable
                                 data={this.getSortedWorkflows()}
+                                title={'Workflows'}
                                 columns={[
-                                    {key: 'name', title: 'Workflow'},
+                                    {key: 'name', title: 'Workflow', flex: 1},
                                     {key: 'tasks_count', title: 'Cnt', width: '50px'},
                                     {key: 'created', title: 'Created', width: '150px', transformFn: getReadableTimestamp},
                                     {key: 'updated', title: 'Updated', width: '150px', transformFn: getReadableTimestamp},

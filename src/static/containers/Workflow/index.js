@@ -118,12 +118,11 @@ class WorkflowView extends React.Component {
                                 </Field>
                             </Fields>
 
-                            <h4 className="text-center">Tasks</h4>
-
                             <DataTable
                                 data={this.getSortedTasks()}
+                                title={'Tasks'}
                                 columns={[
-                                    {key: 'name', title: 'Name'},
+                                    {key: 'name', title: 'Name', flex: 1},
                                     {key: 'job_type', title: 'Job type', width: '100px'},
                                     {key: 'created', title: 'Created', width: '150px', transformFn: getReadableTimestamp},
                                     {key: 'updated', title: 'Updated', width: '150px', transformFn: getReadableTimestamp},
