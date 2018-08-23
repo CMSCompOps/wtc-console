@@ -36,6 +36,7 @@ export default class PagedDataTable extends React.Component {
             title: PropTypes.string.isRequired,
             width: PropTypes.string,
             transformFn: PropTypes.func,
+            align: PropTypes.string,
         })).isRequired,
         onChangePage: PropTypes.func,
         idColumn: PropTypes.string,
@@ -65,26 +66,10 @@ export default class PagedDataTable extends React.Component {
     };
 
     render() {
-        const {
-            columns,
-            data,
-            idColumn,
-            onClickFn,
-            sortFn,
-            sortedBy,
-            desc,
-        } = this.props;
+        const {data} = this.props;
         return (
             <Wrapper>
-                <DataTable
-                    data={data.results}
-                    columns={columns}
-                    idColumn={idColumn}
-                    onClickFn={onClickFn}
-                    sortFn={sortFn}
-                    sortedBy={sortedBy}
-                    desc={desc}
-                />
+                <DataTable {...this.props} data={data.results}/>
                 {this.renderPager()}
             </Wrapper>
         );

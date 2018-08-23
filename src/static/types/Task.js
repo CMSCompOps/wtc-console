@@ -7,5 +7,6 @@ export default PropTypes.shape({
     job_type: PropTypes.string,
     created: PropTypes.string,
     updated: PropTypes.string,
+    failures_count: PropTypes.number,
     statuses: PropTypes.arrayOf(TaskSiteStatus),
 });

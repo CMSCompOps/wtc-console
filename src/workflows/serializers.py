@@ -1,16 +1,17 @@
+from django.db.models import Sum
 from rest_framework import serializers
 from workflows.models import Workflow, Prep, Site, Task, TaskSiteStatus
 
 
 class PrepSerializer(serializers.ModelSerializer):
-    workflows_count = serializers.SerializerMethodField()
+    workflows__count = serializers.SerializerMethodField()
 
-    def get_workflows_count(self, obj):
-        return obj.workflows.count()
+    def get_workflows__count(self, obj):
+        return obj.workflows__count
 
     class Meta:
         model = Prep
-        fields = '__all__'
+        fields = ['name', 'campaign', 'priority', 'workflows__count', 'updated']
 
 
 class SiteSerializer(serializers.ModelSerializer):
@@ -28,14 +29,24 @@ class TaskSiteStatusSerializer(serializers.ModelSerializer):
 
 class TaskSerializer(serializers.ModelSerializer):
     statuses = TaskSiteStatusSerializer(many=True, read_only=True)
+    failures_count = serializers.SerializerMethodField()
+
+    def get_failures_count(self, obj):
+        return obj.statuses.aggregate(Sum('failed_count'))['failed_count__sum']
 
     class Meta:
         model = Task
         fields = '__all__'
 
 
+class WorkflowPrepSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Prep
+        fields = ['name', 'campaign', 'priority']
+
+
 class WorkflowSerializer(serializers.ModelSerializer):
-    prep = PrepSerializer()
+    prep = WorkflowPrepSerializer()
 
     class Meta:
         model = Workflow
@@ -43,7 +54,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
 
 
 class WorkflowDetailsSerializer(serializers.ModelSerializer):
-    prep = PrepSerializer()
+    prep = WorkflowPrepSerializer()
     tasks = TaskSerializer(many=True, read_only=True)
 
     class Meta:
@@ -67,4 +78,4 @@ class PrepDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Prep
-        fields = ['name', 'campaign', 'created', 'updated', 'workflows']
+        fields = '__all__'

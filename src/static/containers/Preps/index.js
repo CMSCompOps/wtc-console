@@ -120,12 +120,14 @@ class PrepsView extends React.Component {
                             columns={[
                                 {key: 'name', title: 'Prep', flex: 1},
                                 {key: 'campaign', title: 'Campaign', flex: 1},
-                                {key: 'workflows_count', title: 'Cnt', width: '50px'},
+                                {key: 'priority', title: 'Priority', width: '100px', align: 'right'},
+                                {key: 'workflows__count', title: 'Cnt', width: '55px', align: 'right'},
                                 {
                                     key: 'updated',
                                     title: 'Last updated',
                                     width: '150px',
-                                    transformFn: getReadableTimestamp
+                                    transformFn: getReadableTimestamp,
+                                    align: 'right',
                                 },
                             ]}
                             onChangePage={this.onChangePage}

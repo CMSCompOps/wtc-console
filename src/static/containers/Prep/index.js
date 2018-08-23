@@ -110,6 +110,10 @@ class PrepView extends React.Component {
                                     <Value>{data.campaign}</Value>
                                 </Field>
                                 <Field>
+                                    <Title>Priority:</Title>
+                                    <Value>{data.priority}</Value>
+                                </Field>
+                                <Field>
                                     <Title>Created:</Title>
                                     <Value>{getReadableTimestamp(data.created)}</Value>
                                 </Field>
@@ -123,9 +127,21 @@ class PrepView extends React.Component {
                                 title={'Workflows'}
                                 columns={[
                                     {key: 'name', title: 'Workflow', flex: 1},
-                                    {key: 'tasks_count', title: 'Cnt', width: '50px'},
-                                    {key: 'created', title: 'Created', width: '150px', transformFn: getReadableTimestamp},
-                                    {key: 'updated', title: 'Updated', width: '150px', transformFn: getReadableTimestamp},
+                                    {key: 'tasks_count', title: 'Items', width: '70px', align: 'right'},
+                                    {
+                                        key: 'created',
+                                        title: 'Created',
+                                        width: '150px',
+                                        transformFn: getReadableTimestamp,
+                                        align: 'right',
+                                    },
+                                    {
+                                        key: 'updated',
+                                        title: 'Updated',
+                                        width: '150px',
+                                        transformFn: getReadableTimestamp,
+                                        align: 'right',
+                                    },
                                 ]}
                                 onChangePage={this.onChangePage}
                                 idColumn={'name'}

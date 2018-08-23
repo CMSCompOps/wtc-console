@@ -123,7 +123,8 @@ class WorkflowsView extends React.Component {
                                     key: 'updated',
                                     title: 'Last updated',
                                     width: '150px',
-                                    transformFn: getReadableTimestamp
+                                    transformFn: getReadableTimestamp,
+                                    align: 'right',
                                 },
                             ]}
                             onChangePage={this.onChangePage}

@@ -2,7 +2,7 @@ from rest_framework import viewsets, mixins
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from knox.auth import TokenAuthentication
-from django.db.models import Q
+from django.db.models import Q, Count, Sum
 
 from workflows.models import Prep, Site, Workflow
 from workflows.serializers import PrepSerializer, PrepDetailsSerializer, WorkflowSerializer, WorkflowDetailsSerializer
@@ -19,13 +19,14 @@ class PrepsViewSet(viewsets.ReadOnlyModelViewSet):
         filter = self.request.query_params.get('filter', None)
         order_key = self.request.query_params.get('order_key', None)
         order_desc = self.request.query_params.get('order_desc', None)
+        queryset = self.queryset.annotate(Count('workflows'))
 
-        order_by = '-updated'
+        order_by = '-priority'
         if order_key:
             order_by = '-' if order_desc == 'true' else ''
             order_by += order_key.replace('.', '__')
 
-        preps = Prep.objects.all().order_by(order_by)
+        preps = queryset.order_by(order_by, '-updated')
 
         if filter:
             preps = preps.filter(

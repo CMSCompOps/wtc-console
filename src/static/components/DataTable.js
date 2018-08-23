@@ -35,24 +35,37 @@ const HeaderCell = styled.div`
 
 const Row = styled.div`
     display: flex;
+    flex-direction: column;
+`;
+
+const RowHeader = styled.div`
+    display: flex;
     flex-direction: row;
     background: #efefef;
     cursor: ${props => props.isLink ? 'pointer' : 'auto'};
 
     &:hover {
-        background: #fcfcfc;
+        background: #e8e8e8;
     }
 `;
 
 const Cell = styled.div`
     flex: ${props => `${props.flex || 0} ${props.width || ''}`}
-    flex-wrap: wrap;
     font-size: 14px;
+    line-height: 16px;
     padding: 7px;
-    border: 1px solid white;
+    border: 1px solid #ffffff;
     word-break: break-all;
-    text-align ${props => props.align || 'left'}
+    text-align: ${props => props.align || 'left'}
     overflow: hidden;
+`;
+
+const FoldingContent = styled.div`
+    flex: 0 100%
+    font-size: 14px;
+    padding: 12px 10px 20px;
+    border: 1px solid #ffffff;
+    background: #fcfcfc;
 `;
 
 const SortIcon = styled.i`
@@ -60,8 +73,21 @@ const SortIcon = styled.i`
     padding-left: 3px;
 `;
 
+const FoldIconContainer = styled.div`
+    display: inline-block;
+    float: left;
+    height: 100%;
+`;
+
+const FoldIcon = styled.i`
+    font-size: 15px;
+    padding-right: 5px;
+    cursor: pointer;
+`;
+
 export default class DataTable extends React.Component {
     static propTypes = {
+        title: PropTypes.string,
         data: PropTypes.array.isRequired,
         columns: PropTypes.arrayOf(PropTypes.shape({
             key: PropTypes.string.isRequired,
@@ -69,8 +95,11 @@ export default class DataTable extends React.Component {
             flex: PropTypes.number,
             width: PropTypes.string,
             transformFn: PropTypes.func,
+            align: PropTypes.string,
         })).isRequired,
-        title: PropTypes.string,
+        folding: PropTypes.bool,
+        foldedContentRenderer: PropTypes.func,
+        expandedIds: PropTypes.arrayOf(PropTypes.string),
         idColumn: PropTypes.string,
         onClickFn: PropTypes.func,
         sortFn: PropTypes.func,
@@ -98,7 +127,6 @@ export default class DataTable extends React.Component {
         const {columns, sortFn, sortedBy, desc} = this.props;
 
         return (
-            <thead>
             <HeaderRow>
                 {columns.map((col, idx) =>
                     <HeaderCell
@@ -113,40 +141,62 @@ export default class DataTable extends React.Component {
                     </HeaderCell>
                 )}
             </HeaderRow>
-            </thead>
         )
     };
 
+    renderRow = (row, idx) => {
+        const {
+            columns,
+            idColumn,
+            onClickFn,
+            folding,
+            expandedIds,
+            foldedContentRenderer,
+        } = this.props;
+        const id = _.get(row, idColumn);
+        const expanded = folding && expandedIds && expandedIds.includes(id);
+
+        return (
+            <Row key={`row_${idx}`} >
+                <RowHeader isLink={!!onClickFn} onClick={() => !!onClickFn && onClickFn(id)}>
+                    {columns.map((col, col_idx) =>
+                        <Cell
+                            key={`cell_${idx}_${col.key}`}
+                            flex={col.flex}
+                            width={col.width}
+                            align={col.align}
+                        >
+                            {folding && col_idx === 0 && <FoldIconContainer>
+                                {expanded
+                                    ? <FoldIcon className={'fa fa-minus-square-o'}/>
+                                    : <FoldIcon className={'fa fa-plus-square-o'}/>}
+                            </FoldIconContainer>}
+                            {this.getCellValue(col, row)}
+                        </Cell>
+                    )}
+                </RowHeader>
+                {expanded && <FoldingContent>
+                    {foldedContentRenderer(row, id)}
+                </FoldingContent>}
+            </Row>
+        );
+    };
+
     render() {
-        const {columns, data, idColumn, onClickFn, title} = this.props;
+        const {
+            data,
+            title,
+        } = this.props;
 
         return (
             <Wrapper>
                 {title && <Title>{title}</Title>}
                 <Table>
                     {this.renderHeader()}
-                    <tbody>
                     {data.length > 0
-                        ? data.map((row, idx) =>
-                            <Row
-                                key={`row_${idx}`}
-                                isLink={!!onClickFn}
-                                onClick={() => !!onClickFn && onClickFn(_.get(row, idColumn))}
-                            >
-                                {columns.map(col =>
-                                    <Cell
-                                        key={`cell_${idx}_${col.key}`}
-                                        flex={col.flex}
-                                        width={col.width}
-                                    >
-                                        {this.getCellValue(col, row)}
-                                        </Cell>
-                                )}
-                            </Row>
-                        )
-                        : <Row><Cell align={'center'} colSpan={columns.length}>No items</Cell></Row>
+                        ? data.map(this.renderRow)
+                        : <Row><Cell align={'center'} flex={1}>No items</Cell></Row>
                     }
-                    </tbody>
                 </Table>
             </Wrapper>
         );

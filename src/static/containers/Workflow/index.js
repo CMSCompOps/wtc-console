@@ -39,6 +39,34 @@ const Value = styled.p`
     font-size: 14px;
 `;
 
+const SitesAndActionsContainer = styled.div`
+    display: flex;
+    flex-direction: row;
+`;
+
+const SectionTitle = styled.h4`
+    text-align: center;
+    margin-bottom: 10px;
+`;
+
+const Section = styled.div`
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
+    
+    &:last-child {
+        margin-right: 0;
+    }
+`;
+
+const Sites = Section.extend`
+    flex: 2;
+`;
+
+const Actions = Section.extend`
+    flex: 1;
+`;
+
 class WorkflowView extends React.Component {
 
     static propTypes = {
@@ -59,6 +87,7 @@ class WorkflowView extends React.Component {
         super(props);
 
         this.state = {
+            expandedTasks: [],
             sortedBy: null,
             desc: false,
         };
@@ -84,9 +113,42 @@ class WorkflowView extends React.Component {
         return sortItems(data.tasks, sortedBy, desc);
     };
 
+    toggleRow = (id) => {
+        const {expandedTasks} = this.state;
+
+        this.setState({
+            ...this.state,
+            expandedTasks: expandedTasks.includes(id)
+                ? expandedTasks.filter(elem => elem !== id)
+                : [...expandedTasks, id],
+        })
+    };
+
+    foldedContentRenderer = (row, id) => {
+        return (
+            <SitesAndActionsContainer>
+                <Sites>
+                    <SectionTitle>Sites</SectionTitle>
+                    <DataTable
+                        data={row.statuses}
+                        columns={[
+                            {key: 'site', title: 'Site', flex: 1},
+                            {key: 'success_count', title: 'Completed', width: '110px'},
+                            {key: 'failed_count', title: 'Failed', width: '110px'},
+                        ]}
+                    />
+                </Sites>
+                <Actions>
+                    <SectionTitle>Actions</SectionTitle>
+                    <div>Todo</div>
+                </Actions>
+            </SitesAndActionsContainer>
+        )
+    };
+
     render() {
         const {isFetching, data} = this.props;
-        const {sortedBy, desc} = this.state;
+        const {sortedBy, desc, expandedTasks} = this.state;
 
         return (
             <div className="protected">
@@ -108,6 +170,10 @@ class WorkflowView extends React.Component {
                                     <Title>Campaign:</Title>
                                     <Value>{data.prep.campaign}</Value>
                                 </Field>}
+                                {data.prep && <Field>
+                                    <Title>Priority:</Title>
+                                    <Value>{data.prep.priority}</Value>
+                                </Field>}
                                 <Field>
                                     <Title>Created:</Title>
                                     <Value>{getReadableTimestamp(data.created)}</Value>
@@ -124,26 +190,32 @@ class WorkflowView extends React.Component {
                                 columns={[
                                     {key: 'name', title: 'Name', flex: 1},
                                     {key: 'job_type', title: 'Job type', width: '100px'},
-                                    {key: 'created', title: 'Created', width: '150px', transformFn: getReadableTimestamp},
-                                    {key: 'updated', title: 'Updated', width: '150px', transformFn: getReadableTimestamp},
+                                    {key: 'failures_count', title: 'Failed', width: '70px', align: 'right'},
+                                    {
+                                        key: 'created',
+                                        title: 'Created',
+                                        width: '150px',
+                                        transformFn: getReadableTimestamp,
+                                        align: 'right',
+                                    },
+                                    {
+                                        key: 'updated',
+                                        title: 'Updated',
+                                        width: '150px',
+                                        transformFn: getReadableTimestamp,
+                                        align: 'right',
+                                    },
                                 ]}
+                                folding={true}
+                                foldedContentRenderer={this.foldedContentRenderer}
+                                expandedIds={expandedTasks}
+                                idColumn={'name'}
+                                onClickFn={this.toggleRow}
                                 onChangePage={this.onChangePage}
                                 sortFn={this.sortData}
                                 sortedBy={sortedBy}
                                 desc={desc}
                             />
-                            {/*<DataTable*/}
-                                {/*data={this.getSortedStatuses()}*/}
-                                {/*columns={[*/}
-                                    {/*{key: 'site', title: 'Site'},*/}
-                                    {/*{key: 'success_count', title: 'Completed', width: '110px'},*/}
-                                    {/*{key: 'failed_count', title: 'Failed', width: '110px'},*/}
-                                {/*]}*/}
-                                {/*onChangePage={this.onChangePage}*/}
-                                {/*sortFn={this.sortData}*/}
-                                {/*sortedBy={sortedBy}*/}
-                                {/*desc={desc}*/}
-                            {/*/>*/}
                         </Details>
                     }
                 </div>
