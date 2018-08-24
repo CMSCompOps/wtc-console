@@ -87,7 +87,6 @@ class WorkflowView extends React.Component {
         super(props);
 
         this.state = {
-            expandedTasks: [],
             sortedBy: null,
             desc: false,
         };
@@ -113,24 +112,18 @@ class WorkflowView extends React.Component {
         return sortItems(data.tasks, sortedBy, desc);
     };
 
-    toggleRow = (id) => {
-        const {expandedTasks} = this.state;
+    foldedStatusContentRenderer = (row, id) => <p><strong>Dataset:</strong>{row.dataset}</p>;
 
-        this.setState({
-            ...this.state,
-            expandedTasks: expandedTasks.includes(id)
-                ? expandedTasks.filter(elem => elem !== id)
-                : [...expandedTasks, id],
-        })
-    };
-
-    foldedContentRenderer = (row, id) => {
+    foldedTaskContentRenderer = (row, id) => {
         return (
             <SitesAndActionsContainer>
                 <Sites>
                     <SectionTitle>Sites</SectionTitle>
                     <DataTable
                         data={row.statuses}
+                        folding={true}
+                        foldedContentRenderer={this.foldedStatusContentRenderer}
+                        idColumn={'site'}
                         columns={[
                             {key: 'site', title: 'Site', flex: 1},
                             {key: 'success_count', title: 'Completed', width: '110px'},
@@ -207,10 +200,9 @@ class WorkflowView extends React.Component {
                                     },
                                 ]}
                                 folding={true}
-                                foldedContentRenderer={this.foldedContentRenderer}
+                                foldedContentRenderer={this.foldedTaskContentRenderer}
                                 expandedIds={expandedTasks}
                                 idColumn={'name'}
-                                onClickFn={this.toggleRow}
                                 onChangePage={this.onChangePage}
                                 sortFn={this.sortData}
                                 sortedBy={sortedBy}

@@ -107,6 +107,14 @@ export default class DataTable extends React.Component {
         desc: PropTypes.bool,
     };
 
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            expandedRows: [],
+        };
+    }
+
     getCellValue = (col, row) => {
         const val = _.get(row, col.key);
 
@@ -144,21 +152,39 @@ export default class DataTable extends React.Component {
         )
     };
 
+    onRowClick = (id) => {
+        const {folding, onClickFn} = this.props;
+
+        folding && this.toggleRow(id);
+
+        !!onClickFn && onClickFn(id, row);
+    };
+
+    toggleRow = (id) => {
+        const {expandedRows} = this.state;
+
+        this.setState({
+            ...this.state,
+            expandedRows: expandedRows.includes(id)
+                ? expandedRows.filter(elem => elem !== id)
+                : [...expandedRows, id],
+        })
+    };
+
     renderRow = (row, idx) => {
         const {
             columns,
             idColumn,
             onClickFn,
             folding,
-            expandedIds,
             foldedContentRenderer,
         } = this.props;
         const id = _.get(row, idColumn);
-        const expanded = folding && expandedIds && expandedIds.includes(id);
+        const expanded = folding && this.state.expandedRows.includes(id);
 
         return (
-            <Row key={`row_${idx}`} >
-                <RowHeader isLink={!!onClickFn} onClick={() => !!onClickFn && onClickFn(id)}>
+            <Row key={`row_${idx}`}>
+                <RowHeader isLink={!!onClickFn || folding} onClick={() => this.onRowClick(id)}>
                     {columns.map((col, col_idx) =>
                         <Cell
                             key={`cell_${idx}_${col.key}`}
