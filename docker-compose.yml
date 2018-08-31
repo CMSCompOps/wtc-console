@@ -33,3 +33,13 @@ services:
             - 5672:5672
         volumes:
           - ./docker/rabbitmq/data:/var/lib/rabbitmq/mnesia
+    frontend:
+        restart: always
+        build:
+            context: .
+            dockerfile: ./docker/web/Dockerfile
+        volumes:
+            - .:/django
+        entrypoint:
+            - /web-entrypoint.sh
+        network_mode: "host"
