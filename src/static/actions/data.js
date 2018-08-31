@@ -7,6 +7,8 @@ import {
     FETCH_PREP_SUCCESS,
     FETCH_PREPS_REQUEST,
     FETCH_PREPS_SUCCESS,
+    FETCH_SITES_REQUEST,
+    FETCH_SITES_SUCCESS,
 } from '../constants';
 import {fetchProtectedData} from './api'
 
@@ -44,5 +46,14 @@ export function fetchWorkflow(token, workflowId) {
         `/api/v1/workflows/workflows/${workflowId}/`,
         FETCH_WORKFLOW_REQUEST,
         FETCH_WORKFLOW_SUCCESS,
+    );
+}
+
+export function fetchSites(token) {
+    return fetchProtectedData(
+        token,
+        `/api/v1/workflows/sites/`,
+        FETCH_SITES_REQUEST,
+        FETCH_SITES_SUCCESS,
     );
 }

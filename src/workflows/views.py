@@ -5,7 +5,8 @@ from knox.auth import TokenAuthentication
 from django.db.models import Q, Count, Sum
 
 from workflows.models import Prep, Site, Workflow
-from workflows.serializers import PrepSerializer, PrepDetailsSerializer, WorkflowSerializer, WorkflowDetailsSerializer
+from workflows.serializers import PrepSerializer, PrepDetailsSerializer, WorkflowSerializer, WorkflowDetailsSerializer, \
+    SiteSerializer
 
 
 class PrepsViewSet(viewsets.ReadOnlyModelViewSet):
@@ -85,4 +86,16 @@ class WorkflowsViewSet(viewsets.ReadOnlyModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         user = self.get_object()
         serializer = WorkflowDetailsSerializer(user)
+        return Response(serializer.data)
+
+
+class SitesViewSet(viewsets.GenericViewSet):
+    queryset = Site.objects.all().order_by('name')
+    serializer_class = SiteSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
