@@ -13,6 +13,9 @@ import DataTable from '../../components/DataTable';
 import NavHeader from '../../components/NavHeader';
 import Select from '../../components/Select';
 import {sortItems} from '../../utils/sort';
+import Checkbox from '../../components/fields/Checkbox';
+import TextInput from '../../components/fields/TextInput';
+import Button from '../../components/Button';
 
 
 const Details = styled.div`
@@ -70,11 +73,46 @@ const FormField = styled.div`
 `;
 
 const Sites = Section.extend`
-    flex: 2;
+    flex: 3;
+`;
+
+const SitesList = Section.extend`
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+`;
+
+const SiteField = styled.div`
+    width: 220px;
+`;
+
+const SiteLabel = styled.label`
+    font-size: 12px;
+    word-break: break-all;
+    font-weight: ${props => props.bold ? 'bold' : 'auto'};
+`;
+
+const CheckboxField = styled(Checkbox)`
+    margin: 0;
+    cursor: pointer;
 `;
 
 const Actions = Section.extend`
     flex: 1;
+`;
+
+const ReasonsForm = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-end;
+`;
+
+const ReasonItem = styled.div`
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: flex-end;
 `;
 
 const ACTIONS = [
@@ -118,6 +156,7 @@ class WorkflowView extends React.Component {
         super(props);
 
         this.state = {
+            reasons: [],
             taskActions: {},
             sortedBy: null,
             desc: false,
@@ -138,6 +177,11 @@ class WorkflowView extends React.Component {
         });
     };
 
+    getTaskActionsById = (taskId) => {
+        const {taskActions} = this.state;
+        return taskActions[taskId] || {};
+    };
+
     getSortedTasks = () => {
         const {workflow} = this.props;
         const {sortedBy, desc} = this.state;
@@ -145,44 +189,67 @@ class WorkflowView extends React.Component {
         return sortItems(workflow.data.tasks, sortedBy, desc);
     };
 
-    foldedStatusContentRenderer = (row, id) => <p><strong>Dataset:</strong>{row.dataset}</p>;
-
-    renderSites = (row) => {
-        return (
-            <Sites>
-                <SectionTitle>Sites</SectionTitle>
-                <DataTable
-                    data={row.statuses}
-                    folding={true}
-                    foldedContentRenderer={this.foldedStatusContentRenderer}
-                    idColumn={'site'}
-                    columns={[
-                        {key: 'site', title: 'Site', flex: 1},
-                        {key: 'success_count', title: 'Completed', width: '110px'},
-                        {key: 'failed_count', title: 'Failed', width: '110px'},
-                    ]}
-                />
-            </Sites>
-        );
-    };
-
     onActionDataChange = (taskId, key, value) => {
         const {taskActions} = this.state;
-        const taskAction = taskActions[taskId] || {};
 
         this.setState({
             ...this.state,
             taskActions: {
-                ...taskActions, [taskId]: {...taskAction, [key]: value},
+                ...taskActions,
+                [taskId]: {
+                    ...this.getTaskActionsById(taskId),
+                    [key]: value,
+                },
             },
         });
+    };
+
+    onSiteCheckboxClick = (taskId, siteName, checked) => {
+        const taskAction = this.getTaskActionsById(taskId);
+        const {sites} = taskAction;
+
+        let newSites = new Set(sites);
+
+        checked
+            ? newSites.add(siteName)
+            : newSites.delete(siteName);
+
+        this.onActionDataChange(taskId, 'sites', newSites);
+    };
+
+    renderSites = (taskId, taskSites) => {
+        const {sites: allSites} = this.props;
+        const taskAction = this.getTaskActionsById(taskId);
+
+        return (
+            <Sites>
+                <SectionTitle>Sites</SectionTitle>
+                <SitesList>
+                    {allSites.data.map(site => {
+                        const checkboxId = `${taskId}_${site.name}`;
+
+                        return (
+                            <SiteField key={checkboxId}>
+                                <CheckboxField
+                                    checked={taskAction.sites && taskAction.sites.has(site.name)}
+                                    handleChange={newValue => this.onSiteCheckboxClick(taskId, site.name, newValue)}
+                                />
+
+                                <SiteLabel bold={taskSites.includes(site.name)}>
+                                    {site.name}
+                                </SiteLabel>
+                            </SiteField>
+                        )
+                    })}
+                </SitesList>
+            </Sites>
+        );
     };
 
     showMethodsSelect = (action) => action && (action.value === 'acdc' || action.value === 'recovery');
 
     renderActions = (taskId) => {
-        const {taskActions} = this.state;
-        const taskAction = taskActions[taskId] || {};
+        const taskAction = this.getTaskActionsById(taskId);
 
         return (
             <Actions>
@@ -210,10 +277,14 @@ class WorkflowView extends React.Component {
         );
     };
 
+    getTaskSitesNames = (task) => {
+        return task.statuses.map(status => status.site);
+    };
+
     foldedTaskContentRenderer = (row, id) => {
         return (
             <SitesAndActionsContainer>
-                {this.renderSites(row)}
+                {this.renderSites(id, this.getTaskSitesNames(row))}
                 {this.renderActions(id)}
             </SitesAndActionsContainer>
         )
@@ -247,6 +318,56 @@ class WorkflowView extends React.Component {
                     <Value>{getReadableTimestamp(workflow.updated)}</Value>
                 </Field>
             </Fields>
+        );
+    };
+
+    addReason = () => {
+        const {reasons} = this.state;
+
+        this.setState({
+            ...this.state,
+            reasons: [...reasons, ''],
+        });
+    };
+
+    addReason = (idx) => {
+        const {reasons} = this.state;
+
+        this.setState({
+            ...this.state,
+            reasons: reasons.filter((reason, i) => i !== idx),
+        });
+    };
+
+    onReasonChange = (value, idx) => {
+        const {reasons} = this.state;
+
+        this.setState({
+            ...this.state,
+            reasons: reasons.map((reason, i) => i === idx ? value: reason),
+        });
+    };
+
+    submitActions = () => {
+        const {reasons, taskActions} = this.state;
+
+        console.log('for submit, sites params:', taskActions, 'reasons:', reasons);
+    };
+
+    renderReasonsForm = () => {
+        const {reasons} = this.state;
+
+        return (
+            <ReasonsForm>
+                {reasons.map((reason, idx) =>
+                    <ReasonItem key={`reason_${idx}`}>
+                        <TextInput value={reason} onChange={e => this.onReasonChange(e.target.value, idx)}/>
+                        <Button onClick={() => this.removeReason(idx)} title={'Remove reason'}/>
+                    </ReasonItem>
+                )}
+                <Button onClick={this.addReason} title={'Add reason'}/>
+                <Button onClick={this.submitActions} title={'Submit actions'}/>
+            </ReasonsForm>
         );
     };
 
@@ -294,6 +415,8 @@ class WorkflowView extends React.Component {
                                 sortedBy={sortedBy}
                                 desc={desc}
                             />
+
+                            {this.renderReasonsForm()}
                         </Details>
                     }
                 </div>
