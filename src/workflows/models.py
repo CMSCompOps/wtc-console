@@ -1,41 +1,39 @@
-from django.db import models
+from mongoengine import Document, EmbeddedDocument, fields
 
 
-class Prep(models.Model):
-    name = models.CharField(max_length=400, primary_key=True)
-    campaign = models.CharField(max_length=400, editable=False)
-    priority = models.IntegerField(default=0)
-    cpus = models.IntegerField(default=0)
-    memory = models.IntegerField(default=0)
-
-    created = models.DateTimeField(editable=False, auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
+class WorkflowToUpdate(Document):
+    name = fields.StringField(max_length=400, primary_key=True)
+    updated = fields.DateTimeField()
 
 
-class Workflow(models.Model):
-    name = models.CharField(max_length=400, primary_key=True)
-    prep = models.ForeignKey(Prep, related_name='workflows', on_delete=models.CASCADE, null=True)
-
-    created = models.DateTimeField(editable=False, auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
+class Site(Document):
+    name = fields.StringField(max_length=400, primary_key=True)
 
 
-class Site(models.Model):
-    name = models.CharField(max_length=400, primary_key=True)
+class TaskSiteStatus(EmbeddedDocument):
+    site = fields.StringField(max_length=400)
+    dataset = fields.StringField(max_length=2000)
+    success_count = fields.IntField(default=0)
+    failed_count = fields.IntField(default=0)
 
 
-class Task(models.Model):
-    name = models.CharField(max_length=2000, primary_key=True)
-    workflow = models.ForeignKey(Workflow, related_name='tasks', on_delete=models.CASCADE)
-    job_type = models.CharField(max_length=100)
-
-    created = models.DateTimeField(editable=False, auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
+class Workflow(EmbeddedDocument):
+    name = fields.StringField(max_length=400, primary_key=True)
 
 
-class TaskSiteStatus(models.Model):
-    task = models.ForeignKey(Task, related_name='statuses', on_delete=models.CASCADE)
-    site = models.ForeignKey(Site, on_delete=models.CASCADE)
-    dataset = models.CharField(max_length=2000)
-    success_count = models.IntegerField(default=0)
-    failed_count = models.IntegerField(default=0)
+class Prep(EmbeddedDocument):
+    name = fields.StringField(max_length=400, primary_key=True)
+    campaign = fields.StringField(max_length=400)
+    priority = fields.IntField(default=0)
+    cpus = fields.IntField(default=0)
+    memory = fields.IntField(default=0)
+
+
+class Task(Document):
+    name = fields.StringField(max_length=2000, primary_key=True)
+    job_type = fields.StringField(max_length=100)
+    updated = fields.DateTimeField()
+
+    prep = fields.EmbeddedDocumentField(Prep)
+    workflow = fields.EmbeddedDocumentField(Workflow)
+    statuses = fields.EmbeddedDocumentListField(TaskSiteStatus)

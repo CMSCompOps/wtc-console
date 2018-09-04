@@ -130,3 +130,4 @@ CELERY_ENABLE_UTC = True
 CELERY_IMPORTS=('djangoreactredux','workflows',)
 
 WORKFLOWS_UPDATE_LIMIT = 500
+WORKFLOWS_UPDATE_TIMEOUT = 2 # in hours
