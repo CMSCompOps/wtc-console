@@ -25,7 +25,7 @@ Here are the main tools whose knowledge is useful to contribute:
 
 ## Setting up local environment
 
-###Setup steps
+### Setup steps
 
 Prerequisites:
 * Python 3.7
@@ -38,25 +38,29 @@ Frontend builds, MongoDB, PostgreSql and RabbitMQ are run in docker containers t
 Running oracle client in docker container is not solved yet. Because of this, client has to be installed locally.
 
 * Install [Oracle client](https://www.oracle.com/downloads/index.html).
-* Setup tns config (tnsnames.ora): `$ export TNS_ADMIN=/path-to-project/oracle-admin/`
+    * Setup tns config by putting tnsnames.ora in projects _oracle-admin_ folder.
 * Copy _local_tamplate.py_ setting file to _local.py_ and fill it with certificates data and Oracle db credentials
-* `$ pip3 install -r py-requirements/dev.txt` - to install Python requirements
-* `$ python3 manage.py migrate --settings=djangoreactredux.settings.dev` - setup PostgreSql database
-* `$ python3 manage.py loaddata fixtures.json --settings=djangoreactredux.settings.dev_docker` - populate with initial user data
+* `$ ./bin/setup_dev.sh` - this will install Python requirements, setup PostgreSql database and populate it with initial user data
 
-To start up development environment after it is setup you need to run these two commands in separate console windows/tabs
+### Running and stopping
 
-* `$ ./bin/start_dev.sh`
+To start up development environment after it is setup you need to run these two commands in separate console windows/tabs in this order
+
 * `$ docker-compose up`
+* `$ ./bin/start_dev.sh`
 
 To stop the development server:
 
 * `$ ./bin/stop_dev.sh` - this will stop celery workers
 * `$ docker-compose stop`
 
-Stop Docker development server and remove containers, networks, volumes, and images created by up.
+### Clean up
+
+Stop Docker development server and remove containers, networks, volumes, and images created by up (to make a fresh start).
 
 * `$ docker-compose down`
+
+### Misc
 
 You can access shell in a container
 
@@ -70,14 +74,20 @@ The database can be accessed @localhost:5433
 
 ## Accessing Website
 
-Go to [localhost](http://localhost:8000)
+Go to [localhost:8000](http://localhost:8000)
 
 
 ## Django migrations
 
 After changing models create database migrations with:
+
 `$ python3 manage.py makemigrations workflows`
 
+## Development
+
+When developing a new feature create your own branch and push your changes at least daily.
+
+Do not push directly to master. Create pull requests and assign someone to approve it. Go through your pull request your self, it helps to see if there is unwanted or commented-out code.
 
 ## Production
 
