@@ -34,6 +34,7 @@ Frontend builds, MongoDB, PostgreSql and RabbitMQ are run in docker containers t
 
 * Install [Docker](https://www.docker.com/products/overview) and [Docker Compose](https://docs.docker.com/compose/install/).
 * `$ docker-compose build`
+* `$ docker-compose up`
 
 Running oracle client in docker container is not solved yet. Because of this, client has to be installed locally.
 
@@ -67,10 +68,13 @@ You can access shell in a container
 * `$ docker ps  # get the name from the list of running containers`
 * `$ docker exec -i -t djangoreactreduxbase_rabbitmq /bin/bash`
 
-The database can be accessed @localhost:5433
+The postgresql database can be accessed @localhost:5433
 
 * `$ psql -h localhost -p 5433 -U djangoreactredux djangoreactredux_dev`
 
+The mongo database can be accessed by connecting to docker instance
+
+* `$ docker exec -it wtcconsole_mongo_1 bash`
 
 ## Accessing Website
 
