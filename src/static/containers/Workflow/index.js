@@ -72,11 +72,11 @@ const FormField = styled.div`
     padding-bottom: 10px;
 `;
 
-const Sites = Section.extend`
+const Sites = styled(Section)`
     flex: 3;
 `;
 
-const SitesList = Section.extend`
+const SitesList = styled(Section)`
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -97,7 +97,7 @@ const CheckboxField = styled(Checkbox)`
     cursor: pointer;
 `;
 
-const Actions = Section.extend`
+const Actions = styled(Section)`
     flex: 1;
 `;
 
@@ -330,7 +330,7 @@ class WorkflowView extends React.Component {
         });
     };
 
-    addReason = (idx) => {
+    removeReason = (idx) => {
         const {reasons} = this.state;
 
         this.setState({

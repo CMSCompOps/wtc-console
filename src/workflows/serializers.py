@@ -15,12 +15,6 @@ from workflows.models import Workflow, Prep, Site, Task, TaskSiteStatus
 #         fields = ['name', 'campaign', 'priority', 'workflows__count', 'updated']
 #
 #
-# class SiteSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Site
-#         fields = '__all__'
-#
-#
 # class TaskSiteStatusSerializer(serializers.ModelSerializer):
 #
 #     class Meta:
@@ -107,3 +101,10 @@ class TaskSerializer(DocumentSerializer):
     class Meta:
         model = Task
         fields = '__all__'
+
+
+class SiteSerializer(DocumentSerializer):
+    class Meta:
+        model = Site
+        fields = '__all__'
+
