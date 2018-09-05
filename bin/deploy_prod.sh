@@ -4,7 +4,7 @@ export TNS_ADMIN=/eos/project/o/oracle/public/admin/
 git pull origin master
 cd src/
 
-python3.7 manage.py migrate --settings=djangoreactredux.settings.prod
+# Install requirement
 pip3.7 install -r py-requirements/prod.txt
 
 # Start celery workers

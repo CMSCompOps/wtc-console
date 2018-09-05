@@ -1,7 +1,7 @@
 from rest_framework import viewsets, mixins
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from knox.auth import TokenAuthentication
+# from knox.auth import TokenAuthentication
 from mongoengine.queryset.visitor import Q
 # from django.db.models import Count, Sum
 
@@ -14,8 +14,8 @@ from workflows.models import Prep, Site, Workflow
 class TasksViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    # authentication_classes = (TokenAuthentication,)
+    # permission_classes = (IsAuthenticated,)
     lookup_field = 'name'
 
     def list(self, request, *args, **kwargs):
@@ -130,8 +130,8 @@ class TasksViewSet(viewsets.ReadOnlyModelViewSet):
 class SitesViewSet(viewsets.GenericViewSet):
     queryset = Site.objects.all().order_by('name')
     serializer_class = SiteSerializer
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    # authentication_classes = (TokenAuthentication,)
+    # permission_classes = (IsAuthenticated,)
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())

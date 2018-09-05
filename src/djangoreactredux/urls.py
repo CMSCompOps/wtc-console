@@ -5,7 +5,6 @@ from django.views.decorators.cache import cache_page
 from base import views as base_views
 
 urlpatterns = [
-    url(r'^api/v1/accounts/', include('accounts.urls', namespace='accounts')),
     url(r'^api/v1/workflows/', include('workflows.urls', namespace='workflows')),
 
     # catch all others because of how history is handled by react router - cache this page because it will never change

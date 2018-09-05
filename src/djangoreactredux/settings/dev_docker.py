@@ -5,12 +5,7 @@ from djangoreactredux.settings.local import *
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'djangoreactredux_dev',
-        'USER': 'djangoreactredux',
-        'PASSWORD': 'password',
-        'HOST': 'postgres',
-        'PORT': 5432,
+        'ENGINE': '',
     },
     'unified': UNIFIED_DB,
 }

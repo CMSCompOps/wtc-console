@@ -10,12 +10,7 @@ PAGE_CACHE_SECONDS = 1
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'djangoreactredux_dev',
-        'USER': 'djangoreactredux',
-        'PASSWORD': 'password',
-        'HOST': 'localhost',
-        'PORT': 5433,
+        'ENGINE': '',
     },
     'unified': UNIFIED_DB,
 }

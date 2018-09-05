@@ -124,7 +124,6 @@ class TasksView extends React.Component {
             isFetching: PropTypes.bool.isRequired,
             data: PropTypes.arrayOf(Site),
         }),
-        token: PropTypes.string.isRequired,
         actions: PropTypes.shape({
             fetchTasks: PropTypes.func.isRequired,
             fetchSites: PropTypes.func.isRequired,
@@ -153,16 +152,14 @@ class TasksView extends React.Component {
     }
 
     componentDidMount() {
-        const {token} = this.props;
-        this.props.actions.fetchSites(token);
+        this.props.actions.fetchSites();
         this.fetchData();
 
     }
 
     fetchData = () => {
-        const {token} = this.props;
         const {page, filter, sortedBy, desc} = this.state;
-        this.props.actions.fetchTasks(token, page, DEFAULT_PAGE_SIZE, filter, sortedBy, desc);
+        this.props.actions.fetchTasks(page, DEFAULT_PAGE_SIZE, filter, sortedBy, desc);
     };
 
     updateLocation = () => {

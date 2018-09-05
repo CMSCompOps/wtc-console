@@ -4,12 +4,10 @@ import {push} from 'react-router-redux';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
-import {authLogoutAndRedirect} from './actions/auth';
 import './styles/main.scss';
 
 class App extends React.Component {
     static propTypes = {
-        isAuthenticated: PropTypes.bool.isRequired,
         children: PropTypes.shape().isRequired,
         dispatch: PropTypes.func.isRequired,
         location: PropTypes.shape({
@@ -19,10 +17,6 @@ class App extends React.Component {
 
     static defaultProps = {
         location: undefined
-    };
-
-    logout = () => {
-        this.props.dispatch(authLogoutAndRedirect());
     };
 
     goToIndex = () => {
@@ -77,38 +71,23 @@ class App extends React.Component {
                             </a>
                         </div>
                         <div className="collapse navbar-collapse" id="top-navbar">
-                            {this.props.isAuthenticated ?
-                                <ul className="nav navbar-nav navbar-right">
-                                    <li className={tasksClass}>
-                                        <a className="js-go-to-protected-button" onClick={this.goToTasks}>
-                                            Tasks
-                                        </a>
-                                    </li>
-                                    <li className={prepsClass}>
-                                        <a className="js-go-to-protected-button" onClick={this.goToPreps}>
-                                            Preps
-                                        </a>
-                                    </li>
-                                    <li className={workflowsClass}>
-                                        <a className="js-go-to-protected-button" onClick={this.goToWorkflows}>
-                                            Workflows
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a className="js-logout-button" onClick={this.logout}>
-                                            Logout
-                                        </a>
-                                    </li>
-                                </ul>
-                                :
-                                <ul className="nav navbar-nav navbar-right">
-                                    <li className={homeClass}>
-                                        <a className="js-login-button" onClick={this.goToIndex}>
-                                            <i className="fa fa-home"/> Login
-                                        </a>
-                                    </li>
-                                </ul>
-                            }
+                            <ul className="nav navbar-nav navbar-right">
+                                <li className={tasksClass}>
+                                    <a className="js-go-to-protected-button" onClick={this.goToTasks}>
+                                        Tasks
+                                    </a>
+                                </li>
+                                <li className={prepsClass}>
+                                    <a className="js-go-to-protected-button" onClick={this.goToPreps}>
+                                        Preps
+                                    </a>
+                                </li>
+                                <li className={workflowsClass}>
+                                    <a className="js-go-to-protected-button" onClick={this.goToWorkflows}>
+                                        Workflows
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </nav>
@@ -123,7 +102,6 @@ class App extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
     return {
-        isAuthenticated: state.auth.isAuthenticated,
         location: state.routing.location
     };
 };

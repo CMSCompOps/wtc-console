@@ -25,10 +25,8 @@ INSTALLED_APPS = (
     'rest_framework_mongoengine',
     'mongoengine.django.mongo_auth',
 
-    'knox',
     'django_extensions',
 
-    'accounts',
     'base',
     'unified',
     'workflows',
@@ -76,13 +74,9 @@ USE_L10N = True
 
 USE_TZ = True
 
-AUTH_USER_MODEL = 'accounts.User'
-
-# MONGOENGINE_USER_DOCUMENT = 'accounts.User'
-#
-# AUTHENTICATION_BACKENDS = (
-#     'mongoengine.django.auth.MongoEngineBackend',
-# )
+AUTHENTICATION_BACKENDS = (
+    'mongoengine.django.auth.MongoEngineBackend',
+)
 
 ACCOUNT_ACTIVATION_DAYS = 14  # days
 
@@ -112,13 +106,6 @@ REST_FRAMEWORK = {
     ),
 }
 
-# ############ REST KNOX ########################
-REST_KNOX = {
-    'SECURE_HASH_ALGORITHM': 'cryptography.hazmat.primitives.hashes.SHA512',
-    'AUTH_TOKEN_CHARACTER_LENGTH': 64,
-    'USER_SERIALIZER': 'knox.serializers.UserSerializer'
-}
-
 DATABASE_ROUTERS = ['lib.dbrouter.DbRouter']
 
 CELERYD_TASK_SOFT_TIME_LIMIT = 2 * 60
@@ -131,3 +118,6 @@ CELERY_IMPORTS=('djangoreactredux','workflows',)
 
 WORKFLOWS_UPDATE_LIMIT = 500
 WORKFLOWS_UPDATE_TIMEOUT = 2 # in hours
+
+# optional
+SESSION_ENGINE = 'mongoengine.django.sessions'
