@@ -6,8 +6,9 @@ from mongoengine.queryset.visitor import Q
 # from django.db.models import Count, Sum
 
 from workflows.models import Prep, Site, Workflow, Task
-# from workflows.serializers import PrepSerializer, PrepDetailsSerializer, WorkflowSerializer, WorkflowDetailsSerializer, TaskDocumentSerializer
+# from workflows.serializers import PrepSerializer, PrepDetailsSerializer, WorkflowSerializer, WorkflowDetailsSerializer, SiteSerializer
 from workflows.serializers import TaskSerializer
+from workflows.models import Prep, Site, Workflow
 
 
 class TasksViewSet(viewsets.ReadOnlyModelViewSet):
@@ -124,3 +125,15 @@ class TasksViewSet(viewsets.ReadOnlyModelViewSet):
 #         user = self.get_object()
 #         serializer = WorkflowDetailsSerializer(user)
 #         return Response(serializer.data)
+
+
+class SitesViewSet(viewsets.GenericViewSet):
+    queryset = Site.objects.all().order_by('name')
+    serializer_class = SiteSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)

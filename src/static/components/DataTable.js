@@ -152,7 +152,7 @@ export default class DataTable extends React.Component {
         )
     };
 
-    onRowClick = (id) => {
+    onRowClick = (id, row) => {
         const {folding, onClickFn} = this.props;
 
         folding && this.toggleRow(id);
@@ -184,7 +184,7 @@ export default class DataTable extends React.Component {
 
         return (
             <Row key={`row_${idx}`}>
-                <RowHeader isLink={!!onClickFn || folding} onClick={() => this.onRowClick(id)}>
+                <RowHeader isLink={!!onClickFn || folding} onClick={() => this.onRowClick(id, row)}>
                     {columns.map((col, col_idx) =>
                         <Cell
                             key={`cell_${idx}_${col.key}`}

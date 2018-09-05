@@ -6,11 +6,13 @@ import workflowReducer from './workflow';
 import prepsReducer from './preps';
 import prepReducer from './prep';
 import tasksReducer from './tasks';
+import sitesReducer from './sites';
 
 export default combineReducers({
     auth: authReducer,
     prep: prepReducer,
     preps: prepsReducer,
+    sites: sitesReducer,
     workflow: workflowReducer,
     workflows: workflowsReducer,
     tasks: tasksReducer,

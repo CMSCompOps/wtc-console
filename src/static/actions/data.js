@@ -9,6 +9,8 @@ import {
     FETCH_PREPS_SUCCESS,
     FETCH_TASKS_REQUEST,
     FETCH_TASKS_SUCCESS,
+    FETCH_SITES_REQUEST,
+    FETCH_SITES_SUCCESS,
 } from '../constants';
 import {fetchProtectedData} from './api'
 
@@ -55,5 +57,14 @@ export function fetchTasks(token, page, size, filter, orderBy, orderDesc) {
         `/api/v1/workflows/tasks/?page=${page || 1}&page_size=${size || 20}&filter=${filter || ''}&order_key=${orderBy || ''}&order_desc=${!!orderDesc}`,
         FETCH_TASKS_REQUEST,
         FETCH_TASKS_SUCCESS,
+    );
+}
+
+export function fetchSites(token) {
+    return fetchProtectedData(
+        token,
+        `/api/v1/workflows/sites/`,
+        FETCH_SITES_REQUEST,
+        FETCH_SITES_SUCCESS,
     );
 }
