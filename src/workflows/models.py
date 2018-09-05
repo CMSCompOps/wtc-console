@@ -33,6 +33,7 @@ class Task(Document):
     name = fields.StringField(max_length=2000, primary_key=True)
     job_type = fields.StringField(max_length=100)
     updated = fields.DateTimeField()
+    failures_count = fields.IntField()
 
     prep = fields.EmbeddedDocumentField(Prep)
     workflow = fields.EmbeddedDocumentField(Workflow)

@@ -57,7 +57,7 @@ class LoginView extends React.Component {
 
     componentWillMount() {
         if (this.props.isAuthenticated) {
-            this.props.dispatch(push('/workflows'));
+            this.props.dispatch(push('/tasks'));
         }
     }
 

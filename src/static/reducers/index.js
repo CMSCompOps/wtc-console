@@ -5,6 +5,7 @@ import workflowsReducer from './workflows';
 import workflowReducer from './workflow';
 import prepsReducer from './preps';
 import prepReducer from './prep';
+import tasksReducer from './tasks';
 
 export default combineReducers({
     auth: authReducer,
@@ -12,5 +13,6 @@ export default combineReducers({
     preps: prepsReducer,
     workflow: workflowReducer,
     workflows: workflowsReducer,
+    tasks: tasksReducer,
     routing: routerReducer,
 });
