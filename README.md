@@ -76,44 +76,44 @@ The mongo database can be accessed by connecting to docker instance
 
 * `$ docker exec -it wtcconsole_mongo_1 bash`
 
+
 ## Accessing Website
 
 Go to [localhost:8000](http://localhost:8000)
 
 
-## Django migrations
-
-After changing models create database migrations with:
-
-`$ python3 manage.py makemigrations workflows`
-
-## Development
+## Development guidelines
 
 When developing a new feature create your own branch and push your changes at least daily.
 
 Do not push directly to master. Create pull requests and assign someone to approve it. Go through your pull request your self, it helps to see if there is unwanted or commented-out code.
 
+
 ## Production
 
 Production setup used nginx as reverse proxy and Gunicorn as application server.
-More information on production server setup can be found in [How To Set Up Django with Postgres, Nginx, and Gunicorn on CentOS 7](https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-centos-7#create-a-gunicorn-systemd-service-file) 
+Below are the steps needed to setup environment on RHEL from scratch. Instructions are based on this article [How To Set Up Django with Postgres, Nginx, and Gunicorn on CentOS 7](https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-centos-7#create-a-gunicorn-systemd-service-file) 
 
 ### Setting up environment
 
-#### Requirements:
+#### Get the sources
+
+Clone this project to root _opt_ directory.
+
+* `cd /opt/`
+* `$ git clone https://github.com/vined/wtc-console.git`
+* `cd wtc-console/`
+
+#### Prerequisites:
 - Python >=2.7
-- Nginx
-- Oracle client
-- RabbitMQ
 
-#### Install Nginx
+#### Install Oracle client
 
-* `$ sudo yum install epel-release`
-* `$ sudo yum install nginx`
+Follow instructions on [Oracle client site](https://www.oracle.com/downloads/index.html)
 
 #### Install RabbitMQ
 
-TODO
+For installation details please refer to [RabbitMQ installation guide](https://www.rabbitmq.com/install-rpm.html)
 
 #### Create virtual python environment
 
@@ -121,12 +121,69 @@ TODO
 * `$ sudo -H pip install virtualenv`
 * `$ sudo virtualenv wtc-console-env`
 
+#### Install and configure nginx
+
+* `$ sudo yum install epel-release`
+* `$ sudo yum install nginx`
+* Add following lines to _/etc/nginx/nginx.conf_ as a first _server_ entry and change **domain_name** to the actual domain name.
+```
+server {
+    listen 80;
+    server_name domain_Name;
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location /static/ {
+        root /opt/wtc-console;
+    }
+    location / {
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_pass http://unix:/opt/wtc-console/wtc-console.sock;
+    }
+}
+```
+
+* Test if configuration is valid
+
+`$ sudo nginx -t`
+
+* Set restart nginx and set it to run on startup
+
+`$ sudo systemctl start nginx`
+
+`$ sudo systemctl enable nginx`
+
+
+#### Add Gunicorn config
+
+* `cp gunicorn.service /etc/systemd/system/` 
+* `sudo systemctl start gunicorn`
+* `sudo systemctl enable gunicorn`
+
+#### Create user and give rights to the project directory
+
+* `$ sudo useradd -M wtc-console`
+* `$ sudo chown wtc-console -R /opt/wtc-console`
+* `$ sudo usermod -a -G wtc-console nginx`
+* `$ sudo chmod 710 /opt/wtc-console`
+
 #### Update production settings
 
 Create prod.py in `src/djangoreactredux/settings/` directory by using _prod_template.py_ settings template file and update the fields with prod values.
 
+
+Proceed to deployment steps.
+
+
 ### Deployment
 
-After environment setup deployment is done with one bash command. It will shutdown current application if running, pull latest changes from repository master branch, install missing dependencies and start the application.
+Deployment is done with one bash command. It will:
+* shutdown celery workers
+* shutdown current application if running
+* pull latest changes from repository master branch
+* install missing dependencies
+* start the application
+* start celery workers
 
 `$ ./src/bin/deploy_prod.sh`
