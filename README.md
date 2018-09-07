@@ -28,7 +28,7 @@ Here are the main tools whose knowledge is useful to contribute:
 ### Setup steps
 
 Prerequisites:
-* Python 3.7
+* Python >=2.7
 
 Frontend builds, MongoDB, PostgreSql and RabbitMQ are run in docker containers to shorten setup time
 
@@ -95,17 +95,38 @@ Do not push directly to master. Create pull requests and assign someone to appro
 
 ## Production
 
-Requirements:
-- Python 3.7
-- PostgreSql
+Production setup used nginx as reverse proxy and Gunicorn as application server.
+More information on production server setup can be found in [How To Set Up Django with Postgres, Nginx, and Gunicorn on CentOS 7](https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-centos-7#create-a-gunicorn-systemd-service-file) 
+
+### Setting up environment
+
+#### Requirements:
+- Python >=2.7
+- Nginx
 - Oracle client
 - RabbitMQ
 
+#### Install Nginx
+
+* `$ sudo yum install epel-release`
+* `$ sudo yum install nginx`
+
+#### Install RabbitMQ
+
+TODO
+
+#### Create virtual python environment
+
+* `$ sudo -H pip install --upgrade pip`
+* `$ sudo -H pip install virtualenv`
+* `$ sudo virtualenv wtc-console-env`
+
+#### Update production settings
+
 Create prod.py in `src/djangoreactredux/settings/` directory by using _prod_template.py_ settings template file and update the fields with prod values.
 
+### Deployment
 
-Production deployment and startup
+After environment setup deployment is done with one bash command. It will shutdown current application if running, pull latest changes from repository master branch, install missing dependencies and start the application.
 
 `$ ./src/bin/deploy_prod.sh`
-
-Note: prod deployment part is not finished yet.

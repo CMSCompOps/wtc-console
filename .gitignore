@@ -58,7 +58,7 @@ tmp/
 oracle-admin/*
 
 # Celery
-**/celerybeat-schedule
+**/celerybeat-schedule*
 **/celery.log
 
 # Certificates

@@ -121,3 +121,7 @@ WORKFLOWS_UPDATE_TIMEOUT = 2 # in hours
 
 # optional
 SESSION_ENGINE = 'mongoengine.django.sessions'
+
+# CERN APIs
+REQUEST_MANAGER_API_URL = 'https://cmsweb.cern.ch/reqmgr2/data/request'
+SERVER_STATS_API_URL = 'https://cmsweb.cern.ch/wmstatsserver/data/filtered_requests'
