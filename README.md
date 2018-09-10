@@ -40,7 +40,7 @@ Running oracle client in docker container is not solved yet. Because of this, cl
 
 * Install [Oracle client](https://www.oracle.com/downloads/index.html).
     * Setup tns config by putting tnsnames.ora in projects _oracle-admin_ folder.
-* Copy _local_tamplate.py_ setting file to _local.py_ and fill it with certificates data and Oracle db credentials
+* Copy _local_template.py_ setting file to _local.py_ and fill it with certificates data and Oracle db credentials
 * `$ ./bin/setup_dev.sh` - this will install Python requirements, setup PostgreSql database and populate it with initial user data
 
 ### Running and stopping
@@ -164,8 +164,8 @@ server {
 #### Create user and give rights to the project directory
 
 * `$ sudo useradd -M wtc-console`
-* `$ sudo chown wtc-console -R /opt/wtc-console`
-* `$ sudo usermod -a -G wtc-console nginx`
+* `$ sudo chown -R wtc-console:nginx /opt/wtc-console`
+* `$ sudo usermod -a -G nginx wtc-console`
 * `$ sudo chmod 710 /opt/wtc-console`
 
 #### Update production settings
