@@ -21,7 +21,6 @@ DATABASES = {
         'USER': 'username',
         'PASSWORD': 'password',
     }
-
 }
 
 MONGODB_DATABASES = {

@@ -20,12 +20,17 @@ const VENDOR = [
     'react-redux',
     'react-router',
     'react-mixin',
+    'react-select',
     'classnames',
     'redux',
     'react-router-redux',
     'jquery',
     'bootstrap-loader',
-    'font-awesome-webpack!./styles/font-awesome.config.prod.js'
+    'font-awesome-webpack!./styles/font-awesome.config.prod.js',
+    'moment',
+    'lodash',
+    'styled-components',
+    'query-string',
 ];
 
 const basePath = path.resolve(__dirname, '../src/static/');

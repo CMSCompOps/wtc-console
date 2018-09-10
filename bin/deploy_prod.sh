@@ -5,6 +5,7 @@ export TNS_ADMIN=/eos/project/o/oracle/public/admin/
 git pull origin master
 
 # Build frontend for production
+npm install
 npm run prod
 
 # Stop celery workers

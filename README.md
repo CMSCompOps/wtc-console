@@ -25,56 +25,61 @@ Here are the main tools whose knowledge is useful to contribute:
 
 ## Setting up local environment
 
-### Setup steps
-
 Prerequisites:
 * Python >=2.7
+
+### Setup steps
+
+Clone this project:
+
+* `git clone https://github.com/vined/wtc-console.git`
+* `cd wtc-console/`
 
 Frontend builds, MongoDB, PostgreSql and RabbitMQ are run in docker containers to shorten setup time
 
 * Install [Docker](https://www.docker.com/products/overview) and [Docker Compose](https://docs.docker.com/compose/install/).
-* `$ docker-compose build`
-* `$ docker-compose up`
+* `docker-compose build`
+* `docker-compose up`
 
 Running oracle client in docker container is not solved yet. Because of this, client has to be installed locally.
 
 * Install [Oracle client](https://www.oracle.com/downloads/index.html).
     * Setup tns config by putting tnsnames.ora in projects _oracle-admin_ folder.
 * Copy _local_template.py_ setting file to _local.py_ and fill it with certificates data and Oracle db credentials
-* `$ ./bin/setup_dev.sh` - this will install Python requirements, setup PostgreSql database and populate it with initial user data
+* `./bin/setup_dev.sh` - this will install Python requirements, setup PostgreSql database and populate it with initial user data
 
 ### Running and stopping
 
 To start up development environment after it is setup you need to run these two commands in separate console windows/tabs in this order
 
-* `$ docker-compose up`
-* `$ ./bin/start_dev.sh`
+* `docker-compose up`
+* `./bin/start_dev.sh`
 
 To stop the development server:
 
-* `$ ./bin/stop_dev.sh` - this will stop celery workers
-* `$ docker-compose stop`
+* `./bin/stop_dev.sh` - this will stop celery workers
+* `docker-compose stop`
 
 ### Clean up
 
 Stop Docker development server and remove containers, networks, volumes, and images created by up (to make a fresh start).
 
-* `$ docker-compose down`
+* `docker-compose down`
 
 ### Misc
 
 You can access shell in a container
 
-* `$ docker ps  # get the name from the list of running containers`
-* `$ docker exec -i -t djangoreactreduxbase_rabbitmq /bin/bash`
+* `docker ps  # get the name from the list of running containers`
+* `docker exec -i -t djangoreactreduxbase_rabbitmq /bin/bash`
 
 The postgresql database can be accessed @localhost:5433
 
-* `$ psql -h localhost -p 5433 -U djangoreactredux djangoreactredux_dev`
+* `psql -h localhost -p 5433 -U djangoreactredux djangoreactredux_dev`
 
 The mongo database can be accessed by connecting to docker instance
 
-* `$ docker exec -it wtcconsole_mongo_1 bash`
+* `docker exec -it wtcconsole_mongo_1 bash`
 
 
 ## Accessing Website
@@ -96,16 +101,24 @@ Below are the steps needed to setup environment on RHEL from scratch. Instructio
 
 ### Setting up environment
 
+#### Create user and login with it
+
+* `sudo useradd wtc-console`
+* `sudo su - wtc-console`
+
 #### Get the sources
 
-Clone this project to root _opt_ directory.
+Clone this project to wtc-console users home directory.
 
-* `cd /opt/`
-* `$ git clone https://github.com/vined/wtc-console.git`
+* `git clone https://github.com/vined/wtc-console.git`
 * `cd wtc-console/`
 
 #### Prerequisites:
 - Python >=2.7
+- Node and NPM
+
+#### Install Node and NPM
+Follow this guide for [RHEL](https://tecadmin.net/install-latest-nodejs-and-npm-on-centos/)
 
 #### Install Oracle client
 
@@ -117,14 +130,14 @@ For installation details please refer to [RabbitMQ installation guide](https://w
 
 #### Create virtual python environment
 
-* `$ sudo -H pip install --upgrade pip`
-* `$ sudo -H pip install virtualenv`
-* `$ sudo virtualenv wtc-console-env`
+* `pip install --upgrade pip`
+* `pip install virtualenv`
+* `virtualenv wtc-console-env`
 
 #### Install and configure nginx
 
-* `$ sudo yum install epel-release`
-* `$ sudo yum install nginx`
+* `sudo yum install epel-release`
+* `sudo yum install nginx`
 * Add following lines to _/etc/nginx/nginx.conf_ as a first _server_ entry and change **domain_name** to the actual domain name.
 ```
 server {
@@ -132,27 +145,27 @@ server {
     server_name domain_Name;
     location = /favicon.ico { access_log off; log_not_found off; }
     location /static/ {
-        root /opt/wtc-console;
+        root /home/wtc-console/wtc-console;
     }
     location / {
         proxy_set_header Host $http_host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_pass http://unix:/opt/wtc-console/wtc-console.sock;
+        proxy_pass http://unix:/home/wtc-console/wtc-console/wtc-console.sock;
     }
 }
 ```
 
 * Test if configuration is valid
 
-`$ sudo nginx -t`
+`sudo nginx -t`
 
 * Set restart nginx and set it to run on startup
 
-`$ sudo systemctl start nginx`
+`sudo systemctl start nginx`
 
-`$ sudo systemctl enable nginx`
+`sudo systemctl enable nginx`
 
 
 #### Add Gunicorn config
@@ -161,22 +174,31 @@ server {
 * `sudo systemctl start gunicorn`
 * `sudo systemctl enable gunicorn`
 
-#### Create user and give rights to the project directory
+#### Give rights to the project directory
 
-* `$ sudo useradd -M wtc-console`
-* `$ sudo chown -R wtc-console:nginx /opt/wtc-console`
-* `$ sudo usermod -a -G nginx wtc-console`
-* `$ sudo chmod 710 /opt/wtc-console`
+TODO: probably remove
+* `sudo chown -R wtc-console:nginx /opt/wtc-console`
+* `sudo usermod -a -G nginx wtc-console`
+* `sudo chmod 770 /opt/wtc-console`
 
 #### Update production settings
 
 Create prod.py in `src/djangoreactredux/settings/` directory by using _prod_template.py_ settings template file and update the fields with prod values.
+
+* `cp src/djangoreactredux/settings/prod_template.py src/djangoreactredux/settings/prod.py`
+* `vim src/djangoreactredux/settings/prod.py`
+ 
+ Create certificates.
 
 
 Proceed to deployment steps.
 
 
 ### Deployment
+
+Become wtc-console user:
+
+`sudo su - wtc-console`
 
 Deployment is done with one bash command. It will:
 * shutdown celery workers
@@ -186,4 +208,4 @@ Deployment is done with one bash command. It will:
 * start the application
 * start celery workers
 
-`$ ./src/bin/deploy_prod.sh`
+`./src/bin/deploy_prod.sh`
