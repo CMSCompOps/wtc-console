@@ -60,6 +60,10 @@ To stop the development server:
 * `./bin/stop_dev.sh` - this will stop celery workers
 * `docker-compose stop`
 
+Note: it might take some time for celery workers to stop if they are in longer process. You can check if they are still running by executing:
+
+`ps -ef | grep celery`
+
 ### Clean up
 
 Stop Docker development server and remove containers, networks, volumes, and images created by up (to make a fresh start).
