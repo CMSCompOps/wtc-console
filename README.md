@@ -142,7 +142,8 @@ For installation details please refer to [RabbitMQ installation guide](https://w
 
 * `sudo yum install epel-release`
 * `sudo yum install nginx`
-* Add following lines to _/etc/nginx/nginx.conf_ as a first _server_ entry and change **domain_name** to the actual domain name.
+
+Add following lines to _/etc/nginx/nginx.conf_ as a first _server_ entry and change **domain_name** to the actual domain name.
 ```
 server {
     listen 80;
@@ -161,15 +162,14 @@ server {
 }
 ```
 
-* Test if configuration is valid
+Test if configuration is valid
 
-`sudo nginx -t`
+* `sudo nginx -t`
 
-* Set restart nginx and set it to run on startup
+Set restart nginx and set it to run on startup
 
-`sudo systemctl start nginx`
-
-`sudo systemctl enable nginx`
+* `sudo systemctl start nginx`
+* `sudo systemctl enable nginx`
 
 
 #### Add Gunicorn config
@@ -180,10 +180,9 @@ server {
 
 #### Give rights to the project directory
 
-TODO: probably remove
-* `sudo chown -R wtc-console:nginx /opt/wtc-console`
+* `sudo chown -R wtc-console:nginx /home/wtc-console/wtc-console`
 * `sudo usermod -a -G nginx wtc-console`
-* `sudo chmod 770 /opt/wtc-console`
+* `sudo chmod 770 /home/wtc-console/wtc-console`
 
 #### Update production settings
 

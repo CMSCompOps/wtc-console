@@ -61,7 +61,7 @@ LOGGING = {
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'filename': '../logs/application.log',
             'when': 'd',
-            'interval': '1',
+            'interval': 1,
             'utc': True,
             'formatter': 'verbose',
         },

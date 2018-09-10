@@ -29,6 +29,6 @@ done
     && pip install -r ../py-requirements/prod.txt \
     && python manage.py check --deploy --settings=djangoreactredux.settings.prod \
     && python manage.py collectstatic --settings=djangoreactredux.settings.prod \
-    && gunicorn --bind 0.0.0.0:8000 myproject.wsgi:application \
+    && gunicorn --bind 0.0.0.0:8000 djangoreactredux.wsgi:application \
     && celery -A djangoreactredux worker -l debug -f celery.log --detach -B \
 )

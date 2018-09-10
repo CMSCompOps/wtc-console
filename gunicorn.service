@@ -5,8 +5,8 @@ After=network.target
 [Service]
 User=wtc-console
 Group=nginx
-WorkingDirectory=/opt/wtc-console
-ExecStart=/opt/wtc-console/wtc-console-env/bin/gunicorn --workers 2 --bind unix:/opt/wtc-console/wtc-console.sock djangoreactredux.wsgi:application
+WorkingDirectory=/home/wtc-console/wtc-console
+ExecStart=/home/wtc-console/wtc-console/wtc-console-env/bin/gunicorn --workers 2 --bind unix:/home/wtc-console/wtc-console/wtc-console.sock djangoreactredux.wsgi:application
 
 [Install]
 WantedBy=multi-user.target
