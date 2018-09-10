@@ -63,3 +63,6 @@ oracle-admin/*
 
 # Certificates
 cert/*
+
+# Log files
+logs/

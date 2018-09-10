@@ -59,7 +59,7 @@ LOGGING = {
         'django_rest_logger_handler': {
             'level': 'DEBUG',
             'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': '/var/log/wtc-console/debug.log',
+            'filename': '../logs/application.log',
             'when': 'd',
             'interval': '1',
             'utc': True,
