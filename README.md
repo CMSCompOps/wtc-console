@@ -20,7 +20,7 @@ Here are the main tools whose knowledge is useful to contribute:
 * [Django](https://www.djangoproject.com/)
 * [Django REST framework](http://www.django-rest-framework.org/) Django REST framework is a powerful and flexible toolkit for building Web APIs
 * [MongoEngine](https://github.com/MongoEngine/mongoengine) Python ODM for MongoDB
-* [Django REST Knox](https://github.com/James1345/django-rest-knox) Token based authentication for API endpoints
+* [Celery](http://docs.celeryproject.org/en/latest/) Distributed tasks queue
 
 
 ## Setting up local environment
