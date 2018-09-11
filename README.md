@@ -212,3 +212,8 @@ Deployment is done with one bash command. It will:
 * start celery workers
 
 `./src/bin/deploy_prod.sh`
+
+
+### Maintenance
+
+Logs are in /home/wtc-console/wtc-console/logs
