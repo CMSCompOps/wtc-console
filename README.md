@@ -171,6 +171,19 @@ Set restart nginx and set it to run on startup
 * `sudo systemctl start nginx`
 * `sudo systemctl enable nginx`
 
+##### For RHEL, Fedora, CentOS
+
+If when opening server you see this error in _/var/log/nginx/error.log_:
+
+```
+*2 connect() to 127.0.0.1:8000 failed (13: Permission denied) while connecting to upstream, client: some_ip, server: some_domain, request: "GET / HTTP/1.1", upstream: "http://127.0.0.1:8000/", host: "some_domain"
+```
+
+Then use this command to solve it:
+* `sudo setsebool -P httpd_can_network_connect 1`
+
+It turns on httpd connections and -P makes it persistent.
+
 
 #### Add Gunicorn config
 
