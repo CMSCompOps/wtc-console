@@ -221,6 +221,7 @@ Deployment is done with one bash command. It will:
 * shutdown current application if running
 * pull latest changes from repository master branch
 * install missing dependencies
+* build frontend app
 * start the application
 * start celery workers
 
