@@ -194,7 +194,6 @@ It turns on httpd connections and -P makes it persistent.
 #### Give rights to the project directory
 
 * `sudo chown -R wtc-console:nginx /home/wtc-console/wtc-console`
-* `sudo usermod -a -G nginx wtc-console`
 * `sudo chmod 770 /home/wtc-console/wtc-console`
 
 #### Update production settings

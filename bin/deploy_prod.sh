@@ -12,7 +12,8 @@ npm run prod
 echo "Stopping Celery workers. If this takes too long, try killing them manually and deleting celeryd.pid\n"
 (cd src \
     && source ../wtc-console-env/bin/activate \
-    && celery -A djangoreactredux control shutdown \
+    && DJANGO_SETTINGS_MODULE=djangoreactredux.settings.prod celery -A djangoreactredux control shutdown \
+    && pkill gunicorn \
 )
 
 # Check if celery workers are stopped
@@ -30,5 +31,5 @@ done
     && python manage.py check --deploy --settings=djangoreactredux.settings.prod \
     && python manage.py collectstatic --noinput --settings=djangoreactredux.settings.prod \
     && gunicorn --bind 0.0.0.0:8000 --daemon --env DJANGO_SETTINGS_MODULE=djangoreactredux.settings.prod djangoreactredux.wsgi:application \
-    && celery -A djangoreactredux worker -l debug -f celery.log --detach -B \
+    && DJANGO_SETTINGS_MODULE=djangoreactredux.settings.prod celery -A djangoreactredux worker -l debug -f celery.log --detach -B \
 )
