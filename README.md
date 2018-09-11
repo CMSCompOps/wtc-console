@@ -39,11 +39,10 @@ Frontend builds, MongoDB, PostgreSql and RabbitMQ are run in docker containers t
 
 * Install [Docker](https://www.docker.com/products/overview) and [Docker Compose](https://docs.docker.com/compose/install/).
 * `docker-compose build`
-* `docker-compose up`
 
 Running oracle client in docker container is not solved yet. Because of this, client has to be installed locally.
 
-* Install [Oracle client](https://www.oracle.com/downloads/index.html).
+* Install [Oracle Instant Client](http://www.oracle.com/technetwork/database/database-technologies/instant-client/overview/index.html).
     * Setup tns config by putting tnsnames.ora in projects _oracle-admin_ folder.
 * Copy _local_template.py_ setting file to _local.py_ and fill it with certificates data and Oracle db credentials
 * `./bin/setup_dev.sh` - this will install Python requirements, setup PostgreSql database and populate it with initial user data
@@ -58,7 +57,7 @@ To start up development environment after it is setup you need to run these two 
 To stop the development server:
 
 * `./bin/stop_dev.sh` - this will stop celery workers
-* `docker-compose stop`
+* `docker-compose stop` or _Ctrl+C_ if you have an active docker terminal
 
 Note: it might take some time for celery workers to stop if they are in longer process. You can check if they are still running by executing:
 
@@ -128,6 +127,22 @@ Follow this guide for [RHEL](https://tecadmin.net/install-latest-nodejs-and-npm-
 
 Follow instructions on [Oracle client site](https://www.oracle.com/downloads/index.html)
 
+Open wtc-console users .bashrc file: 
+
+`vim ~/.bashrc`
+
+Add these lines to it:
+
+```
+ORACLE_HOME=/usr/lib/oracle/12.2/client64
+LD_LIBRARY_PATH=$ORACLE_HOME/lib
+PATH=$PATH:$ORACLE_HOME/bin
+```
+
+And apply these changes:
+
+`. ~/.bashrc `
+
 #### Install RabbitMQ
 
 For installation details please refer to [RabbitMQ installation guide](https://www.rabbitmq.com/install-rpm.html)
@@ -196,6 +211,13 @@ It turns on httpd connections and -P makes it persistent.
 * `sudo chown -R wtc-console:nginx /home/wtc-console/wtc-console`
 * `sudo chmod 770 /home/wtc-console/wtc-console`
 
+#### Firewall config
+
+* `sudo iptables -I INPUT 1 -p tcp --dport 80 -m state --state NEW,ESTABLISHED -j ACCEPT`
+* `sudo iptables -I OUTPUT -p tcp --dport 80 -m state --state NEW,ESTABLISHED -j ACCEPT`
+* `sudo service iptables save`
+* `sudo service iptables restart`
+
 #### Update production settings
 
 Create prod.py in `src/djangoreactredux/settings/` directory by using _prod_template.py_ settings template file and update the fields with prod values.
@@ -226,6 +248,14 @@ Deployment is done with one bash command. It will:
 
 `./src/bin/deploy_prod.sh`
 
+
+### Stopping server
+
+If for some reason application should be stoppet then use this script:
+
+`./src/bin/stop_prod.sh`
+
+It will stop Gunicorn and Celery tasks
 
 ### Maintenance
 
