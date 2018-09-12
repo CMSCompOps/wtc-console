@@ -20,6 +20,9 @@ src/static_root/
 # Python compiled byte code
 *.pyc
 
+# Python virtualenv
+wtc-console-env/
+
 # Databases
 *.sqlite
 docker/mongo/data/*
