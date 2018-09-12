@@ -44,6 +44,13 @@ Running oracle client in docker container is not solved yet. Because of this, cl
 
 * Install [Oracle Instant Client](http://www.oracle.com/technetwork/database/database-technologies/instant-client/overview/index.html).
     * Setup tns config by putting tnsnames.ora in projects _oracle-admin_ folder.
+    * Add these lines to your _.bashrc_, probably the path to client will be _/usr/lib/oracle/xx.x/client64_
+```
+export ORACLE_HOME=/path/to/oracle/client
+export LD_LIBRARY_PATH=$ORACLE_HOME/lib
+export PATH=$PATH:$ORACLE_HOME/bin
+```
+
 * Copy _local_template.py_ setting file to _local.py_ and fill it with certificates data and Oracle db credentials
 * `./bin/setup_dev.sh` - this will install Python requirements, setup PostgreSql database and populate it with initial user data
 
@@ -134,9 +141,9 @@ Open wtc-console users .bashrc file:
 Add these lines to it:
 
 ```
-ORACLE_HOME=/usr/lib/oracle/12.2/client64
-LD_LIBRARY_PATH=$ORACLE_HOME/lib
-PATH=$PATH:$ORACLE_HOME/bin
+export ORACLE_HOME=/usr/lib/oracle/12.2/client64
+export LD_LIBRARY_PATH=$ORACLE_HOME/lib
+export PATH=$PATH:$ORACLE_HOME/bin
 ```
 
 And apply these changes:
