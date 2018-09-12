@@ -39,10 +39,9 @@ echo "Stopping Gunicorn"
 
 echo "Gunicorn started"
 
-# TODO change celery log level to warning
 (cd src/ \
     && source ../wtc-console-env/bin/activate \
-    && DJANGO_SETTINGS_MODULE=djangoreactredux.settings.prod celery -A djangoreactredux worker -l debug -f ../logs/celery.log --detach -B \
+    && DJANGO_SETTINGS_MODULE=djangoreactredux.settings.prod celery -A djangoreactredux worker -l INFO -f ../logs/celery.log --detach -B \
 )
 
 echo "Celery started"

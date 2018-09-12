@@ -2,10 +2,7 @@ import mongoengine
 
 from djangoreactredux.settings.base import *  # NOQA (ignore all errors on this line)
 
-# TODO Change to False
-DEBUG = True
-TEMPLATE_DEBUG = DEBUG
-
+DEBUG = False
 PAGE_CACHE_SECONDS = 60
 
 # TODO: in a real production server this should have a proper url
@@ -41,12 +38,11 @@ mongoengine.connect(
 REST_FRAMEWORK[
     'EXCEPTION_HANDLER'] = 'django_rest_logger.handlers.rest_exception_handler'  # NOQA (ignore all errors on this line)
 
-# TODO change log levels to INFO
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
     'root': {
-        'level': 'DEBUG',
+        'level': 'INFO',
         'handlers': ['django_rest_logger_handler'],
     },
     'formatters': {
@@ -57,7 +53,7 @@ LOGGING = {
     },
     'handlers': {
         'django_rest_logger_handler': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'filename': '../logs/application.log',
             'when': 'd',
@@ -73,7 +69,7 @@ LOGGING = {
             'propagate': False,
         },
         'django_rest_logger': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'handlers': ['django_rest_logger_handler'],
             'propagate': False,
         },
@@ -88,9 +84,8 @@ LOGGER_WARNING = DEFAULT_LOGGER
 
 CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672/'
 
-# TODO remove
-WORKFLOWS_UPDATE_LIMIT = 10
-WORKFLOWS_UPDATE_TIMEOUT = 2  # in hours
+WORKFLOWS_UPDATE_LIMIT = 100
+WORKFLOWS_UPDATE_TIMEOUT = 1  # in hours
 
 CA_PATH = '../cert/CERNRootCertificationAuthority2.crt'
 CERT_PATH = '../cert/crt.pem'
