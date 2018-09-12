@@ -165,21 +165,18 @@ For installation details please refer to [RabbitMQ installation guide](https://w
 * `sudo yum install epel-release`
 * `sudo yum install nginx`
 
-Add following lines to _/etc/nginx/nginx.conf_ as a first _server_ entry and change **domain_name** to the actual domain name.
+Add following lines to _/etc/nginx/nginx.conf_ as a first _server_ entry and change **domain_name** to the actual domain name probably in format of _node_name.cern.ch_
 ```
 server {
     listen 80;
     server_name domain_Name;
     location = /favicon.ico { access_log off; log_not_found off; }
-    location /static/ {
-        root /home/wtc-console/wtc-console;
-    }
     location / {
         proxy_set_header Host $http_host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_pass http://unix:/home/wtc-console/wtc-console/wtc-console.sock;
+        proxy_pass http://0.0.0.0:8000;
     }
 }
 ```
@@ -207,13 +204,7 @@ Then use this command to solve it:
 It turns on httpd connections and -P makes it persistent.
 
 
-#### Add Gunicorn config
-
-* `cp gunicorn.service /etc/systemd/system/` 
-* `sudo systemctl start gunicorn`
-* `sudo systemctl enable gunicorn`
-
-#### Give rights to the project directory
+#### Give nginx group rights to the project directory
 
 * `sudo chown -R wtc-console:nginx /home/wtc-console/wtc-console`
 * `sudo chmod 770 /home/wtc-console/wtc-console`
@@ -224,6 +215,8 @@ It turns on httpd connections and -P makes it persistent.
 * `sudo iptables -I OUTPUT -p tcp --dport 80 -m state --state NEW,ESTABLISHED -j ACCEPT`
 * `sudo service iptables save`
 * `sudo service iptables restart`
+
+You can see current config with `sudo sudo iptables --line -vnL` or `sudo less /etc/sysconfig/iptables`
 
 #### Update production settings
 

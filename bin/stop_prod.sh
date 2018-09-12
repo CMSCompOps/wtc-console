@@ -10,7 +10,7 @@ echo "Stopping Celery workers. If this takes too long, try killing them manually
 # Check if celery workers are stopped
 while [ -f src/celeryd.pid ]
 do
-    echo "."
+    echo -n "."
     sleep 2
 done
 
