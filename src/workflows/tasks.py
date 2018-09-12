@@ -25,12 +25,12 @@ def setup_direct_queue(sender, instance, **kwargs):
 def fetch_new_workflows_from_unified():
     logger.debug('Preparing to fetch workflows from Unified')
 
-    unified_wfs = UnifiedWorkflow.objects \
-        .filter(status__icontains='manual') \
-        .values_list('name', flat=True)
-    logger.info('Received unified workflows with status manual size {}'.format(len(unified_wfs)))
-
     try:
+        unified_wfs = UnifiedWorkflow.objects \
+            .filter(status__icontains='manual') \
+            .values_list('name', flat=True)
+        logger.info('Received unified workflows with status manual size {}'.format(len(unified_wfs)))
+
         wtc_wfs = WorkflowToUpdate.objects \
             .all() \
             .values_list('name')
