@@ -89,6 +89,11 @@ def update_workflow_tasks(prep, workflow, job_data):
         if 'sites' not in task_data:
             continue
 
+        job_type = task_data.get('jobtype', '')
+
+        if not job_type or job_type in settings.SKIP_JOB_TYPES:
+            continue
+
         statuses = parse_task_statuses(task_data)
         failures_count = get_failures_count(statuses)
         logger.debug('Failures count {} for wf {}'.format(failures_count, workflow.name))

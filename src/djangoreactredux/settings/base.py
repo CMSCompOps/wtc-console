@@ -122,3 +122,6 @@ SESSION_ENGINE = 'mongoengine.django.sessions'
 # CERN APIs
 REQUEST_MANAGER_API_URL = 'https://cmsweb.cern.ch/reqmgr2/data/request'
 SERVER_STATS_API_URL = 'https://cmsweb.cern.ch/wmstatsserver/data/filtered_requests'
+
+# Workflows and tasks configuration
+SKIP_JOB_TYPES = ['LogCollect', 'Cleanup']
