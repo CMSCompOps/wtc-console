@@ -61,7 +61,7 @@ def parse_task_statuses(task_data):
         dataset_keys = site_data.get('dataset', {'': {}}).keys()
         dataset = list(dataset_keys)[0] if dataset_keys else ''
 
-        # Remove this after implementing drain statuses retrieval
+        # TODO: Remove this after implementing drain statuses retrieval
         site = Site(name=site_name)
         site.save()
 

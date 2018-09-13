@@ -43,16 +43,17 @@ Frontend builds, MongoDB, PostgreSql and RabbitMQ are run in docker containers t
 Running oracle client in docker container is not solved yet. Because of this, client has to be installed locally.
 
 * Install [Oracle Instant Client](http://www.oracle.com/technetwork/database/database-technologies/instant-client/overview/index.html).
-    * Setup tns config by putting tnsnames.ora in projects _oracle-admin_ folder.
-    * Add these lines to your _.bashrc_, probably the path to client will be _/usr/lib/oracle/xx.x/client64_
+    * Setup tns config by putting tnsnames.ora from _/afs/cern.ch/project/oracle/admin/_ to projects _oracle-admin_ folder.
+    Note: sometimes this config file changes, if you have problems connecting to oracle, then try to fetch a new version of this file
+    * Add these lines to your _.bashrc_, probably the path to client will be _/usr/lib/oracle/xx.x/client64_, but it might be different depending on installation type
 ```
 export ORACLE_HOME=/path/to/oracle/client
 export LD_LIBRARY_PATH=$ORACLE_HOME/lib
 export PATH=$PATH:$ORACLE_HOME/bin
 ```
 
-* Copy _local_template.py_ setting file to _local.py_ and fill it with certificates data and Oracle db credentials
-* `./bin/setup_dev.sh` - this will install Python requirements, setup PostgreSql database and populate it with initial user data
+* Copy _src/djangoreactredux/settings/local_template.py_ setting file to _src/djangoreactredux/settings/local.py_ and fill it with certificates data and Oracle db credentials
+* `./bin/setup_dev.sh` - this will install Python requirements
 
 ### Running and stopping
 
@@ -64,7 +65,7 @@ To start up development environment after it is setup you need to run these two 
 To stop the development server:
 
 * `./bin/stop_dev.sh` - this will stop celery workers
-* `docker-compose stop` or _Ctrl+C_ if you have an active docker terminal
+* `docker-compose stop` or _Ctrl+C_ if you have 'docker-compose up' running terminal
 
 Note: it might take some time for celery workers to stop if they are in longer process. You can check if they are still running by executing:
 
@@ -80,16 +81,16 @@ Stop Docker development server and remove containers, networks, volumes, and ima
 
 You can access shell in a container
 
-* `docker ps  # get the name from the list of running containers`
-* `docker exec -i -t djangoreactreduxbase_rabbitmq /bin/bash`
+* `docker ps` - get the name from the list of running containers
+* `docker exec -i -t djangoreactreduxbase_rabbitmq /bin/bash` - connects to container bash
 
 The postgresql database can be accessed @localhost:5433
 
 * `psql -h localhost -p 5433 -U djangoreactredux djangoreactredux_dev`
 
-The mongo database can be accessed by connecting to docker instance
+The mongo database can be accessed by connecting to docker instance with mongo client
 
-* `docker exec -it wtcconsole_mongo_1 bash`
+* `mongo --host localhost`
 
 
 ## Accessing Website
@@ -106,10 +107,12 @@ Do not push directly to master. Create pull requests and assign someone to appro
 
 ## Production
 
-Production setup used nginx as reverse proxy and Gunicorn as application server.
+Production setup uses nginx as reverse proxy and Gunicorn as an application server.
 Below are the steps needed to setup environment on RHEL from scratch. Instructions are based on this article [How To Set Up Django with Postgres, Nginx, and Gunicorn on CentOS 7](https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-centos-7#create-a-gunicorn-systemd-service-file) 
 
 ### Setting up environment
+
+Use these instructions to setup a new production environment from scratch. By following these instructions you will create a dedicated user _wtc-console_ for running this application with Gunicorn, update proxy config for Nginx and setup firewall to allow traffic on port 80.
 
 #### Create user and login with it
 
@@ -212,7 +215,7 @@ It turns on httpd connections and -P makes it persistent.
 #### Firewall config
 
 * `sudo iptables -I INPUT 1 -p tcp --dport 80 -m state --state NEW,ESTABLISHED -j ACCEPT`
-* `sudo iptables -I OUTPUT -p tcp --dport 80 -m state --state NEW,ESTABLISHED -j ACCEPT`
+* `sudo iptables -I OUTPUT 1 -p tcp --dport 80 -m state --state NEW,ESTABLISHED -j ACCEPT`
 * `sudo service iptables save`
 * `sudo service iptables restart`
 
@@ -232,6 +235,7 @@ Proceed to deployment steps.
 
 
 ### Deployment
+
 
 Become wtc-console user:
 

@@ -1,3 +1,4 @@
+// TODO: remove
 export const SERVER_URL = '';
 
 // config should use named export as there can be different exports,
