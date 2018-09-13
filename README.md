@@ -214,6 +214,8 @@ It turns on httpd connections and -P makes it persistent.
 
 #### Firewall config
 
+Ask system administrators to include port 80 to puppt config. If puppet is not used, then you can configure firewall yourself to bypass traffic on this port with these commands:
+
 * `sudo iptables -I INPUT 1 -p tcp --dport 80 -m state --state NEW,ESTABLISHED -j ACCEPT`
 * `sudo iptables -I OUTPUT 1 -p tcp --dport 80 -m state --state NEW,ESTABLISHED -j ACCEPT`
 * `sudo service iptables save`
