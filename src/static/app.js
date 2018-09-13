@@ -19,10 +19,6 @@ class App extends React.Component {
         location: undefined
     };
 
-    goToIndex = () => {
-        this.props.dispatch(push('/'));
-    };
-
     goToTasks = () => {
         this.props.dispatch(push('/tasks'));
     };
@@ -36,9 +32,6 @@ class App extends React.Component {
     };
 
     render() {
-        const homeClass = classNames({
-            active: this.props.location && this.props.location.pathname === '/'
-        });
         const tasksClass = classNames({
             active: this.props.location && this.props.location.pathname === '/tasks'
         });
@@ -66,7 +59,7 @@ class App extends React.Component {
                                 <span className="icon-bar"/>
                                 <span className="icon-bar"/>
                             </button>
-                            <a className="navbar-brand" onClick={this.goToIndex}>
+                            <a className="navbar-brand" onClick={this.goToTasks}>
                                 WTC Console
                             </a>
                         </div>
@@ -77,16 +70,16 @@ class App extends React.Component {
                                         Tasks
                                     </a>
                                 </li>
-                                <li className={prepsClass}>
-                                    <a className="js-go-to-protected-button" onClick={this.goToPreps}>
-                                        Preps
-                                    </a>
-                                </li>
-                                <li className={workflowsClass}>
-                                    <a className="js-go-to-protected-button" onClick={this.goToWorkflows}>
-                                        Workflows
-                                    </a>
-                                </li>
+                                {/*<li className={prepsClass}>*/}
+                                    {/*<a className="js-go-to-protected-button" onClick={this.goToPreps}>*/}
+                                        {/*Preps*/}
+                                    {/*</a>*/}
+                                {/*</li>*/}
+                                {/*<li className={workflowsClass}>*/}
+                                    {/*<a className="js-go-to-protected-button" onClick={this.goToWorkflows}>*/}
+                                        {/*Workflows*/}
+                                    {/*</a>*/}
+                                {/*</li>*/}
                             </ul>
                         </div>
                     </div>

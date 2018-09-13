@@ -1,15 +1,15 @@
 import React from 'react';
-import { Route, Switch } from 'react-router';
-import { LoginView, PrepView, PrepsView, WorkflowView, WorkflowsView, TasksView, NotFoundView } from './containers';
+import { Redirect, Route, Switch } from 'react-router';
+import { PrepView, PrepsView, WorkflowView, WorkflowsView, TasksView, NotFoundView } from './containers';
 
 export default(
     <Switch>
-        <Route exact path="/" component={LoginView} />
+        <Route exact path="/tasks" component={TasksView} />
         <Route exact path="/preps/:id" component={PrepView} />
         <Route exact path="/preps" component={PrepsView} />
         <Route exact path="/workflows/:id" component={WorkflowView} />
         <Route exact path="/workflows" component={WorkflowsView} />
-        <Route exact path="/tasks" component={TasksView} />
+        <Redirect exact from="/" to="/tasks" />
         <Route path="*" component={NotFoundView} />
     </Switch>
 
