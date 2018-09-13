@@ -12,5 +12,4 @@ export default(
         <Redirect exact from="/" to="/tasks" />
         <Route path="*" component={NotFoundView} />
     </Switch>
-
 );

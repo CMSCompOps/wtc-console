@@ -130,8 +130,6 @@ class TasksViewSet(viewsets.ReadOnlyModelViewSet):
 class SitesViewSet(viewsets.GenericViewSet):
     queryset = Site.objects.all().order_by('+name')
     serializer_class = SiteSerializer
-    # authentication_classes = (TokenAuthentication,)
-    # permission_classes = (IsAuthenticated,)
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
