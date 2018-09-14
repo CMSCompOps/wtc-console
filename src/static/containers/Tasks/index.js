@@ -14,7 +14,7 @@ import {getReadableTimestamp} from '../../utils/dates';
 import {getUrlParamsString} from '../../utils/url';
 import Filter from '../../components/Filter';
 import getListDataType from '../../types/ListData';
-import Select from '../../components/Select';
+import Select from '../../components/fields/Select';
 import Checkbox from '../../components/fields/Checkbox';
 import TextInput from '../../components/fields/TextInput';
 import Button from '../../components/Button';
@@ -47,7 +47,7 @@ const SitesAndActionsContainer = styled.div`
     flex-direction: row;
 `;
 
-const SectionTitle = styled.h4`
+const SectionTitle = styled.h5`
     text-align: center;
     margin-bottom: 10px;
 `;
@@ -97,6 +97,15 @@ const CheckboxField = styled(Checkbox)`
 
 const Actions = styled(Section)`
     flex: 1;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+`;
+
+const ActionBlock = styled(Section)`
+    flex: 1;
+    min-width: 200px;
+    max-width: 300px;
 `;
 
 const ReasonsForm = styled.div`
@@ -236,9 +245,8 @@ class TasksView extends React.Component {
         this.onActionDataChange(taskId, 'sites', newSites);
     };
 
-    renderSites = (taskId, taskSites) => {
+    renderSites = (taskId, taskAction, taskSites) => {
         const {sites: allSites} = this.props;
-        const taskAction = this.getTaskActionsById(taskId);
 
         return (
             <Sites>
@@ -265,33 +273,78 @@ class TasksView extends React.Component {
         );
     };
 
-    showMethodsSelect = (action) => action && (action.value === 'acdc' || action.value === 'recovery');
+    isActionSelected = (taskAction) => !!taskAction && !!taskAction.name && !!taskAction.name.value;
 
-    renderActions = (taskId) => {
-        const taskAction = this.getTaskActionsById(taskId);
+    shouldShowMethodsSelect = (taskAction) =>
+        this.isActionSelected(taskAction)
+        && (taskAction.name.value === 'acdc' || taskAction.name.value === 'recovery');
 
+
+    shouldShowParameters = (taskAction) =>
+        this.isActionSelected(taskAction)
+        && taskAction.name.value !== 'none';
+
+    renderActionParameters = (taskId, taskAction) => {
         return (
-            <Actions>
-                <SectionTitle>Action</SectionTitle>
+            <ActionBlock>
+                <SectionTitle>Parameters</SectionTitle>
                 <div>
                     <FormField>
-                        <Select
-                            value={taskAction.name}
-                            onChange={(action) => this.onActionDataChange(taskId, 'name', action)}
-                            options={ACTIONS}/>
+                        <Label>XRootD:</Label>
+                        <TextInput value={taskAction.xrootd} onChange={e => this.onActionDataChange(taskId, 'xrootd', e.target.value)}/>
                     </FormField>
-                    {this.showMethodsSelect(taskAction.name) && (
-                        <div>
-                            <Label>Method:</Label>
-                            <FormField>
-                                <Select
-                                    value={taskAction.method}
-                                    onChange={(method) => this.onActionDataChange(taskId, 'method', method)}
-                                    options={METHODS}/>
-                            </FormField>
-                        </div>
-                    )}
+                    {/*<FormField>*/}
+                        {/*<Label>Secondary:</Label>*/}
+                        {/*<TextInput value={taskAction.secondary} onChange={e => this.onActionDataChange(taskId, 'secondary', e.target.value)}/>*/}
+                    {/*</FormField>*/}
+                    {/*<FormField>*/}
+                        {/*<Label>Splitting:</Label>*/}
+                        {/*<TextInput value={taskAction.splitting} onChange={e => this.onActionDataChange(taskId, 'splitting', e.target.value)}/>*/}
+                    {/*</FormField>*/}
+                    <FormField>
+                        <Label>Memory:</Label>
+                        <TextInput value={taskAction.memory} onChange={e => this.onActionDataChange(taskId, 'memory', e.target.value)}/>
+                    </FormField>
+                    <FormField>
+                        <Label>Cores:</Label>
+                        <TextInput value={taskAction.cores} onChange={e => this.onActionDataChange(taskId, 'cores', e.target.value)}/>
+                    </FormField>
+                    <FormField>
+                        <Label>Group:</Label>
+                        <TextInput value={taskAction.group} onChange={e => this.onActionDataChange(taskId, 'group', e.target.value)}/>
+                    </FormField>
                 </div>
+            </ActionBlock>
+        );
+    };
+
+    renderActions = (taskId, taskAction) => {
+        return (
+            <Actions>
+                <ActionBlock>
+                    <SectionTitle>Action</SectionTitle>
+                    <div>
+                        <FormField>
+                            <Label>Choose an action:</Label>
+                            <Select
+                                value={taskAction.name}
+                                onChange={(action) => this.onActionDataChange(taskId, 'name', action)}
+                                options={ACTIONS}/>
+                        </FormField>
+                        {this.shouldShowMethodsSelect(taskAction) && (
+                            <div>
+                                <Label>Method:</Label>
+                                <FormField>
+                                    <Select
+                                        value={taskAction.method}
+                                        onChange={(method) => this.onActionDataChange(taskId, 'method', method)}
+                                        options={METHODS}/>
+                                </FormField>
+                            </div>
+                        )}
+                    </div>
+                </ActionBlock>
+                {this.shouldShowParameters(taskAction) && this.renderActionParameters(taskId, taskAction)}
             </Actions>
         );
     };
@@ -300,11 +353,17 @@ class TasksView extends React.Component {
         return task.statuses.map(status => status.site);
     };
 
-    foldedTaskContentRenderer = (row, id) => {
+    shouldShowSites = (taskAction) =>
+        this.shouldShowMethodsSelect(taskAction)
+        && taskAction.method
+        && taskAction.method.value !== 'Auto';
+
+    foldedTaskContentRenderer = (row, taskId) => {
+        const taskAction = this.getTaskActionsById(taskId);
         return (
             <SitesAndActionsContainer>
-                {this.renderSites(id, this.getTaskSitesNames(row))}
-                {this.renderActions(id)}
+                {this.renderActions(taskId, taskAction)}
+                {this.shouldShowSites(taskAction) && this.renderSites(taskId, taskAction, this.getTaskSitesNames(row))}
             </SitesAndActionsContainer>
         )
     };
@@ -366,7 +425,7 @@ class TasksView extends React.Component {
         return (
             <div className="protected">
                 <div className="container">
-                    <h1 className="text-center margin-bottom-medium">Tasks</h1>
+                    <h2 className="text-center margin-bottom-medium">Tasks</h2>
 
                     <Filter onFilter={this.filter} initialValue={filter}/>
 

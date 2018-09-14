@@ -2,7 +2,12 @@ import React from 'react';
 import styled from 'styled-components';
 
 const StyledInput = styled.input`
-    margin: 10px 0 0 10px;
+    width: 100%;
+    padding: 10px;
+    border-color: #ccc;
+    border-radius: 4px;
+    border-style: solid;
+    border-width: 1px;
 `;
 
 export default function TextInput(props) {

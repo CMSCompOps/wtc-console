@@ -11,7 +11,7 @@ import * as actionCreators from '../../actions/data';
 import {getReadableTimestamp} from '../../utils/dates';
 import DataTable from '../../components/DataTable';
 import NavHeader from '../../components/NavHeader';
-import Select from '../../components/Select';
+import Select from '../../components/fields/Select';
 import {sortItems} from '../../utils/sort';
 import Checkbox from '../../components/fields/Checkbox';
 import TextInput from '../../components/fields/TextInput';
