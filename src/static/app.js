@@ -5,6 +5,8 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
 import './styles/main.scss';
+import 'react-toggle/style.css';
+import 'rc-slider/assets/index.css';
 
 class App extends React.Component {
     static propTypes = {

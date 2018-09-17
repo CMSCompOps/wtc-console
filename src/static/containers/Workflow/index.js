@@ -11,7 +11,7 @@ import * as actionCreators from '../../actions/data';
 import {getReadableTimestamp} from '../../utils/dates';
 import DataTable from '../../components/DataTable';
 import NavHeader from '../../components/NavHeader';
-import Select from '../../components/fields/Select';
+import SelectField from '../../components/fields/SelectField';
 import {sortItems} from '../../utils/sort';
 import Checkbox from '../../components/fields/Checkbox';
 import TextInput from '../../components/fields/TextInput';
@@ -256,7 +256,7 @@ class WorkflowView extends React.Component {
                 <SectionTitle>Action</SectionTitle>
                 <div>
                     <FormField>
-                        <Select
+                        <SelectField
                             value={taskAction.name}
                             onChange={(action) => this.onActionDataChange(taskId, 'name', action)}
                             options={ACTIONS}/>
@@ -265,7 +265,7 @@ class WorkflowView extends React.Component {
                         <div>
                             <Label>Method:</Label>
                             <FormField>
-                                <Select
+                                <SelectField
                                     value={taskAction.method}
                                     onChange={(method) => this.onActionDataChange(taskId, 'method', method)}
                                     options={METHODS}/>

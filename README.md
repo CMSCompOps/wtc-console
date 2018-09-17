@@ -82,7 +82,7 @@ Stop Docker development server and remove containers, networks, volumes, and ima
 You can access shell in a container
 
 * `docker ps` - get the name from the list of running containers
-* `docker exec -i -t djangoreactreduxbase_rabbitmq /bin/bash` - connects to container bash
+* `docker exec -i -t wtcconsole_rabbitmq_1 /bin/bash` - connects to container bash
 
 The postgresql database can be accessed @localhost:5433
 
@@ -104,6 +104,26 @@ When developing a new feature create your own branch and push your changes at le
 
 Do not push directly to master. Create pull requests and assign someone to approve it. Go through your pull request your self, it helps to see if there is unwanted or commented-out code.
 
+
+## Adding new dependencies
+
+While working on project you might encounter situations where you want to add functionality from third parties. This is done by adding dependecies to external libraries.
+
+### Frontend
+
+Login to frontend container
+
+* `docker exec -i -t wtcconsole_frontend_1 /bin/bash`
+
+Intall dependency with yarn
+
+* `yarn add dependency-name`
+
+### Backend
+
+Since django is running on your machine, python package instalation is as usual with pypi
+
+* `pip install dependency-name`
 
 ## Production
 
@@ -241,7 +261,11 @@ Proceed to deployment steps.
 
 Become wtc-console user:
 
-`sudo su - wtc-console`
+* `sudo su - wtc-console`
+
+Go to project dir
+
+* `cd wtc-console`
 
 Deployment is done with one bash command. It will:
 * shutdown celery workers

@@ -5,6 +5,7 @@ import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
 import {withRouter} from 'react-router';
 import qs from 'query-string';
+import Toggle from 'react-toggle';
 
 import * as actionCreators from '../../actions/data';
 import Task from '../../types/Task';
@@ -14,14 +15,17 @@ import {getReadableTimestamp} from '../../utils/dates';
 import {getUrlParamsString} from '../../utils/url';
 import Filter from '../../components/Filter';
 import getListDataType from '../../types/ListData';
-import Select from '../../components/fields/Select';
+import SelectField from '../../components/fields/SelectField';
 import Checkbox from '../../components/fields/Checkbox';
 import TextInput from '../../components/fields/TextInput';
 import Button from '../../components/Button';
+import SliderField from '../../components/fields/SliderField';
 
 
 const DEFAULT_PAGE_SIZE = 20;
 const PATH = '/tasks';
+
+const SPLITTING_MARKS = ['2x', '3x', '10x', '20x', '50x', '100x', '200x', 'max'];
 
 const ACTIONS = [
     {value: 'none', label: 'None'},
@@ -63,11 +67,16 @@ const Section = styled.div`
 `;
 
 const Label = styled.div`
-    padding-bottom: 10px;
+    padding: ${props => props.inline ? '0 10px 0 0' : '0 0 10px 0'};
 `;
 
 const FormField = styled.div`
     padding-bottom: 10px;
+`;
+
+const FormFieldInline = styled(FormField)`
+    display: flex;
+    align-items: center;
 `;
 
 const Sites = styled(Section)`
@@ -289,29 +298,35 @@ class TasksView extends React.Component {
             <ActionBlock>
                 <SectionTitle>Parameters</SectionTitle>
                 <div>
+                    <FormFieldInline>
+                        <Label inline>XRootD:</Label>
+                        <Toggle checked={taskAction.xrootd}
+                                onChange={e => this.onActionDataChange(taskId, 'xrootd', e.target.checked)}/>
+                    </FormFieldInline>
+                    <FormFieldInline>
+                        <Label inline>Secondary:</Label>
+                        <Toggle checked={taskAction.secondary}
+                                onChange={e => this.onActionDataChange(taskId, 'secondary', e.target.checked)}/>
+                    </FormFieldInline>
                     <FormField>
-                        <Label>XRootD:</Label>
-                        <TextInput value={taskAction.xrootd} onChange={e => this.onActionDataChange(taskId, 'xrootd', e.target.value)}/>
+                        <Label>Splitting:</Label>
+                        <SliderField marks={SPLITTING_MARKS} max={7} step={null} included={false}
+                                     onChange={s => this.onActionDataChange(taskId, 'splitting', s)}/>
                     </FormField>
-                    {/*<FormField>*/}
-                        {/*<Label>Secondary:</Label>*/}
-                        {/*<TextInput value={taskAction.secondary} onChange={e => this.onActionDataChange(taskId, 'secondary', e.target.value)}/>*/}
-                    {/*</FormField>*/}
-                    {/*<FormField>*/}
-                        {/*<Label>Splitting:</Label>*/}
-                        {/*<TextInput value={taskAction.splitting} onChange={e => this.onActionDataChange(taskId, 'splitting', e.target.value)}/>*/}
-                    {/*</FormField>*/}
                     <FormField>
                         <Label>Memory:</Label>
-                        <TextInput value={taskAction.memory} onChange={e => this.onActionDataChange(taskId, 'memory', e.target.value)}/>
+                        <TextInput value={taskAction.memory}
+                                   onChange={e => this.onActionDataChange(taskId, 'memory', e.target.value)}/>
                     </FormField>
                     <FormField>
                         <Label>Cores:</Label>
-                        <TextInput value={taskAction.cores} onChange={e => this.onActionDataChange(taskId, 'cores', e.target.value)}/>
+                        <TextInput value={taskAction.cores}
+                                   onChange={e => this.onActionDataChange(taskId, 'cores', e.target.value)}/>
                     </FormField>
                     <FormField>
                         <Label>Group:</Label>
-                        <TextInput value={taskAction.group} onChange={e => this.onActionDataChange(taskId, 'group', e.target.value)}/>
+                        <TextInput value={taskAction.group}
+                                   onChange={e => this.onActionDataChange(taskId, 'group', e.target.value)}/>
                     </FormField>
                 </div>
             </ActionBlock>
@@ -326,7 +341,7 @@ class TasksView extends React.Component {
                     <div>
                         <FormField>
                             <Label>Choose an action:</Label>
-                            <Select
+                            <SelectField
                                 value={taskAction.name}
                                 onChange={(action) => this.onActionDataChange(taskId, 'name', action)}
                                 options={ACTIONS}/>
@@ -335,7 +350,7 @@ class TasksView extends React.Component {
                             <div>
                                 <Label>Method:</Label>
                                 <FormField>
-                                    <Select
+                                    <SelectField
                                         value={taskAction.method}
                                         onChange={(method) => this.onActionDataChange(taskId, 'method', method)}
                                         options={METHODS}/>
