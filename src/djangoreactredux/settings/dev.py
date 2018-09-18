@@ -18,8 +18,6 @@ DATABASES = {
 MONGODB_DATABASES = {
     'default': {
         'NAME': 'wtc-console',
-        'HOST': 'localhost',
-        'PORT': 8081,
         'USER': 'root',
         'PASSWORD': 'root',
     }
@@ -27,7 +25,6 @@ MONGODB_DATABASES = {
 
 mongoengine.connect(
     db=MONGODB_DATABASES['default']['NAME'],
-    host=MONGODB_DATABASES['default']['HOST']
 )
 
 REST_FRAMEWORK['EXCEPTION_HANDLER'] = 'django_rest_logger.handlers.rest_exception_handler'  # NOQA (ignore all errors on this line)
