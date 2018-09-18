@@ -72,16 +72,6 @@ class App extends React.Component {
                                         Tasks
                                     </a>
                                 </li>
-                                {/*<li className={prepsClass}>*/}
-                                    {/*<a className="js-go-to-protected-button" onClick={this.goToPreps}>*/}
-                                        {/*Preps*/}
-                                    {/*</a>*/}
-                                {/*</li>*/}
-                                {/*<li className={workflowsClass}>*/}
-                                    {/*<a className="js-go-to-protected-button" onClick={this.goToWorkflows}>*/}
-                                        {/*Workflows*/}
-                                    {/*</a>*/}
-                                {/*</li>*/}
                             </ul>
                         </div>
                     </div>
