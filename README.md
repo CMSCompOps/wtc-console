@@ -23,6 +23,16 @@ Here are the main tools whose knowledge is useful to contribute:
 * [Celery](http://docs.celeryproject.org/en/latest/) Distributed tasks queue
 
 
+## Architecture
+
+This app has a bit complicated architecture due to the nature of other systems it has to communicate.
+
+* MongoDB - a NoSql database where we keep application data in json like documents. Here we also store actions for Unified.
+* Oracle - we only read failed workflows names which are stored here by Unified. _It would be nice if Unified provided api or at least stored it in MongoDB._
+* RequestManager - rest api used for fetching related workflows PrepID name. _To access this api you need grid certificate._
+* WmStats - rest api from which we get all the info about workflow and errors. _To access this api you need grid certificate._
+
+
 ## Setting up local environment
 
 Prerequisites:
