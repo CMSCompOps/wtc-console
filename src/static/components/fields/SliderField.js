@@ -4,7 +4,7 @@ import Slider from 'rc-slider';
 
 const Wrapper = styled.div`
     width: 100%;
-    padding: 0 5px 15px;
+    padding: 0 8px 15px;
 `;
 
 export default class StyledField extends React.Component {
