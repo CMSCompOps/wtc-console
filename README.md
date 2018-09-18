@@ -92,7 +92,7 @@ Stop Docker development server and remove containers, networks, volumes, and ima
 You can access shell in a container
 
 * `docker ps` - get the name from the list of running containers
-* `docker exec -i -t wtcconsole_rabbitmq_1 /bin/bash` - connects to container bash
+* `docker exec -i -t wtc-console_rabbitmq_1 /bin/bash` - connects to container bash
 
 The postgresql database can be accessed @localhost:5433
 
@@ -100,6 +100,7 @@ The postgresql database can be accessed @localhost:5433
 
 The mongo database can be accessed by connecting to docker instance with mongo client
 
+* `docker exec -i -t wtc-console_mongo_1 /bin/bash`
 * `mongo --host localhost`
 
 
