@@ -2,7 +2,6 @@ from __future__ import absolute_import, unicode_literals
 from datetime import datetime, timedelta
 from celery import Celery
 from celery.utils.log import get_task_logger
-from celery.signals import celeryd_after_setup
 from django.conf import settings
 from mongoengine.queryset.visitor import Q
 import requests
@@ -12,13 +11,6 @@ from workflows.models import Prep, Site, Workflow, WorkflowToUpdate, Task, TaskS
 
 app = Celery('workflows')
 logger = get_task_logger(__name__)
-
-
-@celeryd_after_setup.connect
-def setup_direct_queue(sender, instance, **kwargs):
-    logger.info('Fetch workflows from Unified on startup')
-    fetch_new_workflows_from_unified.delay()
-    update_workflows_from_request_manager.delay()
 
 
 @app.task(ignore_result=True)
