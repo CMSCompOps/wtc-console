@@ -1,13 +1,13 @@
-from rest_framework import viewsets, mixins
+from rest_framework import mixins
 from rest_framework.response import Response
+from rest_framework_mongoengine import viewsets
 from mongoengine.queryset.visitor import Q
 
-from workflows.models import Prep, Site, Workflow, Task
-from workflows.serializers import TaskSerializer, SiteSerializer
-from workflows.models import Prep, Site, Workflow
+from workflows.models import Prep, Site, Workflow, Task, TaskAction
+from workflows.serializers import TaskSerializer, SiteSerializer, TaskActionSerializer
 
 
-class TasksViewSet(viewsets.ReadOnlyModelViewSet):
+class TaskViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     # authentication_classes = (TokenAuthentication,)
@@ -43,7 +43,7 @@ class TasksViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
-class SitesViewSet(viewsets.GenericViewSet):
+class SiteViewSet(viewsets.GenericViewSet):
     queryset = Site.objects.all().order_by('+name')
     serializer_class = SiteSerializer
 
@@ -51,3 +51,10 @@ class SitesViewSet(viewsets.GenericViewSet):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+
+class ActionViewSet(mixins.CreateModelMixin,
+                    mixins.ListModelMixin,
+                    viewsets.GenericViewSet):
+    queryset = TaskAction.objects.all()
+    serializer_class = TaskActionSerializer

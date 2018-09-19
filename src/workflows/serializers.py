@@ -1,6 +1,9 @@
 from rest_framework_mongoengine.serializers import DocumentSerializer, EmbeddedDocumentSerializer
-from workflows.models import Workflow, Prep, Site, Task, TaskSiteStatus
+from rest_framework_mongoengine.fields import ReferenceField
+from workflows.models import Action, ActionParameter, ActionTask, Workflow, Prep, Site, Task, TaskSiteStatus
 
+
+# Tasks
 
 class TaskSiteStatusSerializer(EmbeddedDocumentSerializer):
     class Meta:
@@ -30,8 +33,27 @@ class TaskSerializer(DocumentSerializer):
         fields = '__all__'
 
 
+# Sites
+
 class SiteSerializer(DocumentSerializer):
     class Meta:
         model = Site
         fields = '__all__'
 
+
+# Actions
+
+class ActionSerializer(DocumentSerializer):
+    class Meta:
+        model = Action
+        fields = '__all__'
+
+
+class TaskActionSerializer(DocumentSerializer):
+    # action = ActionSerializer()
+    # action = ReferenceField(Action)
+
+    class Meta:
+        model = ActionTask
+        fields = '__all__'
+        depth = 1
