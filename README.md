@@ -94,10 +94,6 @@ You can access shell in a container
 * `docker ps` - get the name from the list of running containers
 * `docker exec -i -t wtc-console_rabbitmq_1 /bin/bash` - connects to container bash
 
-The postgresql database can be accessed @localhost:5433
-
-* `psql -h localhost -p 5433 -U djangoreactredux djangoreactredux_dev`
-
 The mongo database can be accessed by connecting to docker instance with mongo client
 
 * `docker exec -i -t wtc-console_mongo_1 /bin/bash`
