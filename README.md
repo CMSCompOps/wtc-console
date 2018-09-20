@@ -97,7 +97,7 @@ You can access shell in a container
 The mongo database can be accessed by connecting to docker instance with mongo client
 
 * `docker exec -i -t wtc-console_mongo_1 /bin/bash`
-* `mongo --host localhost`
+* `mongo`
 
 
 ## Accessing Website
