@@ -14,7 +14,7 @@ import {
     FETCH_TASKS_ACTIONS_REQUEST,
     FETCH_TASKS_ACTIONS_SUCCESS,
 } from '../constants';
-import {fetchProtectedData} from './api'
+import {fetchProtectedData, saveProtectedData} from './api'
 
 
 export function fetchPreps(page, size, filter, orderBy, orderDesc) {
@@ -60,6 +60,15 @@ export function fetchTasks(page, size, filter, orderBy, orderDesc) {
 export function fetchTasksActions() {
     return fetchProtectedData(
         `/api/v1/workflows/tasks-actions/`,
+        FETCH_TASKS_ACTIONS_REQUEST,
+        FETCH_TASKS_ACTIONS_SUCCESS,
+    );
+}
+
+export function saveTasksActions(tasksActions) {
+    return saveProtectedData(
+        `/api/v1/workflows/tasks-actions/`,
+        tasksActions,
         FETCH_TASKS_ACTIONS_REQUEST,
         FETCH_TASKS_ACTIONS_SUCCESS,
     );
