@@ -57,8 +57,8 @@ class Action(Document):
     splitting = fields.StringField()
     group = fields.StringField()
 
-    sites = fields.ListField(fields.StringField)
-    reasons = fields.ListField(fields.StringField)
+    sites = fields.ListField(fields.StringField())
+    reasons = fields.ListField(fields.StringField())
 
 
 class TaskAction(Document):
@@ -66,4 +66,4 @@ class TaskAction(Document):
     acted = fields.IntField()
     timestamp = fields.LongField()
 
-    action = fields.ReferenceField(Action, reverse_delete_rule=DENY)
+    action_id = fields.ReferenceField(Action, reverse_delete_rule=DENY)

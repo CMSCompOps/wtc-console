@@ -132,9 +132,14 @@ class TasksView extends React.Component {
             isFetching: PropTypes.bool.isRequired,
             data: PropTypes.arrayOf(Site),
         }),
+        tasksActions: PropTypes.shape({
+            isFetching: PropTypes.bool.isRequired,
+            data: PropTypes.arrayOf(Site),
+        }),
         actions: PropTypes.shape({
             fetchTasks: PropTypes.func.isRequired,
             fetchSites: PropTypes.func.isRequired,
+            fetchTasksActions: PropTypes.func.isRequired,
         }).isRequired,
         history: PropTypes.object.isRequired,
         location: PropTypes.object.isRequired,
@@ -168,6 +173,7 @@ class TasksView extends React.Component {
     fetchData = () => {
         const {page, filter, sortedBy, desc} = this.state;
         this.props.actions.fetchTasks(page, DEFAULT_PAGE_SIZE, filter, sortedBy, desc);
+        this.props.actions.fetchTasksActions();
     };
 
     updateLocation = () => {
@@ -480,6 +486,10 @@ const mapStateToProps = (state) => {
         sites: {
             data: state.sites.data,
             isFetching: state.sites.isFetching
+        },
+        tasksActions: {
+            data: state.tasksActions.data,
+            isFetching: state.tasksActions.isFetching
         },
     };
 };

@@ -31,7 +31,7 @@ REST_FRAMEWORK['EXCEPTION_HANDLER'] = 'django_rest_logger.handlers.rest_exceptio
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': True,
+    'disable_existing_loggers': False,
     'root': {
         'level': 'DEBUG',
         'handlers': ['django_rest_logger_handler'],
