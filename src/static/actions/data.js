@@ -13,6 +13,8 @@ import {
     FETCH_SITES_SUCCESS,
     FETCH_TASKS_ACTIONS_REQUEST,
     FETCH_TASKS_ACTIONS_SUCCESS,
+    SAVE_TASKS_ACTIONS_REQUEST,
+    SAVE_TASKS_ACTIONS_SUCCESS,
 } from '../constants';
 import {fetchProtectedData, saveProtectedData} from './api'
 
@@ -69,8 +71,8 @@ export function saveTasksActions(tasksActions) {
     return saveProtectedData(
         `/api/v1/workflows/tasks-actions/`,
         tasksActions,
-        FETCH_TASKS_ACTIONS_REQUEST,
-        FETCH_TASKS_ACTIONS_SUCCESS,
+        SAVE_TASKS_ACTIONS_REQUEST,
+        SAVE_TASKS_ACTIONS_SUCCESS,
     );
 }
 

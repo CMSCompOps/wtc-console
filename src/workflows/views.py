@@ -1,12 +1,12 @@
 import logging
-from rest_framework import mixins
 from rest_framework.response import Response
 from rest_framework_mongoengine import viewsets
 from rest_framework_bulk.mixins import BulkCreateModelMixin
 from mongoengine.queryset.visitor import Q
 
-from workflows.models import Action, Prep, Site, Workflow, Task, TaskAction
+from workflows.models import Action, Prep, Site, Workflow, Task, TaskAction, Reason
 from workflows.serializers import TaskSerializer, SiteSerializer, TaskActionSerializer
+
 
 logger = logging.getLogger(__name__)
 
@@ -55,8 +55,12 @@ class SiteViewSet(viewsets.GenericViewSet):
         return Response(serializer.data)
 
 
-class TaskActionViewSet(mixins.ListModelMixin,
-                        BulkCreateModelMixin,
+class TaskActionViewSet(BulkCreateModelMixin,
                         viewsets.GenericViewSet):
     queryset = TaskAction.objects.all()
     serializer_class = TaskActionSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)

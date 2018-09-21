@@ -3,8 +3,7 @@ import time
 
 from rest_framework_bulk import BulkListSerializer, BulkSerializerMixin
 from rest_framework_mongoengine.serializers import DocumentSerializer, EmbeddedDocumentSerializer
-from rest_framework_mongoengine import fields
-from workflows.models import Action, TaskAction, Workflow, Prep, Site, Task, TaskSiteStatus
+from workflows.models import Action, TaskAction, Workflow, Prep, Site, Task, TaskSiteStatus, Reason
 
 
 logger = logging.getLogger(__name__)
@@ -57,35 +56,47 @@ class ActionSerializer(DocumentSerializer):
 
 
 def get_or_create_action(data):
+    action = {}
 
     if 'id' in data:
-        action = Action.objects(id=id).first()
+        # Get action by id (currently frontend does not send id, but it will be used in the future)
+        action = Action.objects(id=data['id']).first()
     else:
+        # If no action, then try to find equal entry
         action = Action.objects(
-            action=data['action'],
-            xrootd=data['xrootd'],
-            cores=data['cores'],
-            secondary=data['secondary'],
-            splitting=data['splitting'],
-            group=data['group'],
+            action=data.get('action', ''),
+            xrootd=data.get('xrootd', ''),
+            cores=data.get('cores', ''),
+            secondary=data.get('secondary', ''),
+            splitting=data.get('splitting', ''),
+            group=data.get('group', ''),
             sites=data.get('sites', []).sort(),
             reasons=data.get('reasons', []).sort(),
         ).first()
 
+    # If no similar entry exist, then create new one
     if not action:
         action = Action(
-            action=data['action'],
-            xrootd=data['xrootd'],
-            cores=data['cores'],
-            secondary=data['secondary'],
-            splitting=data['splitting'],
-            group=data['group'],
+            action=data.get('action', ''),
+            xrootd=data.get('xrootd', ''),
+            cores=data.get('cores', ''),
+            secondary=data.get('secondary', ''),
+            splitting=data.get('splitting', ''),
+            group=data.get('group', ''),
             sites=data.get('sites', []).sort(),
             reasons=data.get('reasons', []).sort(),
         )
         action.save()
 
     return action
+
+
+def save_new_reasons(reasons):
+    for text in reasons:
+        reason = Reason.objects(text=text)
+
+        if not reason:
+            Reason(text=text).save()
 
 
 class TaskActionSerializer(BulkSerializerMixin, DocumentSerializer):
@@ -109,5 +120,6 @@ class TaskActionSerializer(BulkSerializerMixin, DocumentSerializer):
             **validated_data
         )
         task_action.save()
+        save_new_reasons(action.reasons)
 
         return task_action

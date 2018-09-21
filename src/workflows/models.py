@@ -61,8 +61,13 @@ class Action(Document):
     reasons = fields.ListField(fields.StringField())
 
 
+class Reason(Document):
+    text = fields.StringField()
+
+
 class TaskAction(Document):
     name = fields.StringField()
+    workflow = fields.StringField()
     acted = fields.IntField()
     timestamp = fields.LongField()
 

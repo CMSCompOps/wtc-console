@@ -57,8 +57,9 @@ export function saveProtectedData(url, data, requestType, successType) {
             credentials: 'include',
             headers: {
                 Accept: 'application/json',
+                'Content-Type': 'application/json',
             },
-            body: data,
+            body: JSON.stringify(data),
         })
             .then(checkHttpStatus)
             .then(parseJSON)

@@ -133,12 +133,13 @@ class TasksView extends React.Component {
         }),
         tasksActions: PropTypes.shape({
             isFetching: PropTypes.bool.isRequired,
-            data: PropTypes.arrayOf(Site),
+            data: PropTypes.array,
         }),
         actions: PropTypes.shape({
             fetchTasks: PropTypes.func.isRequired,
             fetchSites: PropTypes.func.isRequired,
             fetchTasksActions: PropTypes.func.isRequired,
+            saveTasksActions: PropTypes.func.isRequired,
         }).isRequired,
         history: PropTypes.object.isRequired,
         location: PropTypes.object.isRequired,
@@ -216,7 +217,7 @@ class TasksView extends React.Component {
         }, this.updateLocationAndFetchData);
     };
 
-    onActionDataChange = (taskId, key, value) => {
+    onActionDataChange = (taskId, newValues) => {
         const {taskActions} = this.state;
 
         this.setState({
@@ -225,7 +226,7 @@ class TasksView extends React.Component {
                 ...taskActions,
                 [taskId]: {
                     ...this.getTaskActionsById(taskId),
-                    [key]: value,
+                    ...newValues,
                 },
             },
         });
@@ -246,7 +247,7 @@ class TasksView extends React.Component {
             ? newSites.add(siteName)
             : newSites.delete(siteName);
 
-        this.onActionDataChange(taskId, 'sites', newSites);
+        this.onActionDataChange(taskId, {'sites': newSites});
     };
 
     renderSites = (taskId, taskAction, taskSites) => {
@@ -291,17 +292,17 @@ class TasksView extends React.Component {
                 <FormFieldInline>
                     <Label inline>XRootD:</Label>
                     <Toggle checked={taskAction.xrootd}
-                            onChange={e => this.onActionDataChange(taskId, 'xrootd', e.target.checked)}/>
+                            onChange={e => this.onActionDataChange(taskId, {'xrootd': e.target.checked})}/>
                 </FormFieldInline>
                 <FormFieldInline>
                     <Label inline>Secondary:</Label>
                     <Toggle checked={taskAction.secondary}
-                            onChange={e => this.onActionDataChange(taskId, 'secondary', e.target.checked)}/>
+                            onChange={e => this.onActionDataChange(taskId, {'secondary': e.target.checked})}/>
                 </FormFieldInline>
                 <FormField>
                     <Label>Splitting:</Label>
                     <SliderField marks={SPLITTING_MARKS} max={7} step={null} included={false}
-                                 onChange={s => this.onActionDataChange(taskId, 'splitting', s)}/>
+                                 onChange={s => this.onActionDataChange(taskId, {'splitting': s})}/>
                 </FormField>
             </ActionBlock>
         );
@@ -313,17 +314,17 @@ class TasksView extends React.Component {
                 <FormFieldInline>
                     <Label inline>Memory:</Label>
                     <TextInput value={taskAction.memory}
-                               onChange={e => this.onActionDataChange(taskId, 'memory', e.target.value)}/>
+                               onChange={e => this.onActionDataChange(taskId, {'memory': e.target.value})}/>
                 </FormFieldInline>
                 <FormFieldInline>
                     <Label inline>Cores:</Label>
                     <TextInput value={taskAction.cores}
-                               onChange={e => this.onActionDataChange(taskId, 'cores', e.target.value)}/>
+                               onChange={e => this.onActionDataChange(taskId, {'cores': e.target.value})}/>
                 </FormFieldInline>
                 <FormFieldInline>
                     <Label inline>Group:</Label>
                     <TextInput value={taskAction.group}
-                               onChange={e => this.onActionDataChange(taskId, 'group', e.target.value)}/>
+                               onChange={e => this.onActionDataChange(taskId, {'group': e.target.value})}/>
                 </FormFieldInline>
             </ActionBlock>
         );
@@ -337,10 +338,7 @@ class TasksView extends React.Component {
                         <Label>Choose an action:</Label>
                         <SelectField
                             value={taskAction.name}
-                            onChange={(action) => {
-                                this.onActionDataChange(taskId, 'name', action);
-                                this.onActionDataChange(taskId, 'task', row);
-                            }}
+                            onChange={action => this.onActionDataChange(taskId, {'task': row, 'name': action})}
                             options={ACTIONS}/>
                     </FormField>
                     {this.shouldShowMethodsSelect(taskAction) && (
@@ -349,7 +347,7 @@ class TasksView extends React.Component {
                             <FormField>
                                 <SelectField
                                     value={taskAction.method}
-                                    onChange={(method) => this.onActionDataChange(taskId, 'method', method)}
+                                    onChange={method => this.onActionDataChange(taskId, {'method': method})}
                                     options={METHODS}/>
                             </FormField>
                         </div>
@@ -427,7 +425,7 @@ class TasksView extends React.Component {
                 cores: taskAction.cores,
                 memory: taskAction.memory,
                 group: taskAction.group,
-                sites: method === 'manual' ? tasksActions.sites : this.getTaskSites(taskAction.task),
+                sites: method === 'manual' ? taskAction.sites : this.getTaskSites(taskAction.task),
                 reasons: reasons,
             }
         }
@@ -441,13 +439,11 @@ class TasksView extends React.Component {
     submitActions = () => {
         const {reasons, taskActions} = this.state;
 
-        console.log('for submit, sites params:', taskActions, 'reasons:', reasons);
-
         const unifiedActions = Object.values(taskActions)
-            .filter(this.shouldAddTaskAction())
+            .filter(this.shouldAddTaskAction)
             .map(taskAction => this.formatTaskActionForUnified(taskAction, reasons));
 
-        console.log('unified actions:', unifiedActions);
+        this.props.actions.saveTasksActions(unifiedActions);
     };
 
     renderReasonsForm = () => {
