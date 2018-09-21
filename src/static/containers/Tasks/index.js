@@ -36,9 +36,8 @@ const ACTIONS = [
 ];
 
 const METHODS = [
-    {value: 'Auto', label: 'Auto'},
-    {value: 'Manual', label: 'Manual'},
-    {value: 'Ban', label: 'Ban'},
+    {value: 'auto', label: 'Auto'},
+    {value: 'manual', label: 'Manual'},
 ];
 
 const Details = styled.div`
@@ -330,7 +329,7 @@ class TasksView extends React.Component {
         );
     };
 
-    renderActions = (taskId, taskAction) => {
+    renderActions = (taskId, taskAction, row) => {
         return (
             <Actions>
                 <ActionBlock>
@@ -338,7 +337,10 @@ class TasksView extends React.Component {
                         <Label>Choose an action:</Label>
                         <SelectField
                             value={taskAction.name}
-                            onChange={(action) => this.onActionDataChange(taskId, 'name', action)}
+                            onChange={(action) => {
+                                this.onActionDataChange(taskId, 'name', action);
+                                this.onActionDataChange(taskId, 'task', row);
+                            }}
                             options={ACTIONS}/>
                     </FormField>
                     {this.shouldShowMethodsSelect(taskAction) && (
@@ -372,7 +374,7 @@ class TasksView extends React.Component {
         const taskAction = this.getTaskActionsById(taskId);
         return (
             <SitesAndActionsContainer>
-                {this.renderActions(taskId, taskAction)}
+                {this.renderActions(taskId, taskAction, row)}
                 {this.shouldShowSites(taskAction) && this.renderSites(taskId, taskAction, this.getTaskSitesNames(row))}
             </SitesAndActionsContainer>
         )
@@ -405,10 +407,47 @@ class TasksView extends React.Component {
         });
     };
 
+    getTaskSites = (task) => task.statuses.map(status => status.site);
+
+    formatTaskActionForUnified = (taskAction, reasons) => {
+
+        if (!taskAction.task)
+            return {};
+
+        const method = _.get(taskAction, 'method.value') || 'auto';
+
+        return {
+            name: taskAction.task.name,
+            workflow: taskAction.task.workflow.name,
+            action_id: {
+                action: _.get(taskAction, 'name.value'),
+                xrootd: taskAction.xrootd ? 'enabled' : 'disabled',
+                secondary: taskAction.secondary ? 'enabled' : 'disabled',
+                splitting: taskAction.splitting,
+                cores: taskAction.cores,
+                memory: taskAction.memory,
+                group: taskAction.group,
+                sites: method === 'manual' ? tasksActions.sites : this.getTaskSites(taskAction.task),
+                reasons: reasons,
+            }
+        }
+    };
+
+    shouldAddTaskAction = (taskAction) => {
+        const actionName = _.get(taskAction, 'name.value');
+        return !!taskAction.task && !!actionName && actionName !== 'none';
+    };
+
     submitActions = () => {
         const {reasons, taskActions} = this.state;
 
         console.log('for submit, sites params:', taskActions, 'reasons:', reasons);
+
+        const unifiedActions = Object.values(taskActions)
+            .filter(this.shouldAddTaskAction())
+            .map(taskAction => this.formatTaskActionForUnified(taskAction, reasons));
+
+        console.log('unified actions:', unifiedActions);
     };
 
     renderReasonsForm = () => {

@@ -1,6 +1,13 @@
+import logging
+import time
+
+from rest_framework_bulk import BulkListSerializer, BulkSerializerMixin
 from rest_framework_mongoengine.serializers import DocumentSerializer, EmbeddedDocumentSerializer
 from rest_framework_mongoengine import fields
 from workflows.models import Action, TaskAction, Workflow, Prep, Site, Task, TaskSiteStatus
+
+
+logger = logging.getLogger(__name__)
 
 
 # Tasks
@@ -81,19 +88,26 @@ def get_or_create_action(data):
     return action
 
 
-class TaskActionSerializer(DocumentSerializer):
+class TaskActionSerializer(BulkSerializerMixin, DocumentSerializer):
     action_id = ActionSerializer()
 
     class Meta:
         model = TaskAction
         fields = '__all__'
         depth = 1
+        list_serializer_class = BulkListSerializer
 
     def create(self, validated_data):
+        logger.debug('TaskActionSerializer.create validated_data: {}'.format(validated_data))
         action_data = validated_data.pop('action_id')
         action = get_or_create_action(action_data)
 
-        task_action = TaskAction(action_id=action.pk, **validated_data)
+        task_action = TaskAction(
+            action_id=action.pk,
+            acted = 0,
+            timestamp = time.time(),
+            **validated_data
+        )
         task_action.save()
 
         return task_action

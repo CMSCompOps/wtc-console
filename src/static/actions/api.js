@@ -53,7 +53,7 @@ export function saveProtectedData(url, data, requestType, successType) {
     return (dispatch, state) => {
         dispatch(request(requestType));
         return fetch(`${SERVER_URL}${url}`, {
-            method: 'PUT',
+            method: 'POST',
             credentials: 'include',
             headers: {
                 Accept: 'application/json',
