@@ -55,8 +55,14 @@ class ActionSerializer(DocumentSerializer):
         fields = '__all__'
 
 
+def get_list_values(key, data):
+    return sorted(data.get(key, []))
+
+
 def get_or_create_action(data):
-    action = {}
+    action = None
+
+    logger.debug('TaskActionSerializer.get_or_create action data: {}'.format(data))
 
     if 'id' in data:
         # Get action by id (currently frontend does not send id, but it will be used in the future)
@@ -65,26 +71,26 @@ def get_or_create_action(data):
         # If no action, then try to find equal entry
         action = Action.objects(
             action=data.get('action', ''),
-            xrootd=data.get('xrootd', ''),
+            xrootd=data.get('xrootd', 'disabled'),
             cores=data.get('cores', ''),
-            secondary=data.get('secondary', ''),
+            secondary=data.get('secondary', 'disabled'),
             splitting=data.get('splitting', ''),
             group=data.get('group', ''),
-            sites=data.get('sites', []).sort(),
-            reasons=data.get('reasons', []).sort(),
+            sites=get_list_values('sites', data),
+            reasons=get_list_values('reasons', data),
         ).first()
 
     # If no similar entry exist, then create new one
     if not action:
         action = Action(
             action=data.get('action', ''),
-            xrootd=data.get('xrootd', ''),
+            xrootd=data.get('xrootd', 'disabled'),
             cores=data.get('cores', ''),
-            secondary=data.get('secondary', ''),
+            secondary=data.get('secondary', 'disabled'),
             splitting=data.get('splitting', ''),
             group=data.get('group', ''),
-            sites=data.get('sites', []).sort(),
-            reasons=data.get('reasons', []).sort(),
+            sites=get_list_values('sites', data),
+            reasons=get_list_values('reasons', data),
         )
         action.save()
 
