@@ -106,7 +106,7 @@ const ActionBlock = styled(Section)`
     max-width: 300px;
 `;
 
-const ReasonsForm = styled.div`
+const ActionsForm = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -446,11 +446,11 @@ class TasksView extends React.Component {
         this.props.actions.saveTasksActions(unifiedActions);
     };
 
-    renderReasonsForm = () => {
+    renderActionsForm = () => {
         const {reasons} = this.state;
 
         return (
-            <ReasonsForm>
+            <ActionsForm>
                 {reasons.map((reason, idx) =>
                     <ReasonItem key={`reason_${idx}`}>
                         <TextInput value={reason} onChange={e => this.onReasonChange(e.target.value, idx)}/>
@@ -459,7 +459,7 @@ class TasksView extends React.Component {
                 )}
                 <Button onClick={this.addReason} title={'Add reason'}/>
                 <Button onClick={this.submitActions} title={'Submit actions'}/>
-            </ReasonsForm>
+            </ActionsForm>
         );
     };
 
@@ -503,7 +503,7 @@ class TasksView extends React.Component {
                                 sortedBy={sortedBy}
                                 desc={desc}
                             />
-                            {this.renderReasonsForm()}
+                            {this.renderActionsForm()}
                         </Details>
                     }
                 </div>
