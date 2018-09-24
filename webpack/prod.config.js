@@ -9,13 +9,27 @@ module.exports = {
     module: {
         rules: [{
             test: /\.css$/,
+            exclude: [
+                /node_modules\/react-toggle/,
+                /node_modules\/rc-slider/,
+            ],
             use: ExtractTextPlugin.extract([
                 {
                     loader: 'css-loader',
-                    options: { importLoaders: 1 },
+                    options: {importLoaders: 1},
                 },
-                'postcss-loader']
-            )
+                'postcss-loader',
+            ])
+        }, {
+            test: /\.css$/,
+            include: [
+                /node_modules\/react-toggle/,
+                /node_modules\/rc-slider/,
+            ],
+            use: [
+                'style-loader',
+                'css-loader',
+            ],
         }, {
             test: /\.scss$/,
             use: ExtractTextPlugin.extract([
