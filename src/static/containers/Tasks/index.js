@@ -5,6 +5,7 @@ import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
 import {withRouter} from 'react-router';
 import qs from 'query-string';
+import Toggle from 'react-toggle';
 
 import * as actionCreators from '../../actions/data';
 import Task from '../../types/Task';
@@ -14,14 +15,17 @@ import {getReadableTimestamp} from '../../utils/dates';
 import {getUrlParamsString} from '../../utils/url';
 import Filter from '../../components/Filter';
 import getListDataType from '../../types/ListData';
-import Select from '../../components/fields/Select';
-import Checkbox from '../../components/fields/Checkbox';
+import SelectField from '../../components/fields/SelectField';
+import CheckboxField from '../../components/fields/CheckboxField';
 import TextInput from '../../components/fields/TextInput';
 import Button from '../../components/Button';
+import SliderField from '../../components/fields/SliderField';
 
 
 const DEFAULT_PAGE_SIZE = 20;
 const PATH = '/tasks';
+
+const SPLITTING_MARKS = ['2x', '3x', '10x', '20x', '50x', '100x', '200x', 'max'];
 
 const ACTIONS = [
     {value: 'none', label: 'None'},
@@ -32,9 +36,8 @@ const ACTIONS = [
 ];
 
 const METHODS = [
-    {value: 'Auto', label: 'Auto'},
-    {value: 'Manual', label: 'Manual'},
-    {value: 'Ban', label: 'Ban'},
+    {value: 'auto', label: 'Auto'},
+    {value: 'manual', label: 'Manual'},
 ];
 
 const Details = styled.div`
@@ -47,27 +50,24 @@ const SitesAndActionsContainer = styled.div`
     flex-direction: row;
 `;
 
-const SectionTitle = styled.h5`
-    text-align: center;
-    margin-bottom: 10px;
-`;
-
 const Section = styled.div`
     display: flex;
     flex-direction: column;
-    margin-left: 10px;
-    
-    &:last-child {
-        margin-right: 0;
-    }
+    justify-content: start;
+    margin-right: 15px;
 `;
 
 const Label = styled.div`
-    padding-bottom: 10px;
+    padding: ${props => props.inline ? '0 10px 0 0' : '0 0 10px 0'};
 `;
 
 const FormField = styled.div`
     padding-bottom: 10px;
+`;
+
+const FormFieldInline = styled(FormField)`
+    display: flex;
+    align-items: center;
 `;
 
 const Sites = styled(Section)`
@@ -78,6 +78,7 @@ const SitesList = styled(Section)`
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    justify-content: space-between;
 `;
 
 const SiteField = styled.div`
@@ -87,12 +88,9 @@ const SiteField = styled.div`
 const SiteLabel = styled.label`
     font-size: 12px;
     word-break: break-all;
-    font-weight: ${props => props.bold ? 'bold' : 'auto'};
-`;
-
-const CheckboxField = styled(Checkbox)`
-    margin: 0;
+    font-weight: ${props => props.bold ? 'bold' : 'normal'};
     cursor: pointer;
+    margin-left: 3px;
 `;
 
 const Actions = styled(Section)`
@@ -133,9 +131,15 @@ class TasksView extends React.Component {
             isFetching: PropTypes.bool.isRequired,
             data: PropTypes.arrayOf(Site),
         }),
+        tasksActions: PropTypes.shape({
+            isFetching: PropTypes.bool.isRequired,
+            data: PropTypes.array,
+        }),
         actions: PropTypes.shape({
             fetchTasks: PropTypes.func.isRequired,
             fetchSites: PropTypes.func.isRequired,
+            fetchTasksActions: PropTypes.func.isRequired,
+            saveTasksActions: PropTypes.func.isRequired,
         }).isRequired,
         history: PropTypes.object.isRequired,
         location: PropTypes.object.isRequired,
@@ -169,6 +173,7 @@ class TasksView extends React.Component {
     fetchData = () => {
         const {page, filter, sortedBy, desc} = this.state;
         this.props.actions.fetchTasks(page, DEFAULT_PAGE_SIZE, filter, sortedBy, desc);
+        this.props.actions.fetchTasksActions();
     };
 
     updateLocation = () => {
@@ -212,7 +217,7 @@ class TasksView extends React.Component {
         }, this.updateLocationAndFetchData);
     };
 
-    onActionDataChange = (taskId, key, value) => {
+    onActionDataChange = (taskId, newValues) => {
         const {taskActions} = this.state;
 
         this.setState({
@@ -221,7 +226,7 @@ class TasksView extends React.Component {
                 ...taskActions,
                 [taskId]: {
                     ...this.getTaskActionsById(taskId),
-                    [key]: value,
+                    ...newValues,
                 },
             },
         });
@@ -242,7 +247,7 @@ class TasksView extends React.Component {
             ? newSites.add(siteName)
             : newSites.delete(siteName);
 
-        this.onActionDataChange(taskId, 'sites', newSites);
+        this.onActionDataChange(taskId, {'sites': newSites});
     };
 
     renderSites = (taskId, taskAction, taskSites) => {
@@ -250,7 +255,7 @@ class TasksView extends React.Component {
 
         return (
             <Sites>
-                <SectionTitle>Sites</SectionTitle>
+                <Label>Choose sites:</Label>
                 <SitesList>
                     {allSites.data.map(site => {
                         const checkboxId = `${taskId}_${site.name}`;
@@ -258,13 +263,10 @@ class TasksView extends React.Component {
                         return (
                             <SiteField key={checkboxId}>
                                 <CheckboxField
+                                    label={<SiteLabel bold={taskSites.includes(site.name)}>{site.name}</SiteLabel>}
                                     checked={taskAction.sites && taskAction.sites.has(site.name)}
                                     handleChange={newValue => this.onSiteCheckboxClick(taskId, site.name, newValue)}
                                 />
-
-                                <SiteLabel bold={taskSites.includes(site.name)}>
-                                    {site.name}
-                                </SiteLabel>
                             </SiteField>
                         )
                     })}
@@ -287,64 +289,72 @@ class TasksView extends React.Component {
     renderActionParameters = (taskId, taskAction) => {
         return (
             <ActionBlock>
-                <SectionTitle>Parameters</SectionTitle>
-                <div>
-                    <FormField>
-                        <Label>XRootD:</Label>
-                        <TextInput value={taskAction.xrootd} onChange={e => this.onActionDataChange(taskId, 'xrootd', e.target.value)}/>
-                    </FormField>
-                    {/*<FormField>*/}
-                        {/*<Label>Secondary:</Label>*/}
-                        {/*<TextInput value={taskAction.secondary} onChange={e => this.onActionDataChange(taskId, 'secondary', e.target.value)}/>*/}
-                    {/*</FormField>*/}
-                    {/*<FormField>*/}
-                        {/*<Label>Splitting:</Label>*/}
-                        {/*<TextInput value={taskAction.splitting} onChange={e => this.onActionDataChange(taskId, 'splitting', e.target.value)}/>*/}
-                    {/*</FormField>*/}
-                    <FormField>
-                        <Label>Memory:</Label>
-                        <TextInput value={taskAction.memory} onChange={e => this.onActionDataChange(taskId, 'memory', e.target.value)}/>
-                    </FormField>
-                    <FormField>
-                        <Label>Cores:</Label>
-                        <TextInput value={taskAction.cores} onChange={e => this.onActionDataChange(taskId, 'cores', e.target.value)}/>
-                    </FormField>
-                    <FormField>
-                        <Label>Group:</Label>
-                        <TextInput value={taskAction.group} onChange={e => this.onActionDataChange(taskId, 'group', e.target.value)}/>
-                    </FormField>
-                </div>
+                <FormFieldInline>
+                    <Label inline>XRootD:</Label>
+                    <Toggle checked={taskAction.xrootd}
+                            onChange={e => this.onActionDataChange(taskId, {'xrootd': e.target.checked})}/>
+                </FormFieldInline>
+                <FormFieldInline>
+                    <Label inline>Secondary:</Label>
+                    <Toggle checked={taskAction.secondary}
+                            onChange={e => this.onActionDataChange(taskId, {'secondary': e.target.checked})}/>
+                </FormFieldInline>
+                <FormField>
+                    <Label>Splitting:</Label>
+                    <SliderField marks={SPLITTING_MARKS} max={7} step={null} included={false}
+                                 onChange={s => this.onActionDataChange(taskId, {'splitting': s})}/>
+                </FormField>
             </ActionBlock>
         );
     };
 
-    renderActions = (taskId, taskAction) => {
+    renderActionParameters2 = (taskId, taskAction) => {
+        return (
+            <ActionBlock>
+                <FormFieldInline>
+                    <Label inline>Memory:</Label>
+                    <TextInput value={taskAction.memory}
+                               onChange={e => this.onActionDataChange(taskId, {'memory': e.target.value})}/>
+                </FormFieldInline>
+                <FormFieldInline>
+                    <Label inline>Cores:</Label>
+                    <TextInput value={taskAction.cores}
+                               onChange={e => this.onActionDataChange(taskId, {'cores': e.target.value})}/>
+                </FormFieldInline>
+                <FormFieldInline>
+                    <Label inline>Group:</Label>
+                    <TextInput value={taskAction.group}
+                               onChange={e => this.onActionDataChange(taskId, {'group': e.target.value})}/>
+                </FormFieldInline>
+            </ActionBlock>
+        );
+    };
+
+    renderActions = (taskId, taskAction, row) => {
         return (
             <Actions>
                 <ActionBlock>
-                    <SectionTitle>Action</SectionTitle>
-                    <div>
-                        <FormField>
-                            <Label>Choose an action:</Label>
-                            <Select
-                                value={taskAction.name}
-                                onChange={(action) => this.onActionDataChange(taskId, 'name', action)}
-                                options={ACTIONS}/>
-                        </FormField>
-                        {this.shouldShowMethodsSelect(taskAction) && (
-                            <div>
-                                <Label>Method:</Label>
-                                <FormField>
-                                    <Select
-                                        value={taskAction.method}
-                                        onChange={(method) => this.onActionDataChange(taskId, 'method', method)}
-                                        options={METHODS}/>
-                                </FormField>
-                            </div>
-                        )}
-                    </div>
+                    <FormField>
+                        <Label>Choose an action:</Label>
+                        <SelectField
+                            value={taskAction.name}
+                            onChange={action => this.onActionDataChange(taskId, {'task': row, 'name': action})}
+                            options={ACTIONS}/>
+                    </FormField>
+                    {this.shouldShowMethodsSelect(taskAction) && (
+                        <div>
+                            <Label>Method:</Label>
+                            <FormField>
+                                <SelectField
+                                    value={taskAction.method}
+                                    onChange={method => this.onActionDataChange(taskId, {'method': method})}
+                                    options={METHODS}/>
+                            </FormField>
+                        </div>
+                    )}
                 </ActionBlock>
                 {this.shouldShowParameters(taskAction) && this.renderActionParameters(taskId, taskAction)}
+                {this.shouldShowParameters(taskAction) && this.renderActionParameters2(taskId, taskAction)}
             </Actions>
         );
     };
@@ -362,7 +372,7 @@ class TasksView extends React.Component {
         const taskAction = this.getTaskActionsById(taskId);
         return (
             <SitesAndActionsContainer>
-                {this.renderActions(taskId, taskAction)}
+                {this.renderActions(taskId, taskAction, row)}
                 {this.shouldShowSites(taskAction) && this.renderSites(taskId, taskAction, this.getTaskSitesNames(row))}
             </SitesAndActionsContainer>
         )
@@ -395,10 +405,45 @@ class TasksView extends React.Component {
         });
     };
 
+    getTaskSites = (task) => task.statuses.map(status => status.site);
+
+    formatTaskActionForUnified = (taskAction, reasons) => {
+
+        if (!taskAction.task)
+            return {};
+
+        const method = _.get(taskAction, 'method.value') || 'auto';
+
+        return {
+            name: taskAction.task.name,
+            workflow: taskAction.task.workflow.name,
+            action_id: {
+                action: _.get(taskAction, 'name.value'),
+                xrootd: taskAction.xrootd ? 'enabled' : 'disabled',
+                secondary: taskAction.secondary ? 'enabled' : 'disabled',
+                splitting: taskAction.splitting,
+                cores: taskAction.cores,
+                memory: taskAction.memory,
+                group: taskAction.group,
+                sites: method === 'manual' ? taskAction.sites : this.getTaskSites(taskAction.task),
+                reasons: reasons,
+            }
+        }
+    };
+
+    shouldAddTaskAction = (taskAction) => {
+        const actionName = _.get(taskAction, 'name.value');
+        return !!taskAction.task && !!actionName && actionName !== 'none';
+    };
+
     submitActions = () => {
         const {reasons, taskActions} = this.state;
 
-        console.log('for submit, sites params:', taskActions, 'reasons:', reasons);
+        const unifiedActions = Object.values(taskActions)
+            .filter(this.shouldAddTaskAction)
+            .map(taskAction => this.formatTaskActionForUnified(taskAction, reasons));
+
+        this.props.actions.saveTasksActions(unifiedActions);
     };
 
     renderReasonsForm = () => {
@@ -476,6 +521,10 @@ const mapStateToProps = (state) => {
         sites: {
             data: state.sites.data,
             isFetching: state.sites.isFetching
+        },
+        tasksActions: {
+            data: state.tasksActions.data,
+            isFetching: state.tasksActions.isFetching
         },
     };
 };

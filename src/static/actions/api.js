@@ -30,7 +30,7 @@ export function fetchProtectedData(url, requestType, successType) {
             credentials: 'include',
             headers: {
                 Accept: 'application/json',
-            }
+            },
         })
             .then(checkHttpStatus)
             .then(parseJSON)
@@ -49,3 +49,31 @@ export function fetchProtectedData(url, requestType, successType) {
     };
 }
 
+export function saveProtectedData(url, data, requestType, successType) {
+    return (dispatch, state) => {
+        dispatch(request(requestType));
+        return fetch(`${SERVER_URL}${url}`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+            .then(checkHttpStatus)
+            .then(parseJSON)
+            .then(response => {
+                dispatch(success(successType, response));
+            })
+            .catch((error) => {
+                if (error && typeof error.response !== 'undefined' && error.response.status >= 500) {
+                    dispatch(fetchDataFailure(error.response.status, 'A server error occurred while sending your data!'));
+                } else {
+                    dispatch(fetchDataFailure('Connection Error', 'An error occurred while sending your data!'));
+                }
+
+                return Promise.resolve();
+            });
+    };
+}
