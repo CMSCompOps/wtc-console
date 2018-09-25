@@ -45,7 +45,7 @@ const Details = styled.div`
     padding-bottom: 20px;
 `;
 
-const SitesAndActionsContainer = styled.div`
+const ActionAndSitesContainer = styled.div`
     display: flex;
     flex-direction: row;
 `;
@@ -93,7 +93,7 @@ const SiteLabel = styled.label`
     margin-left: 3px;
 `;
 
-const Actions = styled(Section)`
+const ActionParameters = styled(Section)`
     flex: 1;
     display: flex;
     flex-direction: row;
@@ -106,11 +106,12 @@ const ActionBlock = styled(Section)`
     max-width: 300px;
 `;
 
-const ActionsForm = styled.div`
+const ReasonsForm = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
     align-items: flex-end;
+    width: 100%;
 `;
 
 const ReasonItem = styled.div`
@@ -138,7 +139,6 @@ class TasksView extends React.Component {
         actions: PropTypes.shape({
             fetchTasks: PropTypes.func.isRequired,
             fetchSites: PropTypes.func.isRequired,
-            fetchTasksActions: PropTypes.func.isRequired,
             saveTasksActions: PropTypes.func.isRequired,
         }).isRequired,
         history: PropTypes.object.isRequired,
@@ -155,8 +155,7 @@ class TasksView extends React.Component {
         const params = qs.parse(props.location.search);
 
         this.state = {
-            reasons: [],
-            taskActions: {},
+            actions: {},
             page: params.page || 1,
             filter: params.filter || '',
             sortedBy: params.sortedBy,
@@ -167,13 +166,11 @@ class TasksView extends React.Component {
     componentDidMount() {
         this.props.actions.fetchSites();
         this.fetchData();
-
     }
 
     fetchData = () => {
         const {page, filter, sortedBy, desc} = this.state;
         this.props.actions.fetchTasks(page, DEFAULT_PAGE_SIZE, filter, sortedBy, desc);
-        this.props.actions.fetchTasksActions();
     };
 
     updateLocation = () => {
@@ -217,29 +214,28 @@ class TasksView extends React.Component {
         }, this.updateLocationAndFetchData);
     };
 
-    onActionDataChange = (taskId, newValues) => {
-        const {taskActions} = this.state;
+    getActionByIdx = (idx) => {
+        const {actions} = this.state;
+        return actions[idx] || {};
+    };
+
+    onActionDataChange = (idx, newValues) => {
+        const {actions} = this.state;
 
         this.setState({
             ...this.state,
-            taskActions: {
-                ...taskActions,
-                [taskId]: {
-                    ...this.getTaskActionsById(taskId),
+            actions: {
+                ...actions,
+                [idx]: {
+                    ...this.getActionByIdx(idx),
                     ...newValues,
                 },
             },
         });
     };
 
-    getTaskActionsById = (taskId) => {
-        const {taskActions} = this.state;
-        return taskActions[taskId] || {};
-    };
-
-    onSiteCheckboxClick = (taskId, siteName, checked) => {
-        const taskAction = this.getTaskActionsById(taskId);
-        const {sites} = taskAction;
+    onSiteCheckboxClick = (idx, action, siteName, checked) => {
+        const {sites} = action;
 
         let newSites = new Set(sites);
 
@@ -247,10 +243,10 @@ class TasksView extends React.Component {
             ? newSites.add(siteName)
             : newSites.delete(siteName);
 
-        this.onActionDataChange(taskId, {'sites': newSites});
+        this.onActionDataChange(idx, {'sites': newSites});
     };
 
-    renderSites = (taskId, taskAction, taskSites) => {
+    renderSites = (taskId, action, taskSites) => {
         const {sites: allSites} = this.props;
 
         return (
@@ -264,8 +260,8 @@ class TasksView extends React.Component {
                             <SiteField key={checkboxId}>
                                 <CheckboxField
                                     label={<SiteLabel bold={taskSites.includes(site.name)}>{site.name}</SiteLabel>}
-                                    checked={taskAction.sites && taskAction.sites.has(site.name)}
-                                    handleChange={newValue => this.onSiteCheckboxClick(taskId, site.name, newValue)}
+                                    checked={action.sites && action.sites.has(site.name)}
+                                    handleChange={newValue => this.onSiteCheckboxClick(idx, action, site.name, newValue)}
                                 />
                             </SiteField>
                         )
@@ -275,87 +271,87 @@ class TasksView extends React.Component {
         );
     };
 
-    isActionSelected = (taskAction) => !!taskAction && !!taskAction.name && !!taskAction.name.value;
+    isActionSelected = (action) => !!action && !!action.name && !!action.name.value;
 
-    shouldShowMethodsSelect = (taskAction) =>
-        this.isActionSelected(taskAction)
-        && (taskAction.name.value === 'acdc' || taskAction.name.value === 'recovery');
+    shouldShowMethodsSelect = (action) =>
+        this.isActionSelected(action)
+        && (action.name.value === 'acdc' || action.name.value === 'recovery');
 
 
-    shouldShowParameters = (taskAction) =>
-        this.isActionSelected(taskAction)
-        && taskAction.name.value !== 'none';
+    shouldShowParameters = (action) =>
+        this.isActionSelected(action)
+        && action.name.value !== 'none';
 
-    renderActionParameters = (taskId, taskAction) => {
+    renderActionParameters = (idx, action) => {
         return (
             <ActionBlock>
                 <FormFieldInline>
                     <Label inline>XRootD:</Label>
-                    <Toggle checked={taskAction.xrootd}
-                            onChange={e => this.onActionDataChange(taskId, {'xrootd': e.target.checked})}/>
+                    <Toggle checked={action.xrootd}
+                            onChange={e => this.onActionDataChange(idx, {'xrootd': e.target.checked})}/>
                 </FormFieldInline>
                 <FormFieldInline>
                     <Label inline>Secondary:</Label>
-                    <Toggle checked={taskAction.secondary}
-                            onChange={e => this.onActionDataChange(taskId, {'secondary': e.target.checked})}/>
+                    <Toggle checked={action.secondary}
+                            onChange={e => this.onActionDataChange(idx, {'secondary': e.target.checked})}/>
                 </FormFieldInline>
                 <FormField>
                     <Label>Splitting:</Label>
                     <SliderField marks={SPLITTING_MARKS} max={7} step={null} included={false}
-                                 onChange={s => this.onActionDataChange(taskId, {'splitting': s})}/>
+                                 onChange={s => this.onActionDataChange(idx, {'splitting': s})}/>
                 </FormField>
             </ActionBlock>
         );
     };
 
-    renderActionParameters2 = (taskId, taskAction) => {
+    renderActionParameters2 = (idx, action) => {
         return (
             <ActionBlock>
                 <FormFieldInline>
                     <Label inline>Memory:</Label>
-                    <TextInput value={taskAction.memory}
-                               onChange={e => this.onActionDataChange(taskId, {'memory': e.target.value})}/>
+                    <TextInput value={action.memory}
+                               onChange={e => this.onActionDataChange(idx, {'memory': e.target.value})}/>
                 </FormFieldInline>
                 <FormFieldInline>
                     <Label inline>Cores:</Label>
-                    <TextInput value={taskAction.cores}
-                               onChange={e => this.onActionDataChange(taskId, {'cores': e.target.value})}/>
+                    <TextInput value={action.cores}
+                               onChange={e => this.onActionDataChange(idx, {'cores': e.target.value})}/>
                 </FormFieldInline>
                 <FormFieldInline>
                     <Label inline>Group:</Label>
-                    <TextInput value={taskAction.group}
-                               onChange={e => this.onActionDataChange(taskId, {'group': e.target.value})}/>
+                    <TextInput value={action.group}
+                               onChange={e => this.onActionDataChange(idx, {'group': e.target.value})}/>
                 </FormFieldInline>
             </ActionBlock>
         );
     };
 
-    renderActions = (taskId, taskAction, row) => {
+    renderActionForm = (idx, action, row) => {
         return (
-            <Actions>
+            <ActionParameters>
                 <ActionBlock>
                     <FormField>
                         <Label>Choose an action:</Label>
                         <SelectField
-                            value={taskAction.name}
-                            onChange={action => this.onActionDataChange(taskId, {'task': row, 'name': action})}
+                            value={action.name}
+                            onChange={action => this.onActionDataChange(idx, {'task': row, 'name': action})}
                             options={ACTIONS}/>
                     </FormField>
-                    {this.shouldShowMethodsSelect(taskAction) && (
+                    {this.shouldShowMethodsSelect(action) && (
                         <div>
                             <Label>Method:</Label>
                             <FormField>
                                 <SelectField
-                                    value={taskAction.method}
-                                    onChange={method => this.onActionDataChange(taskId, {'method': method})}
+                                    value={action.method}
+                                    onChange={method => this.onActionDataChange(idx, {'method': method})}
                                     options={METHODS}/>
                             </FormField>
                         </div>
                     )}
                 </ActionBlock>
-                {this.shouldShowParameters(taskAction) && this.renderActionParameters(taskId, taskAction)}
-                {this.shouldShowParameters(taskAction) && this.renderActionParameters2(taskId, taskAction)}
-            </Actions>
+                {this.shouldShowParameters(action) && this.renderActionParameters(idx, action)}
+                {this.shouldShowParameters(action) && this.renderActionParameters2(idx, action)}
+            </ActionParameters>
         );
     };
 
@@ -363,104 +359,115 @@ class TasksView extends React.Component {
         return task.statuses.map(status => status.site);
     };
 
-    shouldShowSites = (taskAction) =>
-        this.shouldShowMethodsSelect(taskAction)
-        && taskAction.method
-        && taskAction.method.value !== 'Auto';
+    shouldShowSites = (action) =>
+        this.shouldShowMethodsSelect(action)
+        && action.method
+        && action.method.value !== 'auto';
 
-    foldedTaskContentRenderer = (row, taskId) => {
-        const taskAction = this.getTaskActionsById(taskId);
+    addReason = (actionIdx, action) => {
+        const {reasons} = action;
+        this.onActionDataChange(actionIdx, {'reasons': [...reasons, '']});
+    };
+
+    removeReason = (actionIdx, action, reasonIdx) => {
+        const {reasons} = action;
+        this.onActionDataChange(actionIdx, {'reasons': reasons.filter((reason, i) => i !== reasonIdx)});
+    };
+
+    onReasonChange = (actionIdx, action, reasonIdx, value) => {
+        const {reasons} = action;
+        this.onActionDataChange(actionIdx, {'reasons': reasons.map((reason, i) => i === reasonIdx ? value : reason)});
+    };
+
+    renderActionReasons = (actionIdx, action) => {
+        const reasons = action.reasons || [];
+
         return (
-            <SitesAndActionsContainer>
-                {this.renderActions(taskId, taskAction, row)}
-                {this.shouldShowSites(taskAction) && this.renderSites(taskId, taskAction, this.getTaskSitesNames(row))}
-            </SitesAndActionsContainer>
+            <ReasonsForm>
+                {reasons.map((reason, reasonIdx) =>
+                    <ReasonItem key={`reason_${reasonIdx}`}>
+                        <TextInput value={reason}
+                                   onChange={e => this.onReasonChange(actionIdx, action, reasonIdx, e.target.value)}/>
+                        <Button onClick={() => this.removeReason(actionIdx, action, reasonIdx)}
+                                title={'Remove reason'}/>
+                    </ReasonItem>
+                )}
+                <Button onClick={() => this.addReason(actionIdx, action)} title={'Add reason'}/>
+            </ReasonsForm>
+        );
+    };
+
+    renderAction = (idx, action) => {
+        return (
+            <ActionAndSitesContainer>
+                {this.renderActionForm(idx, action, row)}
+                {this.shouldShowSites(action) && this.renderSites(idx, action, this.getTaskSitesNames(row))}
+                {this.renderActionReasons(idx, action)}
+                // TODO: delete and add tasks buttons
+                // TODO: list added tasks or message 'No tasks added, select tasks and click 'Apply to selected tasks' button'
+            </ActionAndSitesContainer>
         )
     };
 
-    addReason = () => {
-        const {reasons} = this.state;
-
-        this.setState({
-            ...this.state,
-            reasons: [...reasons, ''],
-        });
+    foldedTaskContentRenderer = (row) => {
+        return (
+            <p>TODO: Render workflows indented</p>
+        )
     };
 
-    removeReason = (idx) => {
-        const {reasons} = this.state;
+    renderActions = () => {
+        const {actions} = this.state;
 
-        this.setState({
-            ...this.state,
-            reasons: reasons.filter((reason, i) => i !== idx),
-        });
+        return (
+            // TODO: render in data table
+            <ActionAndSitesContainer>
+                {Object.entries(actions).map(([idx, action]) => this.renderAction(idx, action))}
+
+                // TODO: add action button
+                <Button onClick={this.submitActions} title={'Submit actions'}/>
+            </ActionAndSitesContainer>
+        )
     };
 
-    onReasonChange = (value, idx) => {
-        const {reasons} = this.state;
-
-        this.setState({
-            ...this.state,
-            reasons: reasons.map((reason, i) => i === idx ? value : reason),
-        });
-    };
 
     getTaskSites = (task) => task.statuses.map(status => status.site);
 
-    formatTaskActionForUnified = (taskAction, reasons) => {
+    formatTaskActionForUnified = (action) => {
 
-        if (!taskAction.task)
-            return {};
+        const method = _.get(action, 'method.value') || 'auto';
 
-        const method = _.get(taskAction, 'method.value') || 'auto';
-
-        return {
-            name: taskAction.task.name,
-            workflow: taskAction.task.workflow.name,
-            action_id: {
-                action: _.get(taskAction, 'name.value'),
-                xrootd: taskAction.xrootd ? 'enabled' : 'disabled',
-                secondary: taskAction.secondary ? 'enabled' : 'disabled',
-                splitting: taskAction.splitting,
-                cores: taskAction.cores,
-                memory: taskAction.memory,
-                group: taskAction.group,
-                sites: method === 'manual' ? taskAction.sites : this.getTaskSites(taskAction.task),
-                reasons: reasons,
+        return action.tasks.map(action => {
+            return {
+                name: action.task.name,
+                workflow: action.task.workflow.name,
+                action_id: {
+                    action: _.get(action, 'name.value'),
+                    xrootd: action.xrootd ? 'enabled' : 'disabled',
+                    secondary: action.secondary ? 'enabled' : 'disabled',
+                    splitting: action.splitting,
+                    cores: action.cores,
+                    memory: action.memory,
+                    group: action.group,
+                    sites: method === 'manual' ? action.sites : this.getTaskSites(action.task),
+                    reasons: action.reasons,
+                }
             }
-        }
+        });
     };
 
-    shouldAddTaskAction = (taskAction) => {
-        const actionName = _.get(taskAction, 'name.value');
-        return !!taskAction.task && !!actionName && actionName !== 'none';
+    shouldAddTaskAction = (action) => {
+        const actionName = _.get(action, 'name.value');
+        return !!actionName && actionName !== 'none' && action.tasks;
     };
 
     submitActions = () => {
-        const {reasons, taskActions} = this.state;
+        const {actions} = this.state;
 
-        const unifiedActions = Object.values(taskActions)
+        const unifiedActions = Object.values(actions)
             .filter(this.shouldAddTaskAction)
-            .map(taskAction => this.formatTaskActionForUnified(taskAction, reasons));
+            .flatMap(action => this.formatTaskActionForUnified(action));
 
         this.props.actions.saveTasksActions(unifiedActions);
-    };
-
-    renderActionsForm = () => {
-        const {reasons} = this.state;
-
-        return (
-            <ActionsForm>
-                {reasons.map((reason, idx) =>
-                    <ReasonItem key={`reason_${idx}`}>
-                        <TextInput value={reason} onChange={e => this.onReasonChange(e.target.value, idx)}/>
-                        <Button onClick={() => this.removeReason(idx)} title={'Remove reason'}/>
-                    </ReasonItem>
-                )}
-                <Button onClick={this.addReason} title={'Add reason'}/>
-                <Button onClick={this.submitActions} title={'Submit actions'}/>
-            </ActionsForm>
-        );
     };
 
     render() {
@@ -471,6 +478,8 @@ class TasksView extends React.Component {
             <div className="protected">
                 <div className="container">
                     <h2 className="text-center margin-bottom-medium">Tasks</h2>
+
+                    {this.renderActions()}
 
                     <Filter onFilter={this.filter} initialValue={filter}/>
 
@@ -503,7 +512,6 @@ class TasksView extends React.Component {
                                 sortedBy={sortedBy}
                                 desc={desc}
                             />
-                            {this.renderActionsForm()}
                         </Details>
                     }
                 </div>

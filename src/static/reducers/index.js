@@ -6,7 +6,6 @@ import prepsReducer from './preps';
 import prepReducer from './prep';
 import tasksReducer from './tasks';
 import sitesReducer from './sites';
-import tasksActionsReducer from './tasksActions';
 
 export default combineReducers({
     prep: prepReducer,
@@ -15,6 +14,5 @@ export default combineReducers({
     workflow: workflowReducer,
     workflows: workflowsReducer,
     tasks: tasksReducer,
-    tasksActions: tasksActionsReducer,
     routing: routerReducer,
 });

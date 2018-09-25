@@ -62,8 +62,6 @@ def get_list_values(key, data):
 def get_or_create_action(data):
     action = None
 
-    logger.debug('TaskActionSerializer.get_or_create action data: {}'.format(data))
-
     if 'id' in data:
         # Get action by id (currently frontend does not send id, but it will be used in the future)
         action = Action.objects(id=data['id']).first()
@@ -115,7 +113,6 @@ class TaskActionSerializer(BulkSerializerMixin, DocumentSerializer):
         list_serializer_class = BulkListSerializer
 
     def create(self, validated_data):
-        logger.debug('TaskActionSerializer.create validated_data: {}'.format(validated_data))
         action_data = validated_data.pop('action_id')
         action = get_or_create_action(action_data)
 
