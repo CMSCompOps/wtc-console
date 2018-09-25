@@ -74,6 +74,6 @@ CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672/'
 WORKFLOWS_UPDATE_LIMIT = 10
 WORKFLOWS_UPDATE_TIMEOUT = 2 # in hours
 
-CA_PATH = '/home/edvinas/workspaces/cern/wtc-console/cert/CERNRootCertificationAuthority2.crt'
-CERT_PATH = '/home/edvinas/workspaces/cern/wtc-console/cert/crt.pem'
-CERT_KEY_PATH = '/home/edvinas/workspaces/cern/wtc-console/cert/key.pem'
+CA_PATH = '../cert/CERNRootCertificationAuthority2.crt'
+CERT_PATH = '../cert/crt.pem'
+CERT_KEY_PATH = '../cert/key.pem'
