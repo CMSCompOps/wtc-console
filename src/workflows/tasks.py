@@ -196,4 +196,4 @@ def update_workflows_from_request_manager():
     except Exception as e:
         logger.error('Exception raised: {}'.format(e))
 
-    logger.info('Workflows updated {}'.format(updated_wfs.count()))
+    logger.info('Workflows updated {}'.format(len(updated_wfs)))
