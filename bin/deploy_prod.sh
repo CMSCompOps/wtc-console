@@ -2,7 +2,7 @@
 export TNS_ADMIN=/afs/cern.ch/project/oracle/admin/
 
 # Fetch updates
-git pull origin master
+git pull
 
 # Build frontend for production
 npm install
