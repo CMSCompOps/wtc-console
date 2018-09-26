@@ -55,15 +55,13 @@ Running oracle client in docker container is not solved yet. Because of this, cl
 * Install [Oracle Instant Client](http://www.oracle.com/technetwork/database/database-technologies/instant-client/overview/index.html).
     * Setup tns config by putting tnsnames.ora from _/afs/cern.ch/project/oracle/admin/_ to projects _oracle-admin_ folder.
     Note: sometimes this config file changes, if you have problems connecting to oracle, then try to fetch a new version of this file
-    * Add these lines to your _.bashrc_, probably the path to client will be _/usr/lib/oracle/xx.x/client64_, but it might be different depending on installation type
+    * Add these lines to your _.bashrc_, probably the path to client will be _/usr/lib/oracle/xx.x/client64_ on linux, but it might be different depending on installation type and OS.
 ```
-export ORACLE_HOME=/path/to/oracle/client
-export LD_LIBRARY_PATH=$ORACLE_HOME/lib
-export PATH=$PATH:$ORACLE_HOME/bin
+export LD_LIBRARY_PATH=/path/to/instantclient_12_2
 ```
 
-* Copy _src/djangoreactredux/settings/local_template.py_ setting file to _src/djangoreactredux/settings/local.py_ and fill it with certificates data and Oracle db credentials
-* `./bin/setup_dev.sh` - this will install Python requirements
+* Copy _src/djangoreactredux/settings/local_template.py_ setting file to _src/djangoreactredux/settings/local.py_ and update Oracle db credentials.
+* Copy your certificates to _cert_ folder. Required certificates are your Grid certificate and its key, both in _pem_ format, and cern certification authority (CERNRootCertificationAuthority2.crt).
 
 ### Running and stopping
 
@@ -72,14 +70,18 @@ To start up development environment after it is setup you need to run these two 
 * `docker-compose up`
 * `./bin/start_dev.sh`
 
-To stop the development server:
+To stop the development server (order important):
 
 * `./bin/stop_dev.sh` - this will stop celery workers
-* `docker-compose stop` or _Ctrl+C_ if you have 'docker-compose up' running terminal
+* `docker-compose stop` or _Ctrl+C_ if you have 'docker-compose up' running terminal. Make sure that you see stopping lines. If not, then use this command.
 
 Note: it might take some time for celery workers to stop if they are in longer process. You can check if they are still running by executing:
 
 `ps -ef | grep celery`
+
+If stopping takes too long, then kill them one by one with:
+
+`kill -9 pid`
 
 ### Clean up
 
