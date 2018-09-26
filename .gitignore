@@ -58,7 +58,7 @@ scripts/
 
 # local files
 tmp/
-oracle-admin/*
+oracle-admin/tnsnames.ora
 
 # Celery
 **/celerybeat-schedule*
