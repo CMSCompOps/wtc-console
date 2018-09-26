@@ -225,12 +225,15 @@ class TasksView extends React.Component {
 
     onActionDataChange = (idx, newValues) => {
         const {actions} = this.state;
-        let newActions = [...actions];
-        newActions[idx] = {...actions[idx], ...newValues};
 
         this.setState({
             ...this.state,
-            actions: newActions,
+            actions: actions
+                .map(action =>
+                    action.idx === idx
+                        ? {...action, ...newValues}
+                        : action
+                ),
         });
     };
 
@@ -392,7 +395,7 @@ class TasksView extends React.Component {
 
     addAction = () => {
         const {actions} = this.state;
-        const idx = actions.length;
+        const idx = new Date().getUTCMilliseconds();
 
         this.setState({
             ...this.state,
@@ -411,7 +414,7 @@ class TasksView extends React.Component {
 
         this.setState({
             ...this.state,
-            actions: actions.filter((val, i) => i !== idx),
+            actions: actions.filter(action => action.idx !== idx),
         });
     };
 
