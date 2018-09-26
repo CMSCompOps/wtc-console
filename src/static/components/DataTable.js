@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import styled from 'styled-components';
+import CheckboxField from './fields/CheckboxField';
 
 const Wrapper = styled.div`
     width: 100%;
@@ -10,6 +11,26 @@ const Wrapper = styled.div`
 const Title = styled.h4`
     text-align: center;
     margin-bottom: 15px;
+`;
+
+const Panel = styled.div`
+    display: inline-block;
+`;
+
+const LeftPanel = styled(Panel)`
+    float: left;
+
+    * {
+        margin-right: 5px;
+    }
+`;
+
+const RightPanel = styled(Panel)`
+    float: right;
+
+    & > * {
+        margin-left: 5px;
+    }
 `;
 
 const Table = styled.div`
@@ -50,6 +71,7 @@ const RowHeader = styled.div`
 `;
 
 const Cell = styled.div`
+    display: flex;
     flex: ${props => `${props.flex || 0} ${props.width || ''}`}
     font-size: 14px;
     line-height: 16px;
@@ -85,6 +107,17 @@ const FoldIcon = styled.i`
     cursor: pointer;
 `;
 
+const RowCheckbox = styled(CheckboxField)`
+    display: inline-block;
+    height: 100%;
+    float: left;
+    margin-right: 5px;
+    
+    input {
+        margin: 0;
+    }
+`;
+
 export default class DataTable extends React.Component {
     static propTypes = {
         title: PropTypes.string,
@@ -100,11 +133,14 @@ export default class DataTable extends React.Component {
         folding: PropTypes.bool,
         foldedContentRenderer: PropTypes.func,
         expandedIds: PropTypes.arrayOf(PropTypes.string),
+        selectable: PropTypes.bool,
+        onSelectionChangeFn: PropTypes.func,
         idColumn: PropTypes.string,
         onClickFn: PropTypes.func,
         sortFn: PropTypes.func,
         sortedBy: PropTypes.string,
         desc: PropTypes.bool,
+        panelRenderer: PropTypes.func,
     };
 
     constructor(props) {
@@ -112,8 +148,14 @@ export default class DataTable extends React.Component {
 
         this.state = {
             expandedRows: [],
+            selectedRows: [],
         };
     }
+
+    getId = (row) => {
+        const { idColumn } = this.props;
+        return _.get(row, idColumn);
+    };
 
     getCellValue = (col, row) => {
         const val = _.get(row, col.key);
@@ -171,15 +213,49 @@ export default class DataTable extends React.Component {
         })
     };
 
+    afterSelectionUpdate = () => {
+        const {onSelectionChangeFn} = this.props;
+        onSelectionChangeFn && onSelectionChangeFn(this.state.selectedRows);
+    };
+
+    toggleSelection = (id, selected) => {
+        const {selectedRows} = this.state;
+
+        this.setState({
+            ...this.state,
+            selectedRows: selected
+                ? [...selectedRows, id]
+                : selectedRows.filter(elem => elem !== id),
+        }, this.afterSelectionUpdate);
+    };
+
+    selectAll = () => {
+        const { data } = this.props;
+
+        this.setState({
+            ...this.state,
+            selectedRows: data.map(this.getId),
+        }, this.afterSelectionUpdate);
+    };
+
+    clearAll = () => {
+        this.setState({
+            ...this.state,
+            selectedRows: [],
+        }, this.afterSelectionUpdate);
+    };
+
     renderRow = (row, idx) => {
         const {
             columns,
-            idColumn,
             onClickFn,
             folding,
             foldedContentRenderer,
+            selectable,
         } = this.props;
-        const id = _.get(row, idColumn);
+
+        const {selectedRows} = this.state;
+        const id = this.getId(row);
         const expanded = folding && this.state.expandedRows.includes(id);
 
         return (
@@ -192,12 +268,18 @@ export default class DataTable extends React.Component {
                             width={col.width}
                             align={col.align}
                         >
+                            {selectable && col_idx === 0 && <RowCheckbox
+                                checked={selectedRows.includes(id)}
+                                handleChange={checked => this.toggleSelection(id, checked)}
+                            />}
+
                             {folding && col_idx === 0 && <FoldIconContainer>
                                 {expanded
                                     ? <FoldIcon className={'fa fa-minus-square-o'}/>
                                     : <FoldIcon className={'fa fa-plus-square-o'}/>}
                             </FoldIconContainer>}
-                            {this.getCellValue(col, row)}
+
+                            <div>{this.getCellValue(col, row)}</div>
                         </Cell>
                     )}
                 </RowHeader>
@@ -212,11 +294,19 @@ export default class DataTable extends React.Component {
         const {
             data,
             title,
+            panelRenderer,
         } = this.props;
 
         return (
             <Wrapper>
                 {title && <Title>{title}</Title>}
+                <LeftPanel>
+                    {panelRenderer && panelRenderer()}
+                </LeftPanel>
+                <RightPanel>
+                    <a href="#" onClick={this.selectAll}>Select all</a>
+                    <a href="#" onClick={this.clearAll}>Clear all</a>
+                </RightPanel>
                 <Table>
                     {this.renderHeader()}
                     {data.length > 0

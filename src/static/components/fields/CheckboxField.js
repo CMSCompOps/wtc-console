@@ -18,18 +18,20 @@ export default class CheckboxField extends React.Component {
         checked: PropTypes.bool,
         label: PropTypes.any,
         handleChange: PropTypes.func,
+        className: PropTypes.string,
     };
 
-    toggleValue = () => {
+    toggleValue = (e) => {
         const {handleChange, checked} = this.props;
         handleChange(!checked);
+        e.stopPropagation();
     };
 
     render() {
-        const {checked, label} = this.props;
+        const {checked, className, label} = this.props;
 
         return (
-            <Wrapper onClick={this.toggleValue}>
+            <Wrapper className={className} onClick={this.toggleValue}>
                 <StyledCheckbox type={'checkbox'} checked={checked}/>
                 {label}
             </Wrapper>

@@ -78,7 +78,7 @@ const SitesList = styled(Section)`
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: flex-start;
 `;
 
 const SiteField = styled.div`
@@ -132,10 +132,6 @@ class TasksView extends React.Component {
             isFetching: PropTypes.bool.isRequired,
             data: PropTypes.arrayOf(Site),
         }),
-        tasksActions: PropTypes.shape({
-            isFetching: PropTypes.bool.isRequired,
-            data: PropTypes.array,
-        }),
         actions: PropTypes.shape({
             fetchTasks: PropTypes.func.isRequired,
             fetchSites: PropTypes.func.isRequired,
@@ -156,6 +152,7 @@ class TasksView extends React.Component {
 
         this.state = {
             actions: {},
+            selectedTasks: [],
             page: params.page || 1,
             filter: params.filter || '',
             sortedBy: params.sortedBy,
@@ -246,7 +243,7 @@ class TasksView extends React.Component {
         this.onActionDataChange(idx, {'sites': newSites});
     };
 
-    renderSites = (taskId, action, taskSites) => {
+    renderSites = (taskId, action) => {
         const {sites: allSites} = this.props;
 
         return (
@@ -259,7 +256,7 @@ class TasksView extends React.Component {
                         return (
                             <SiteField key={checkboxId}>
                                 <CheckboxField
-                                    label={<SiteLabel bold={taskSites.includes(site.name)}>{site.name}</SiteLabel>}
+                                    label={<SiteLabel>{site.name}</SiteLabel>}
                                     checked={action.sites && action.sites.has(site.name)}
                                     handleChange={newValue => this.onSiteCheckboxClick(idx, action, site.name, newValue)}
                                 />
@@ -326,7 +323,7 @@ class TasksView extends React.Component {
         );
     };
 
-    renderActionForm = (idx, action, row) => {
+    renderActionForm = (idx, action) => {
         return (
             <ActionParameters>
                 <ActionBlock>
@@ -334,7 +331,7 @@ class TasksView extends React.Component {
                         <Label>Choose an action:</Label>
                         <SelectField
                             value={action.name}
-                            onChange={action => this.onActionDataChange(idx, {'task': row, 'name': action})}
+                            onChange={action => this.onActionDataChange(idx, {'name': action})}
                             options={ACTIONS}/>
                     </FormField>
                     {this.shouldShowMethodsSelect(action) && (
@@ -353,10 +350,6 @@ class TasksView extends React.Component {
                 {this.shouldShowParameters(action) && this.renderActionParameters2(idx, action)}
             </ActionParameters>
         );
-    };
-
-    getTaskSitesNames = (task) => {
-        return task.statuses.map(status => status.site);
     };
 
     shouldShowSites = (action) =>
@@ -397,21 +390,47 @@ class TasksView extends React.Component {
         );
     };
 
-    renderAction = (idx, action) => {
-        return (
-            <ActionAndSitesContainer>
-                {this.renderActionForm(idx, action, row)}
-                {this.shouldShowSites(action) && this.renderSites(idx, action, this.getTaskSitesNames(row))}
-                {this.renderActionReasons(idx, action)}
-                // TODO: delete and add tasks buttons
-                // TODO: list added tasks or message 'No tasks added, select tasks and click 'Apply to selected tasks' button'
-            </ActionAndSitesContainer>
-        )
+    addAction = () => {
+        const {actions} = this.state;
+
+        this.setState({
+            ...this.state,
+            actions: {
+                ...actions,
+                [actions.length]: {},
+            },
+        });
     };
 
-    foldedTaskContentRenderer = (row) => {
+    removeAction = (idx) => {
+        const {actions} = this.state;
+
+        this.setState({
+            ...this.state,
+            actions: _.omit(actions, [idx]),
+        });
+    };
+
+    applyActionToSelectedTasks = (actionIdx) => {
+        const {selectedTasks} = this.state;
+        this.onActionDataChange(actionIdx, {'tasks': selectedTasks});
+    };
+
+    renderAction = (idx, action) => {
         return (
-            <p>TODO: Render workflows indented</p>
+            <ActionAndSitesContainer key={idx}>
+                {this.renderActionForm(idx, action)}
+                {this.shouldShowSites(action) && this.renderSites(idx, action)}
+                {this.renderActionReasons(idx, action)}
+
+                <a onClick={() => this.applyActionToSelectedTasks(idx, action)}>Apply action to selected tasks</a>
+                <a onClick={this.removeAction}>Remove action</a>
+
+                <p>Applied to tasks:</p>
+                {action.tasks
+                    ? <ul>{action.tasks.map((task, idx) => <li key={idx}>{task}</li>)}</ul>
+                    : <p>No tasks added, select tasks and click 'Apply action to selected tasks' button</p>}
+            </ActionAndSitesContainer>
         )
     };
 
@@ -419,16 +438,14 @@ class TasksView extends React.Component {
         const {actions} = this.state;
 
         return (
-            // TODO: render in data table
+            // TODO: render actions in folding data table
             <ActionAndSitesContainer>
                 {Object.entries(actions).map(([idx, action]) => this.renderAction(idx, action))}
-
-                // TODO: add action button
+                <Button onClick={this.addAction} title={'Add action'}/>
                 <Button onClick={this.submitActions} title={'Submit actions'}/>
             </ActionAndSitesContainer>
         )
     };
-
 
     getTaskSites = (task) => task.statuses.map(status => status.site);
 
@@ -436,10 +453,10 @@ class TasksView extends React.Component {
 
         const method = _.get(action, 'method.value') || 'auto';
 
-        return action.tasks.map(action => {
+        return action.tasks.map(task => {
             return {
-                name: action.task.name,
-                workflow: action.task.workflow.name,
+                name: task.name,
+                workflow: task.workflow.name,
                 action_id: {
                     action: _.get(action, 'name.value'),
                     xrootd: action.xrootd ? 'enabled' : 'disabled',
@@ -448,7 +465,7 @@ class TasksView extends React.Component {
                     cores: action.cores,
                     memory: action.memory,
                     group: action.group,
-                    sites: method === 'manual' ? action.sites : this.getTaskSites(action.task),
+                    sites: method === 'manual' ? action.sites : this.getTaskSites(task),
                     reasons: action.reasons,
                 }
             }
@@ -470,9 +487,22 @@ class TasksView extends React.Component {
         this.props.actions.saveTasksActions(unifiedActions);
     };
 
+    onTasksSelectionChange = (selectedTasks) => {
+        this.setState({
+            ...this.state,
+            selectedTasks,
+        });
+    };
+
+    foldedTaskContentRenderer = (row) => {
+        return (
+            <p>TODO: Render workflows indented and their tasks</p>
+        )
+    };
+
     render() {
         const {tasks, sites} = this.props;
-        const {filter, sortedBy, desc, expandedTasks} = this.state;
+        const {filter, sortedBy, desc} = this.state;
 
         return (
             <div className="protected">
@@ -480,8 +510,6 @@ class TasksView extends React.Component {
                     <h2 className="text-center margin-bottom-medium">Tasks</h2>
 
                     {this.renderActions()}
-
-                    <Filter onFilter={this.filter} initialValue={filter}/>
 
                     {tasks.isFetching || sites.isFetching || !tasks.data
                         ? <p className="text-center">Loading data...</p>
@@ -507,10 +535,12 @@ class TasksView extends React.Component {
                                 idColumn={'name'}
                                 folding={true}
                                 foldedContentRenderer={this.foldedTaskContentRenderer}
-                                expandedIds={expandedTasks}
+                                selectable={true}
+                                onSelectionChange={this.onTasksSelectionChange}
                                 sortFn={this.sortData}
                                 sortedBy={sortedBy}
                                 desc={desc}
+                                panelRenderer={() => <Filter onFilter={this.filter} initialValue={filter}/>}
                             />
                         </Details>
                     }
@@ -529,10 +559,6 @@ const mapStateToProps = (state) => {
         sites: {
             data: state.sites.data,
             isFetching: state.sites.isFetching
-        },
-        tasksActions: {
-            data: state.tasksActions.data,
-            isFetching: state.tasksActions.isFetching
         },
     };
 };
