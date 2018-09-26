@@ -20,6 +20,7 @@ import CheckboxField from '../../components/fields/CheckboxField';
 import TextInput from '../../components/fields/TextInput';
 import Button from '../../components/Button';
 import SliderField from '../../components/fields/SliderField';
+import DataTable from '../../components/DataTable';
 
 
 const DEFAULT_PAGE_SIZE = 20;
@@ -48,6 +49,11 @@ const Details = styled.div`
 const ActionAndSitesContainer = styled.div`
     display: flex;
     flex-direction: row;
+`;
+
+const ActionFoldingContent = styled.div`
+    display: flex;
+    flex-direction: column;
 `;
 
 const Section = styled.div`
@@ -121,6 +127,12 @@ const ReasonItem = styled.div`
     align-items: flex-end;
 `;
 
+const ButtonsPanel = styled.div`
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+`;
+
 class TasksView extends React.Component {
 
     static propTypes = {
@@ -151,7 +163,7 @@ class TasksView extends React.Component {
         const params = qs.parse(props.location.search);
 
         this.state = {
-            actions: {},
+            actions: [],
             selectedTasks: [],
             page: params.page || 1,
             filter: params.filter || '',
@@ -211,23 +223,14 @@ class TasksView extends React.Component {
         }, this.updateLocationAndFetchData);
     };
 
-    getActionByIdx = (idx) => {
-        const {actions} = this.state;
-        return actions[idx] || {};
-    };
-
     onActionDataChange = (idx, newValues) => {
         const {actions} = this.state;
+        let newActions = [...actions];
+        newActions[idx] = {...actions[idx], ...newValues};
 
         this.setState({
             ...this.state,
-            actions: {
-                ...actions,
-                [idx]: {
-                    ...this.getActionByIdx(idx),
-                    ...newValues,
-                },
-            },
+            actions: newActions,
         });
     };
 
@@ -373,11 +376,9 @@ class TasksView extends React.Component {
     };
 
     renderActionReasons = (actionIdx, action) => {
-        const reasons = action.reasons || [];
-
         return (
             <ReasonsForm>
-                {reasons.map((reason, reasonIdx) =>
+                {action.reasons.map((reason, reasonIdx) =>
                     <ReasonItem key={`reason_${reasonIdx}`}>
                         <TextInput value={reason}
                                    onChange={e => this.onReasonChange(actionIdx, action, reasonIdx, e.target.value)}/>
@@ -385,20 +386,23 @@ class TasksView extends React.Component {
                                 title={'Remove reason'}/>
                     </ReasonItem>
                 )}
-                <Button onClick={() => this.addReason(actionIdx, action)} title={'Add reason'}/>
             </ReasonsForm>
         );
     };
 
     addAction = () => {
         const {actions} = this.state;
+        const idx = actions.length;
 
         this.setState({
             ...this.state,
-            actions: {
+            actions: [
                 ...actions,
-                [actions.length]: {},
-            },
+                {
+                    idx,
+                    reasons: [],
+                },
+            ],
         });
     };
 
@@ -407,7 +411,7 @@ class TasksView extends React.Component {
 
         this.setState({
             ...this.state,
-            actions: _.omit(actions, [idx]),
+            actions: actions.filter((val, i) => i !== idx),
         });
     };
 
@@ -416,21 +420,31 @@ class TasksView extends React.Component {
         this.onActionDataChange(actionIdx, {'tasks': selectedTasks});
     };
 
-    renderAction = (idx, action) => {
+    renderAction = (action, idx) => {
         return (
-            <ActionAndSitesContainer key={idx}>
-                {this.renderActionForm(idx, action)}
-                {this.shouldShowSites(action) && this.renderSites(idx, action)}
-                {this.renderActionReasons(idx, action)}
+            <ActionFoldingContent>
+                <ActionAndSitesContainer key={idx}>
+                    {this.renderActionForm(idx, action)}
+                    {this.shouldShowSites(action) && this.renderSites(idx, action)}
+                </ActionAndSitesContainer>
 
-                <a onClick={() => this.applyActionToSelectedTasks(idx, action)}>Apply action to selected tasks</a>
-                <a onClick={this.removeAction}>Remove action</a>
+                <div>
+                    <Label>Applied to tasks:</Label>
+                    {action.tasks && action.tasks.length > 0
+                        ? <ul>{action.tasks.map((task, idx) => <li key={idx}>{task.name}</li>)}</ul>
+                        : <ul>
+                            <li>No tasks added, select tasks and click 'Apply action to selected tasks' button</li>
+                        </ul>}
+                </div>
 
-                <p>Applied to tasks:</p>
-                {action.tasks
-                    ? <ul>{action.tasks.map((task, idx) => <li key={idx}>{task}</li>)}</ul>
-                    : <p>No tasks added, select tasks and click 'Apply action to selected tasks' button</p>}
-            </ActionAndSitesContainer>
+                {action.reasons && this.renderActionReasons(idx, action)}
+
+                <ButtonsPanel>
+                    <Button onClick={() => this.addReason(idx, action)} title={'Add reason'}/>
+                    <Button onClick={() => this.applyActionToSelectedTasks(idx)} title={'Apply to selected tasks'}/>
+                    <Button onClick={() => this.removeAction(idx)} title={'Remove action'}/>
+                </ButtonsPanel>
+            </ActionFoldingContent>
         )
     };
 
@@ -438,12 +452,20 @@ class TasksView extends React.Component {
         const {actions} = this.state;
 
         return (
-            // TODO: render actions in folding data table
-            <ActionAndSitesContainer>
-                {Object.entries(actions).map(([idx, action]) => this.renderAction(idx, action))}
-                <Button onClick={this.addAction} title={'Add action'}/>
-                <Button onClick={this.submitActions} title={'Submit actions'}/>
-            </ActionAndSitesContainer>
+            <div>
+                <DataTable
+                    title={'Actions'}
+                    data={actions}
+                    columns={[{key: 'name.label', title: '', flex: 1, defaultValue: 'New action'}]}
+                    folding={true}
+                    idColumn={'idx'}
+                    foldedContentRenderer={this.renderAction}
+                />
+                <ButtonsPanel>
+                    <Button onClick={this.addAction} title={'Add action'}/>
+                    <Button onClick={this.submitActions} title={'Submit actions'}/>
+                </ButtonsPanel>
+            </div>
         )
     };
 
@@ -480,7 +502,7 @@ class TasksView extends React.Component {
     submitActions = () => {
         const {actions} = this.state;
 
-        const unifiedActions = Object.values(actions)
+        const unifiedActions = actions
             .filter(this.shouldAddTaskAction)
             .flatMap(action => this.formatTaskActionForUnified(action));
 
@@ -507,7 +529,6 @@ class TasksView extends React.Component {
         return (
             <div className="protected">
                 <div className="container">
-                    <h2 className="text-center margin-bottom-medium">Tasks</h2>
 
                     {this.renderActions()}
 
@@ -516,6 +537,7 @@ class TasksView extends React.Component {
                         : <Details>
                             <PagedDataTable
                                 data={tasks.data}
+                                title={'Tasks'}
                                 columns={[
                                     {key: 'name', title: 'Task', flex: 3},
                                     {key: 'workflow.name', title: 'Workflow', flex: 2},
@@ -536,7 +558,7 @@ class TasksView extends React.Component {
                                 folding={true}
                                 foldedContentRenderer={this.foldedTaskContentRenderer}
                                 selectable={true}
-                                onSelectionChange={this.onTasksSelectionChange}
+                                onSelectionChangeFn={this.onTasksSelectionChange}
                                 sortFn={this.sortData}
                                 sortedBy={sortedBy}
                                 desc={desc}

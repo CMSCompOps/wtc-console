@@ -50,7 +50,7 @@ const HeaderCell = styled.div`
     font-size: 14px;
     font-weight: bold;
     padding: 7px;
-    border: 1px solid white;
+    border: 1px solid #ccc;
     cursor: ${props => props.isLink ? 'pointer' : 'auto'};
 `;
 
@@ -76,7 +76,7 @@ const Cell = styled.div`
     font-size: 14px;
     line-height: 16px;
     padding: 7px;
-    border: 1px solid #ffffff;
+    border: 1px solid #ccc;
     word-break: break-all;
     text-align: ${props => props.align || 'left'}
     overflow: hidden;
@@ -86,8 +86,8 @@ const FoldingContent = styled.div`
     flex: 0 100%
     font-size: 14px;
     padding: 12px 10px 20px;
-    border: 1px solid #ffffff;
-    background: #fcfcfc;
+    border: 1px solid #ccc;
+    // background: #f6f6f6;
 `;
 
 const SortIcon = styled.i`
@@ -129,6 +129,7 @@ export default class DataTable extends React.Component {
             width: PropTypes.string,
             transformFn: PropTypes.func,
             align: PropTypes.string,
+            defaultValue: PropTypes.string,
         })).isRequired,
         folding: PropTypes.bool,
         foldedContentRenderer: PropTypes.func,
@@ -158,7 +159,7 @@ export default class DataTable extends React.Component {
     };
 
     getCellValue = (col, row) => {
-        const val = _.get(row, col.key);
+        const val = _.get(row, col.key) || col.defaultValue;
 
         return col.transformFn
             ? col.transformFn(val)
@@ -218,31 +219,41 @@ export default class DataTable extends React.Component {
         onSelectionChangeFn && onSelectionChangeFn(this.state.selectedRows);
     };
 
-    toggleSelection = (id, selected) => {
+    toggleSelection = (row, selected) => {
         const {selectedRows} = this.state;
+        const id = this.getId(row);
 
         this.setState({
             ...this.state,
             selectedRows: selected
-                ? [...selectedRows, id]
-                : selectedRows.filter(elem => elem !== id),
+                ? [...selectedRows, row]
+                : selectedRows.filter(elem => this.getId(elem) !== id),
         }, this.afterSelectionUpdate);
     };
 
-    selectAll = () => {
+    selectAll = (event) => {
+        event.preventDefault();
+
         const { data } = this.props;
 
         this.setState({
             ...this.state,
-            selectedRows: data.map(this.getId),
+            selectedRows: data,
         }, this.afterSelectionUpdate);
     };
 
-    clearAll = () => {
+    clearAll = (event) => {
+        event.preventDefault();
+
         this.setState({
             ...this.state,
             selectedRows: [],
         }, this.afterSelectionUpdate);
+    };
+
+    isSelected = (idx) => {
+        const {selectedRows} = this.state;
+        return !!selectedRows.find(elem => this.getId(elem) === idx);
     };
 
     renderRow = (row, idx) => {
@@ -254,7 +265,6 @@ export default class DataTable extends React.Component {
             selectable,
         } = this.props;
 
-        const {selectedRows} = this.state;
         const id = this.getId(row);
         const expanded = folding && this.state.expandedRows.includes(id);
 
@@ -269,8 +279,8 @@ export default class DataTable extends React.Component {
                             align={col.align}
                         >
                             {selectable && col_idx === 0 && <RowCheckbox
-                                checked={selectedRows.includes(id)}
-                                handleChange={checked => this.toggleSelection(id, checked)}
+                                checked={this.isSelected(id)}
+                                handleChange={checked => this.toggleSelection(row, checked)}
                             />}
 
                             {folding && col_idx === 0 && <FoldIconContainer>
@@ -295,6 +305,7 @@ export default class DataTable extends React.Component {
             data,
             title,
             panelRenderer,
+            selectable,
         } = this.props;
 
         return (
@@ -304,8 +315,8 @@ export default class DataTable extends React.Component {
                     {panelRenderer && panelRenderer()}
                 </LeftPanel>
                 <RightPanel>
-                    <a href="#" onClick={this.selectAll}>Select all</a>
-                    <a href="#" onClick={this.clearAll}>Clear all</a>
+                    {selectable && <a href="#" onClick={this.selectAll}>Select all</a>}
+                    {selectable && <a href="#" onClick={this.clearAll}>Clear all</a>}
                 </RightPanel>
                 <Table>
                     {this.renderHeader()}
