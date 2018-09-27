@@ -134,14 +134,36 @@ Since django is running on your machine, python package instalation is as usual 
 
 * `pip install dependency-name`
 
-## Production
+## Installing on a new machine (prod, dev)
 
-Production setup uses nginx as reverse proxy and Gunicorn as an application server.
+Production/development setup uses nginx as reverse proxy and Gunicorn as an application server.
 Below are the steps needed to setup environment on RHEL from scratch. Instructions are based on this article [How To Set Up Django with Postgres, Nginx, and Gunicorn on CentOS 7](https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-centos-7#create-a-gunicorn-systemd-service-file) 
 
 ### Setting up environment
 
 Use these instructions to setup a new production environment from scratch. By following these instructions you will create a dedicated user _wtc-console_ for running this application with Gunicorn, update proxy config for Nginx and setup firewall to allow traffic on port 80.
+
+#### Prerequisites:
+- Python >=2.7
+
+#### Install Node and NPM
+Follow this guide for [RHEL](https://tecadmin.net/install-latest-nodejs-and-npm-on-centos/)
+
+#### Install Oracle Instant Client
+
+* Go to [Oracle client site](https://www.oracle.com/technetwork/database/database-technologies/instant-client/overview/index.html) and download Oracle Instant Client 12.2 Basic. Note: you will need to have Oracle account and download it to your machine.
+
+* Upload it to the server in your preferred way
+* Run `sudo yum localinstall oracle-instantclient* --nogpgcheck`
+
+#### Install RabbitMQ
+
+Add RabbitMQ repo according to [RabbitMQ installation guide](https://www.rabbitmq.com/install-rpm.html#bintray).
+Then run these commands:
+
+* `sudo yum install rabbitmq-server`
+* `sudo chkconfig rabbitmq-server on`
+* `sudo /sbin/service rabbitmq-server start`
 
 #### Create user and login with it
 
@@ -152,19 +174,10 @@ Use these instructions to setup a new production environment from scratch. By fo
 
 Clone this project to wtc-console users home directory.
 
-* `git clone https://github.com/vined/wtc-console.git`
+* `git clone https://github.com/CMSCompOps/wtc-console.git`
 * `cd wtc-console/`
 
-#### Prerequisites:
-- Python >=2.7
-- Node and NPM
-
-#### Install Node and NPM
-Follow this guide for [RHEL](https://tecadmin.net/install-latest-nodejs-and-npm-on-centos/)
-
-#### Install Oracle client
-
-Follow instructions on [Oracle client site](https://www.oracle.com/downloads/index.html)
+#### Setup oracle client
 
 Open wtc-console users .bashrc file: 
 
@@ -182,10 +195,6 @@ And apply these changes:
 
 `. ~/.bashrc `
 
-#### Install RabbitMQ
-
-For installation details please refer to [RabbitMQ installation guide](https://www.rabbitmq.com/install-rpm.html)
-
 #### Create virtual python environment
 
 * `pip install --upgrade pip`
@@ -194,14 +203,16 @@ For installation details please refer to [RabbitMQ installation guide](https://w
 
 #### Install and configure nginx
 
+Log out of wtc-console users session and with your user install nginx and dependencies
+
 * `sudo yum install epel-release`
 * `sudo yum install nginx`
 
-Add following lines to _/etc/nginx/nginx.conf_ as a first _server_ entry and change **domain_name** to the actual domain name probably in format of _node_name.cern.ch_
+Add following lines to _/etc/nginx/nginx.conf_ as a first _server_ entry in _http_ section and change **domain_name** to the actual domain name probably in format of _node_name.cern.ch_
 ```
 server {
     listen 80;
-    server_name domain_Name;
+    server_name domain_name;
     location = /favicon.ico { access_log off; log_not_found off; }
     location / {
         proxy_set_header Host $http_host;
@@ -217,14 +228,19 @@ Test if configuration is valid
 
 * `sudo nginx -t`
 
-Set restart nginx and set it to run on startup
+Start nginx and set it to run on startup
 
+On RHEL and CentOS:
 * `sudo systemctl start nginx`
 * `sudo systemctl enable nginx`
 
+On Scientific Linux CERN:
+* `sudo service nginx start`
+* `sudo chkconfig nginx on`
+
 ##### For RHEL, Fedora, CentOS
 
-If when opening server you see this error in _/var/log/nginx/error.log_:
+If when opening _domain.cern.ch_ you see this error in _/var/log/nginx/error.log_:
 
 ```
 *2 connect() to 127.0.0.1:8000 failed (13: Permission denied) while connecting to upstream, client: some_ip, server: some_domain, request: "GET / HTTP/1.1", upstream: "http://127.0.0.1:8000/", host: "some_domain"
@@ -236,30 +252,30 @@ Then use this command to solve it:
 It turns on httpd connections and -P makes it persistent.
 
 
-#### Give nginx group rights to the project directory
+#### Give Nginx group rights to the project directory
 
 * `sudo chown -R wtc-console:nginx /home/wtc-console/wtc-console`
 * `sudo chmod 770 /home/wtc-console/wtc-console`
 
 #### Firewall config
 
-Ask system administrators to include port 80 to puppt config. If puppet is not used, then you can configure firewall yourself to bypass traffic on this port with these commands:
+Ask system administrators to include port 80 to puppet config. If puppet is not used, then you can configure firewall yourself to bypass traffic on this port with these commands:
 
 * `sudo iptables -I INPUT 1 -p tcp --dport 80 -m state --state NEW,ESTABLISHED -j ACCEPT`
 * `sudo iptables -I OUTPUT 1 -p tcp --dport 80 -m state --state NEW,ESTABLISHED -j ACCEPT`
 * `sudo service iptables save`
 * `sudo service iptables restart`
 
-You can see current config with `sudo sudo iptables --line -vnL` or `sudo less /etc/sysconfig/iptables`
+You can see current config with `sudo iptables --line -vnL` or `sudo less /etc/sysconfig/iptables`
 
 #### Update production settings
 
-Create prod.py in `src/djangoreactredux/settings/` directory by using _prod_template.py_ settings template file and update the fields with prod values.
+Create prod.py in `src/djangoreactredux/settings/` directory by using _prod_template.py_ settings template file and update the oracle and mongo db fields with prod values.
 
 * `cp src/djangoreactredux/settings/prod_template.py src/djangoreactredux/settings/prod.py`
 * `vim src/djangoreactredux/settings/prod.py`
  
- Create certificates.
+Create certificates for this machine and copy them to _cert/_ directory.
 
 
 Proceed to deployment steps.
@@ -285,7 +301,7 @@ Deployment is done with one bash command. It will:
 * start the application
 * start celery workers
 
-`./src/bin/deploy_prod.sh`
+`./bin/deploy_prod.sh`
 
 
 ### Stopping server

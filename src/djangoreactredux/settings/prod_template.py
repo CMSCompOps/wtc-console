@@ -24,9 +24,6 @@ MONGODB_DATABASES = {
     'default': {
         'NAME': 'wtc-console',
         'HOST': 'localhost',
-        'PORT': 8081,
-        'USER': 'root',
-        'PASSWORD': 'root',
     }
 }
 
