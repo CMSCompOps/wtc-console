@@ -23,10 +23,6 @@ class TaskSiteStatus(EmbeddedDocument):
     failed_count = fields.LongField(default=0)
 
 
-class Workflow(EmbeddedDocument):
-    name = fields.StringField(max_length=400, primary_key=True)
-
-
 class Prep(EmbeddedDocument):
     name = fields.StringField(max_length=400, primary_key=True)
     campaign = fields.StringField(max_length=400)
@@ -36,13 +32,14 @@ class Prep(EmbeddedDocument):
 
 
 class Task(Document):
-    name = fields.StringField(max_length=2000, primary_key=True)
-    job_type = fields.StringField(max_length=100)
+    name = fields.StringField(primary_key=True)
+    workflow = fields.StringField()
+    parent_workflow = fields.StringField()
+    job_type = fields.StringField()
     updated = fields.DateTimeField()
     failures_count = fields.LongField()
 
     prep = fields.EmbeddedDocumentField(Prep)
-    workflow = fields.EmbeddedDocumentField(Workflow)
     statuses = fields.EmbeddedDocumentListField(TaskSiteStatus)
 
 

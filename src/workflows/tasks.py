@@ -7,7 +7,7 @@ from mongoengine.queryset.visitor import Q
 import requests
 
 from unified.models import UnifiedWorkflow
-from workflows.models import Prep, Site, Workflow, WorkflowToUpdate, Task, TaskSiteStatus
+from workflows.models import Prep, Site, WorkflowToUpdate, Task, TaskSiteStatus
 
 app = Celery('workflows')
 logger = get_task_logger(__name__)
@@ -76,7 +76,7 @@ def get_failures_count(statuses):
     return cnt
 
 
-def update_workflow_tasks(prep, workflow, job_data):
+def update_workflow_tasks(prep, workflow, parent_workflow, job_data):
     for task_name, task_data in job_data['tasks'].items():
         if 'sites' not in task_data:
             continue
@@ -88,7 +88,6 @@ def update_workflow_tasks(prep, workflow, job_data):
 
         statuses = parse_task_statuses(task_data)
         failures_count = get_failures_count(statuses)
-        logger.debug('Failures count {} for wf {}'.format(failures_count, workflow.name))
 
         try:
             Task(
@@ -97,6 +96,7 @@ def update_workflow_tasks(prep, workflow, job_data):
                 failures_count=failures_count,
                 updated=datetime.utcnow(),
                 workflow=workflow,
+                parent_workflow=parent_workflow,
                 prep=prep,
                 statuses=statuses,
             ).save()
@@ -107,7 +107,7 @@ def update_workflow_tasks(prep, workflow, job_data):
 
 @app.task(ignore_result=True, soft_time_limit=3600)
 def update_workflows_from_request_manager():
-    updated_wfs = []
+    updated_wfs_count = 0
 
     logger.debug('Preparing to fetch preps from request manager url {} and cert at {}'
                  .format(settings.REQUEST_MANAGER_API_URL, settings.CERT_PATH))
@@ -128,8 +128,6 @@ def update_workflows_from_request_manager():
                  verify=settings.CA_PATH,
                  cert=(settings.CERT_PATH, settings.CERT_KEY_PATH,))
         preps_data = preps_data_response.json()['result'][0]
-
-        # logger.debug('Received JSON response from request manager {0}'.format(preps_data))
 
         for wf in wfs:
             logger.debug('Updating data for workflow: {} {}'.format(wf.name, wf.updated))
@@ -178,22 +176,21 @@ def update_workflows_from_request_manager():
                         if 'tasks' not in job_data:
                             continue
 
-                        job_wf = job_data['workflow']
-
                         logger.debug('Job {}'.format(job))
-                        logger.debug('Workflow {}'.format(job_wf))
 
-                        workflow = Workflow(name=stat['RequestName'])
+                        workflow = stat['RequestName']
+                        parent_workflow = stat['OriginalRequestName']
+
+                        logger.debug('Workflow {}, Parent workflow {}'.format(workflow, parent_workflow))
 
                         try:
-                            update_workflow_tasks(prep, workflow, job_data)
+                            update_workflow_tasks(prep, workflow, parent_workflow, job_data)
                         except Exception as e:
-                            logger.error('Exception raised when updating Task {} statuses: {}'.format(workflow.name, e))
+                            logger.error('Exception raised when updating Task {} statuses: {}'.format(workflow, e))
 
-                        updated_wfs.append(job_wf)
-
+                        updated_wfs_count += 1
 
     except Exception as e:
         logger.error('Exception raised: {}'.format(e))
 
-    logger.info('Workflows updated {}'.format(len(updated_wfs)))
+    logger.info('Workflows updated {}'.format(updated_wfs_count))

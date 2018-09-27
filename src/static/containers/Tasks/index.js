@@ -21,6 +21,7 @@ import TextInput from '../../components/fields/TextInput';
 import Button from '../../components/Button';
 import SliderField from '../../components/fields/SliderField';
 import DataTable from '../../components/DataTable';
+import TreeTable from '../../components/TreeTable';
 
 
 const DEFAULT_PAGE_SIZE = 20;
@@ -110,6 +111,15 @@ const ActionBlock = styled(Section)`
     flex: 1;
     min-width: 200px;
     max-width: 300px;
+`;
+
+const ActionTasks = styled.ul`
+    padding-left: 15px;
+    
+    li {
+        margin-bottom: 5px;
+        list-style: circle;
+    }
 `;
 
 const ReasonsForm = styled.div`
@@ -434,10 +444,8 @@ class TasksView extends React.Component {
                 <div>
                     <Label>Applied to tasks:</Label>
                     {action.tasks && action.tasks.length > 0
-                        ? <ul>{action.tasks.map((task, idx) => <li key={idx}>{task.name}</li>)}</ul>
-                        : <ul>
-                            <li>No tasks added, select tasks and click 'Apply action to selected tasks' button</li>
-                        </ul>}
+                        ? <ActionTasks>{action.tasks.map((task, idx) => <li key={idx}>{task.name}</li>)}</ActionTasks>
+                        : <ul><li>No tasks added, select tasks and click 'Apply action to selected tasks' button</li></ul>}
                 </div>
 
                 {action.reasons && this.renderActionReasons(idx, action)}
@@ -534,6 +542,8 @@ class TasksView extends React.Component {
                 <div className="container">
 
                     {this.renderActions()}
+
+                    <TreeTable/>
 
                     {tasks.isFetching || sites.isFetching || !tasks.data
                         ? <p className="text-center">Loading data...</p>

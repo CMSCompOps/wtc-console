@@ -1,9 +1,10 @@
 import logging
 import time
 
+from mongoengine import fields as fields
 from rest_framework_bulk import BulkListSerializer, BulkSerializerMixin
-from rest_framework_mongoengine.serializers import DocumentSerializer, EmbeddedDocumentSerializer
-from workflows.models import Action, TaskAction, Workflow, Prep, Site, Task, TaskSiteStatus, Reason
+from rest_framework_mongoengine.serializers import DocumentSerializer, EmbeddedDocumentSerializer, DynamicDocumentSerializer
+from workflows.models import Action, TaskAction, Prep, Site, Task, TaskSiteStatus, Reason
 
 
 logger = logging.getLogger(__name__)
@@ -23,20 +24,23 @@ class PrepSerializer(EmbeddedDocumentSerializer):
         fields = '__all__'
 
 
-class WorkflowSerializer(EmbeddedDocumentSerializer):
-    class Meta:
-        model = Workflow
-        fields = '__all__'
-
-
 class TaskSerializer(DocumentSerializer):
     prep = PrepSerializer()
-    workflow = WorkflowSerializer()
     statuses = TaskSiteStatusSerializer(many=True)
 
     class Meta:
         model = Task
         fields = '__all__'
+
+
+class WorkflowGroupSerializer(DynamicDocumentSerializer):
+    id = fields.StringField()
+    statuses = TaskSiteStatusSerializer(many=True)
+
+
+class PrepGroupSerializer(DynamicDocumentSerializer):
+    id = fields.StringField()
+    workflows = WorkflowGroupSerializer(many=True)
 
 
 # Sites
