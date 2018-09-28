@@ -33,7 +33,7 @@ This app has a bit complicated architecture due to the nature of other systems i
 * WmStats - rest api from which we get all the info about workflow and errors. _To access this api you need grid certificate._
 
 
-## Setting up local environment
+## Setting up _local_ environment
 
 Prerequisites:
 * Python >=2.7
@@ -268,7 +268,13 @@ Ask system administrators to include port 80 to puppet config. If puppet is not 
 
 You can see current config with `sudo iptables --line -vnL` or `sudo less /etc/sysconfig/iptables`
 
-#### Update production settings
+#### Update settings
+
+##### For development node
+
+Copy _src/djangoreactredux/settings/local_template.py_ setting file to _src/djangoreactredux/settings/local.py_ and update Oracle db credentials.
+
+##### For production node
 
 Create prod.py in `src/djangoreactredux/settings/` directory by using _prod_template.py_ settings template file and update the oracle and mongo db fields with prod values.
 
@@ -277,11 +283,35 @@ Create prod.py in `src/djangoreactredux/settings/` directory by using _prod_temp
  
 Create certificates for this machine and copy them to _cert/_ directory.
 
+#### Next steps
 
-Proceed to deployment steps.
+Proceed to [Development on dev machine](#development-on-dev-machine) or [Production deployment](#production-deployment) steps depending on the machine purpose.
 
 
-### Deployment
+### Development on remote machine
+
+Development on remote node requires to run three sessions (terminals). First one will have frontent watch running, second will have backend running. And third one is for developent with editor of your choise.
+
+##### For all terminals
+Become wtc-console user:
+* `sudo su - wtc-console`
+
+Go to project dir
+* `cd wtc-console`
+
+##### In terminal 1
+Start frontend resources watching:
+* `npm install && npm run dev`
+
+##### In terminal 2
+Start Django backend and Celery workers:
+* `./bin/start_dev.sh`
+
+##### In terminal 3
+Edit sources with an editor of you choise.
+
+
+### Production deployment
 
 
 Become wtc-console user:
@@ -304,7 +334,7 @@ Deployment is done with one bash command. It will:
 `./bin/deploy_prod.sh`
 
 
-### Stopping server
+#### Stopping server
 
 If for some reason application should be stoppet then use this script:
 
@@ -312,6 +342,6 @@ If for some reason application should be stoppet then use this script:
 
 It will stop Gunicorn and Celery tasks
 
-### Maintenance
+#### Maintenance
 
 Logs are in /home/wtc-console/wtc-console/logs
