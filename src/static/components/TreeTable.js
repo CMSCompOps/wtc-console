@@ -87,7 +87,7 @@ export default class TreeTable extends React.Component {
         return (
             <Row>
                 <Cell flex={1}><Value><Checkbox/>{task.id}</Value></Cell>
-                <Cell flex={1}><Value>Some more data</Value></Cell>
+                <Cell flex={1}><Value>{task.failures_count}</Value></Cell>
             </Row>
         )
     };

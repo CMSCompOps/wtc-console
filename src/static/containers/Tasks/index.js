@@ -27,7 +27,7 @@ import TreeTable from '../../components/TreeTable';
 const DEFAULT_PAGE_SIZE = 20;
 const PATH = '/tasks';
 
-const SPLITTING_MARKS = ['2x', '3x', '10x', '20x', '50x', '100x', '200x', 'max'];
+const SPLITTING_MARKS = ['default', '2x', '3x', '10x', '20x', '50x', '100x', '200x', 'max'];
 
 const ACTIONS = [
     {value: 'none', label: 'None'},

@@ -5,15 +5,14 @@ from rest_framework_bulk.mixins import BulkCreateModelMixin
 from mongoengine.queryset.visitor import Q
 
 from workflows.models import Action, Prep, Site, Task, TaskAction, Reason
-from workflows.serializers import TaskSerializer, SiteSerializer, TaskActionSerializer, PrepGroupSerializer
+from workflows.serializers import SiteSerializer, TaskActionSerializer, PrepSerializer
 
 logger = logging.getLogger(__name__)
 
 
 class TaskViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Task.objects.all()
-    serializer_class = TaskSerializer
-    # serializer_class = PrepGroupSerializer
+    queryset = Prep.objects.all()
+    serializer_class = PrepSerializer
     lookup_field = 'name'
 
     def list(self, request, *args, **kwargs):
@@ -31,15 +30,11 @@ class TaskViewSet(viewsets.ReadOnlyModelViewSet):
         if filter_query:
             tasks = tasks.filter(
                 Q(name__icontains=filter_query)
-                | Q(workflow__icontains=filter_query)
-                | Q(prep__name__icontains=filter_query)
-                | Q(prep__campaign__icontains=filter_query)
+                | Q(campaign__icontains=filter_query)
+                # | Q(workflow__icontains=filter_query)
+                # | Q(prep__name__icontains=filter_query)
+                # | Q(prep__campaign__icontains=filter_query)
             )
-
-        # tasks = tasks.aggregate(
-        #     {'$group': {'_id': {'prep': '$prep._id', 'workflow': '$workflow'}, 'tasks': {'$push': '$$ROOT'}}},
-        #     {'$group': {'_id': '$_id.prep', 'workflows': {'$push': {'_id': '$_id.workflow', 'tasks': '$$ROOT.tasks'}}}}
-        # )
 
         page = self.paginate_queryset(tasks)
         if page is not None:
