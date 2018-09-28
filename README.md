@@ -68,11 +68,11 @@ export LD_LIBRARY_PATH=/path/to/instantclient_12_2
 To start up development environment after it is setup you need to run these two commands in separate console windows/tabs in this order
 
 * `docker-compose up`
-* `./bin/start_dev.sh`
+* `./bin/start_docker_dev.sh`
 
 To stop the development server (order important):
 
-* `./bin/stop_dev.sh` - this will stop celery workers
+* `./bin/stop_celery_workers.sh` - this will stop celery workers
 * `docker-compose stop` or _Ctrl+C_ if you have 'docker-compose up' running terminal. Make sure that you see stopping lines. If not, then use this command.
 
 Note: it might take some time for celery workers to stop if they are in longer process. You can check if they are still running by executing:
@@ -278,10 +278,23 @@ Create prod.py in `src/djangoreactredux/settings/` directory by using _prod_temp
 Create certificates for this machine and copy them to _cert/_ directory.
 
 
-Proceed to deployment steps.
+Proceed to [Development on dev machine](#development-on-dev-machine) or [Production deployment](#production-deployment) steps depending on the machine purpose.
 
 
-### Deployment
+### Development on dev machine
+
+
+Become wtc-console user:
+
+* `sudo su - wtc-console`
+
+Go to project dir
+
+* `cd wtc-console`
+
+
+
+### Production deployment
 
 
 Become wtc-console user:
@@ -304,7 +317,7 @@ Deployment is done with one bash command. It will:
 `./bin/deploy_prod.sh`
 
 
-### Stopping server
+#### Stopping server
 
 If for some reason application should be stoppet then use this script:
 
@@ -312,6 +325,6 @@ If for some reason application should be stoppet then use this script:
 
 It will stop Gunicorn and Celery tasks
 
-### Maintenance
+#### Maintenance
 
 Logs are in /home/wtc-console/wtc-console/logs
