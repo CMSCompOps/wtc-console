@@ -15,14 +15,6 @@ DATABASES = {
     'unified': UNIFIED_DB,
 }
 
-MONGODB_DATABASES = {
-    'default': {
-        'NAME': 'wtc-console',
-        'USER': 'root',
-        'PASSWORD': 'root',
-    }
-}
-
 mongoengine.connect(
     db=MONGODB_DATABASES['default']['NAME'],
 )
