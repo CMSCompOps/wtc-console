@@ -69,3 +69,5 @@ cert/*
 
 # Log files
 logs/
+
+package-lock.json

@@ -6,3 +6,11 @@ UNIFIED_DB = {
     'USER': 'username',
     'PASSWORD': 'password',
 }
+
+MONGODB_DATABASES = {
+    'default': {
+        'NAME': 'wtc-console',
+        'USER': 'root',
+        'PASSWORD': 'root',
+    }
+}
