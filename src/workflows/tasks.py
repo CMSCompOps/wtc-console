@@ -86,9 +86,13 @@ def get_failures_count(statuses):
     return cnt
 
 
+def get_task_name(long_task_name):
+    return long_task_name.split('/')[-1]
+
+
 def update_workflow_tasks(prep, workflow, parent_workflow, tasks_data):
     tasks = []
-    for task_name, task_data in tasks_data:
+    for long_task_name, task_data in tasks_data:
         if 'sites' not in task_data:
             continue
 
@@ -97,6 +101,7 @@ def update_workflow_tasks(prep, workflow, parent_workflow, tasks_data):
         if not job_type or job_type in settings.SKIP_JOB_TYPES:
             continue
 
+        task_name = get_task_name(long_task_name)
         statuses = parse_task_statuses(task_data)
         failures_count = get_failures_count(statuses)
 
