@@ -21,7 +21,7 @@ import TextInput from '../../components/fields/TextInput';
 import Button from '../../components/Button';
 import SliderField from '../../components/fields/SliderField';
 import DataTable from '../../components/DataTable';
-import TreeTable from '../../components/TreeTable';
+import PrepWorkflowsTreeTable from '../../components/PrepWorkflowsTreeTable';
 
 
 const DEFAULT_PAGE_SIZE = 20;
@@ -543,7 +543,12 @@ class TasksView extends React.Component {
 
                     {this.renderActions()}
 
-                    <TreeTable/>
+                    {tasks.isFetching || sites.isFetching || !tasks.data
+                        ? <p className="text-center">Loading data...</p>
+                        : <Details>
+                            <PrepWorkflowsTreeTable title={'Tasks'} data={tasks.data.results}/>
+                        </Details>
+                    }
 
                     {tasks.isFetching || sites.isFetching || !tasks.data
                         ? <p className="text-center">Loading data...</p>
