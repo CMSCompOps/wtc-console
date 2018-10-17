@@ -87,7 +87,6 @@ const FoldingContent = styled.div`
     font-size: 14px;
     padding: 12px 10px 20px;
     border: 1px solid #ccc;
-    // background: #f6f6f6;
 `;
 
 const SortIcon = styled.i`

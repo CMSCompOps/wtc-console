@@ -31,6 +31,7 @@ class TaskViewSet(viewsets.ReadOnlyModelViewSet):
             tasks = tasks.filter(
                 Q(name__icontains=filter_query)
                 | Q(campaign__icontains=filter_query)
+                # TODO: workflow and task filter
                 # | Q(workflow__icontains=filter_query)
                 # | Q(prep__name__icontains=filter_query)
                 # | Q(prep__campaign__icontains=filter_query)
