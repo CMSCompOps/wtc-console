@@ -65,6 +65,7 @@ export default class Filter extends React.Component {
 
         return (
             <FilterWrapper onSubmit={(e) => this.onSubmit(e, filter)} value={filter}>
+                <span>Filter by:</span>
                 <Input
                     type={'search'}
                     value={filter}

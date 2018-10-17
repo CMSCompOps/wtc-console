@@ -10,8 +10,6 @@ import Toggle from 'react-toggle';
 import * as actionCreators from '../../actions/data';
 import Task from '../../types/Task';
 import Site from '../../types/Site';
-import PagedDataTable from '../../components/PagedDataTable';
-import {getReadableTimestamp} from '../../utils/dates';
 import {getUrlParamsString} from '../../utils/url';
 import Filter from '../../components/Filter';
 import getListDataType from '../../types/ListData';
@@ -22,9 +20,10 @@ import Button from '../../components/Button';
 import SliderField from '../../components/fields/SliderField';
 import DataTable from '../../components/DataTable';
 import PrepWorkflowsTreeTable from '../../components/PrepWorkflowsTreeTable';
+import Pager from '../../components/Pager';
 
 
-const DEFAULT_PAGE_SIZE = 20;
+const DEFAULT_PAGE_SIZE = 10;
 const PATH = '/tasks';
 
 const SPLITTING_MARKS = ['default', '2x', '3x', '10x', '20x', '50x', '100x', '200x', 'max'];
@@ -41,6 +40,11 @@ const METHODS = [
     {value: 'auto', label: 'Auto'},
     {value: 'manual', label: 'Manual'},
 ];
+
+const Title = styled.h4`
+    text-align: center;
+    margin-bottom: 15px;
+`;
 
 const Details = styled.div`
     width: 100%;
@@ -445,7 +449,9 @@ class TasksView extends React.Component {
                     <Label>Applied to tasks:</Label>
                     {action.tasks && action.tasks.length > 0
                         ? <ActionTasks>{action.tasks.map((task, idx) => <li key={idx}>{task.name}</li>)}</ActionTasks>
-                        : <ul><li>No tasks added, select tasks and click 'Apply action to selected tasks' button</li></ul>}
+                        : <ul>
+                            <li>No tasks added, select tasks and click 'Apply action to selected tasks' button</li>
+                        </ul>}
                 </div>
 
                 {action.reasons && this.renderActionReasons(idx, action)}
@@ -527,12 +533,6 @@ class TasksView extends React.Component {
         });
     };
 
-    foldedTaskContentRenderer = (row) => {
-        return (
-            <p>TODO: Render workflows indented and their tasks</p>
-        )
-    };
-
     render() {
         const {tasks, sites} = this.props;
         const {filter, sortedBy, desc} = this.state;
@@ -543,47 +543,20 @@ class TasksView extends React.Component {
 
                     {this.renderActions()}
 
-                    {tasks.isFetching || sites.isFetching || !tasks.data
-                        ? <p className="text-center">Loading data...</p>
-                        : <Details>
-                            <PrepWorkflowsTreeTable title={'Tasks'} data={tasks.data.results}/>
-                        </Details>
-                    }
+                    <Title>Tasks</Title>
 
                     {tasks.isFetching || sites.isFetching || !tasks.data
                         ? <p className="text-center">Loading data...</p>
                         : <Details>
-                            <PagedDataTable
-                                data={tasks.data}
-                                title={'Tasks'}
-                                columns={[
-                                    {key: 'name', title: 'Task', flex: 3},
-                                    {key: 'workflow.name', title: 'Workflow', flex: 2},
-                                    {key: 'prep.name', title: 'Prep', flex: 1},
-                                    {key: 'prep.campaign', title: 'Campaign', flex: 1},
-                                    {key: 'prep.priority', title: 'Priority', width: '80px', align: 'right'},
-                                    {key: 'failures_count', title: 'Failures', width: '90px', align: 'right'},
-                                    {
-                                        key: 'updated',
-                                        title: 'Last updated',
-                                        width: '150px',
-                                        transformFn: getReadableTimestamp,
-                                        align: 'right',
-                                    },
-                                ]}
-                                onChangePage={this.onChangePage}
-                                idColumn={'name'}
-                                folding={true}
-                                foldedContentRenderer={this.foldedTaskContentRenderer}
-                                selectable={true}
+                            <PrepWorkflowsTreeTable
+                                data={tasks.data.results}
                                 onSelectionChangeFn={this.onTasksSelectionChange}
-                                sortFn={this.sortData}
-                                sortedBy={sortedBy}
-                                desc={desc}
                                 panelRenderer={() => <Filter onFilter={this.filter} initialValue={filter}/>}
                             />
+                            <Pager data={tasks.data} onChangePage={this.onChangePage}/>
                         </Details>
                     }
+
                 </div>
             </div>
         );

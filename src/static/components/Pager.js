@@ -1,15 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import getListDataType from '../types/ListData';
 import styled from 'styled-components';
+import getListDataType from '../types/ListData';
 import {getPages} from '../utils/pages';
-import DataTable from './DataTable';
+
 
 const Wrapper = styled.div`
-    width: 100%;
-`;
-
-const PagerWrapper = styled.div`
     width: 100%;
 `;
 
@@ -28,29 +24,18 @@ const Pages = styled.ul`
     }
 `;
 
-export default class PagedDataTable extends React.Component {
+export default class Pager extends React.Component {
     static propTypes = {
         data: getListDataType(PropTypes.any).isRequired,
-        columns: PropTypes.arrayOf(PropTypes.shape({
-            key: PropTypes.string.isRequired,
-            title: PropTypes.string.isRequired,
-            width: PropTypes.string,
-            transformFn: PropTypes.func,
-            align: PropTypes.string,
-        })).isRequired,
         onChangePage: PropTypes.func,
-        idColumn: PropTypes.string,
-        onClickFn: PropTypes.func,
-        sortFn: PropTypes.func,
-        sortedBy: PropTypes.string,
-        desc: PropTypes.bool,
     };
 
-    renderPager = () => {
+
+    render = () => {
         const {onChangePage, data} = this.props;
 
         return (
-            <PagerWrapper>
+            <Wrapper>
                 <Pages>
                     {getPages(data.pages).map((page, idx) =>
                         <li key={`page_${idx}`}>
@@ -61,17 +46,7 @@ export default class PagedDataTable extends React.Component {
                         </li>
                     )}
                 </Pages>
-            </PagerWrapper>
+            </Wrapper>
         )
     };
-
-    render() {
-        const {data} = this.props;
-        return (
-            <Wrapper>
-                <DataTable {...this.props} data={data.results}/>
-                {this.renderPager()}
-            </Wrapper>
-        );
-    }
 }
