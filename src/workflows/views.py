@@ -9,6 +9,15 @@ from workflows.serializers import SiteSerializer, TaskActionSerializer, PrepSeri
 
 logger = logging.getLogger(__name__)
 
+TASKS_ORDERING = {
+    'priority-asc': 'priority',
+    'priority-desc': '-priority',
+    'prep-asc': 'name',
+    'prep-desc': '-name',
+    'updated-asc': 'updated',
+    'updated-desc': '-updated',
+}
+
 
 class TaskViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Prep.objects.all()
@@ -17,13 +26,13 @@ class TaskViewSet(viewsets.ReadOnlyModelViewSet):
 
     def list(self, request, *args, **kwargs):
         order_key = self.request.query_params.get('order_key', None)
-        order_desc = self.request.query_params.get('order_desc', None)
         filter_query = self.request.query_params.get('filter', None)
 
-        order_by = '-prep__priority'
+        order_by = '-priority'
         if order_key:
-            order_by = '-' if order_desc == 'true' else ''
-            order_by += order_key.replace('.', '__')
+            order_by = TASKS_ORDERING[order_key]
+
+        logger.debug('ordering: {}, found: {}'.format(order_key, order_by))
 
         tasks = self.queryset.order_by(order_by)
 

@@ -41,6 +41,17 @@ const METHODS = [
     {value: 'manual', label: 'Manual'},
 ];
 
+const ORDER_BY_OPTIONS = [
+    {value: 'priority-asc', label: 'Priority +'},
+    {value: 'priority-desc', label: 'Priority -'},
+    {value: 'prep-asc', label: 'Prep +'},
+    {value: 'prep-desc', label: 'Prep -'},
+    {value: 'updated-asc', label: 'Updated +'},
+    {value: 'updated-desc', label: 'Updated -'},
+];
+
+const DEFAULT_ORDER = ORDER_BY_OPTIONS[1];
+
 const Title = styled.h4`
     text-align: center;
     margin-bottom: 15px;
@@ -147,6 +158,17 @@ const ButtonsPanel = styled.div`
     justify-content: flex-end;
 `;
 
+const Inline = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+`;
+
+const Div = styled.div`
+    width: ${props => props.width || 'auto'}
+    padding: ${props => props.padding || '0'}
+`;
+
 class TasksView extends React.Component {
 
     static propTypes = {
@@ -181,8 +203,7 @@ class TasksView extends React.Component {
             selectedTasks: [],
             page: params.page || 1,
             filter: params.filter || '',
-            sortedBy: params.sortedBy,
-            desc: !!params.desc,
+            orderBy: ORDER_BY_OPTIONS.find(opt => opt.value === params.orderBy) || DEFAULT_ORDER,
         };
     }
 
@@ -192,14 +213,14 @@ class TasksView extends React.Component {
     }
 
     fetchData = () => {
-        const {page, filter, sortedBy, desc} = this.state;
-        this.props.actions.fetchTasks(page, DEFAULT_PAGE_SIZE, filter, sortedBy, desc);
+        const {page, filter, orderBy} = this.state;
+        this.props.actions.fetchTasks(page, DEFAULT_PAGE_SIZE, filter, orderBy.value);
     };
 
     updateLocation = () => {
-        const {page, filter, sortedBy, desc} = this.state;
+        const {page, filter, orderBy} = this.state;
 
-        let params = getUrlParamsString({page, filter, sortedBy, desc});
+        let params = getUrlParamsString({page, filter, orderBy: orderBy.value});
 
         if (params) {
             this.props.history.replace(`${PATH}?${params}`);
@@ -221,12 +242,11 @@ class TasksView extends React.Component {
         }, this.updateLocationAndFetchData);
     };
 
-    sortData = (sortedBy, desc) => {
+    reorder = (orderBy) => {
         this.setState({
             ...this.state,
             page: 1,
-            sortedBy,
-            desc,
+            orderBy,
         }, this.updateLocationAndFetchData);
     };
 
@@ -314,7 +334,7 @@ class TasksView extends React.Component {
                 </FormFieldInline>
                 <FormField>
                     <Label>Splitting:</Label>
-                    <SliderField marks={SPLITTING_MARKS} max={7} step={null} included={false}
+                    <SliderField marks={SPLITTING_MARKS} max={SPLITTING_MARKS.length - 1} step={null} included={false}
                                  onChange={s => this.onActionDataChange(idx, {'splitting': s})}/>
                 </FormField>
             </ActionBlock>
@@ -533,9 +553,24 @@ class TasksView extends React.Component {
         });
     };
 
+    renderOrderByField = () => {
+        const {orderBy} = this.state;
+        return (
+            <Inline>
+                <span>Sort by:</span>
+                <Div width={'200px'}>
+                    <SelectField
+                        value={orderBy}
+                        onChange={orderBy => this.reorder(orderBy)}
+                        options={ORDER_BY_OPTIONS}/>
+                </Div>
+            </Inline>
+        )
+    };
+
     render() {
         const {tasks, sites} = this.props;
-        const {filter, sortedBy, desc} = this.state;
+        const {filter} = this.state;
 
         return (
             <div className="protected">
@@ -551,7 +586,12 @@ class TasksView extends React.Component {
                             <PrepWorkflowsTreeTable
                                 data={tasks.data.results}
                                 onSelectionChangeFn={this.onTasksSelectionChange}
-                                panelRenderer={() => <Filter onFilter={this.filter} initialValue={filter}/>}
+                                panelRenderer={() =>
+                                    <Inline>
+                                        <Filter onFilter={this.filter} initialValue={filter}/>
+                                        {this.renderOrderByField()}
+                                    </Inline>
+                                }
                             />
                             <Pager data={tasks.data} onChangePage={this.onChangePage}/>
                         </Details>

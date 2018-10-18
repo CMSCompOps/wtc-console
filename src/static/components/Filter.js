@@ -4,7 +4,6 @@ import styled from 'styled-components';
 
 
 const FilterWrapper = styled.form`
-    width: 100%;
     padding-bottom: 10px;
 `;
 

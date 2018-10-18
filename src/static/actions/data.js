@@ -9,9 +9,9 @@ import {
 import {fetchProtectedData, saveProtectedData} from './api'
 
 
-export function fetchTasks(page, size, filter, orderBy, orderDesc) {
+export function fetchTasks(page, size, filter, orderBy) {
     return fetchProtectedData(
-        `/api/v1/workflows/tasks/?page=${page || 1}&page_size=${size || 20}&filter=${filter || ''}&order_key=${orderBy || ''}&order_desc=${!!orderDesc}`,
+        `/api/v1/workflows/tasks/?page=${page || 1}&page_size=${size || 20}&filter=${filter || ''}&order_key=${orderBy || ''}`,
         FETCH_TASKS_REQUEST,
         FETCH_TASKS_SUCCESS,
     );
