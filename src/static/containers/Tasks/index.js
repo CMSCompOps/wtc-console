@@ -506,8 +506,6 @@ class TasksView extends React.Component {
         )
     };
 
-    getTaskSites = (task) => task.statuses.map(status => status.site);
-
     formatTaskActionForUnified = (action) => {
 
         const method = _.get(action, 'method.value') || 'auto';
@@ -524,7 +522,7 @@ class TasksView extends React.Component {
                     cores: action.cores,
                     memory: action.memory,
                     group: action.group,
-                    sites: method === 'manual' ? action.sites : this.getTaskSites(task),
+                    sites: method === 'manual' ? action.sites : [],
                     reasons: action.reasons,
                 }
             }
