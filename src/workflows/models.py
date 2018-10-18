@@ -75,10 +75,22 @@ class Reason(Document):
     text = fields.StringField()
 
 
+class TaskActionParameters(EmbeddedDocument):
+    action = fields.StringField()
+    xrootd = fields.StringField()
+    cores = fields.StringField()
+    memory = fields.StringField()
+    secondary = fields.StringField()
+    splitting = fields.StringField()
+    group = fields.StringField()
+
+    sites = fields.ListField(fields.StringField())
+    reasons = fields.ListField(fields.StringField())
+
+
 class TaskAction(Document):
     name = fields.StringField()
     workflow = fields.StringField()
     acted = fields.IntField()
     timestamp = fields.LongField()
-
-    action_id = fields.ReferenceField(Action, reverse_delete_rule=DENY)
+    parameters = fields.EmbeddedDocumentField(TaskActionParameters)

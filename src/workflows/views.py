@@ -7,6 +7,7 @@ from mongoengine.queryset.visitor import Q
 from workflows.models import Action, Prep, Site, Task, TaskAction, Reason
 from workflows.serializers import SiteSerializer, TaskActionSerializer, PrepSerializer
 
+
 logger = logging.getLogger(__name__)
 
 TASKS_ORDERING = {
@@ -31,8 +32,6 @@ class TaskViewSet(viewsets.ReadOnlyModelViewSet):
         order_by = '-priority'
         if order_key:
             order_by = TASKS_ORDERING[order_key]
-
-        logger.debug('ordering: {}, found: {}'.format(order_key, order_by))
 
         tasks = self.queryset.order_by(order_by)
 

@@ -1,11 +1,10 @@
 import logging
 import time
 
-from mongoengine import fields as fields
 from rest_framework_bulk import BulkListSerializer, BulkSerializerMixin
 from rest_framework_mongoengine.serializers import DocumentSerializer, EmbeddedDocumentSerializer
-from workflows.models import Action, TaskAction, Prep, Site, Task, TaskSiteStatus, Reason, TaskPrep, Workflow
-
+from workflows.models import Action, TaskAction, TaskActionParameters, Prep, Site, Task, TaskSiteStatus, Reason, \
+    TaskPrep, Workflow
 
 logger = logging.getLogger(__name__)
 
@@ -59,17 +58,11 @@ class SiteSerializer(DocumentSerializer):
 
 # Actions
 
-class ActionSerializer(DocumentSerializer):
-    class Meta:
-        model = Action
-        fields = '__all__'
-
-
 def get_list_values(key, data):
     return sorted(data.get(key, []))
 
 
-def get_or_create_action(data):
+def save_action(data):
     action = None
 
     if 'id' in data:
@@ -78,27 +71,27 @@ def get_or_create_action(data):
     else:
         # If no action, then try to find equal entry
         action = Action.objects(
-            action=data.get('action', ''),
-            xrootd=data.get('xrootd', 'disabled'),
-            cores=data.get('cores', ''),
-            secondary=data.get('secondary', 'disabled'),
-            splitting=data.get('splitting', ''),
-            group=data.get('group', ''),
-            sites=get_list_values('sites', data),
-            reasons=get_list_values('reasons', data),
+            action=data.action,
+            xrootd=data.xrootd,
+            cores=data.cores,
+            secondary=data.secondary,
+            splitting=data.splitting,
+            group=data.group,
+            sites=data.sites,
+            reasons=data.reasons,
         ).first()
 
     # If no similar entry exist, then create new one
     if not action:
         action = Action(
-            action=data.get('action', ''),
-            xrootd=data.get('xrootd', 'disabled'),
-            cores=data.get('cores', ''),
-            secondary=data.get('secondary', 'disabled'),
-            splitting=data.get('splitting', ''),
-            group=data.get('group', ''),
-            sites=get_list_values('sites', data),
-            reasons=get_list_values('reasons', data),
+            action=data.action,
+            xrootd=data.xrootd,
+            cores=data.cores,
+            secondary=data.secondary,
+            splitting=data.splitting,
+            group=data.group,
+            sites=data.sites,
+            reasons=data.reasons,
         )
         action.save()
 
@@ -113,8 +106,14 @@ def save_new_reasons(reasons):
             Reason(text=text).save()
 
 
+class TaskActionParametersSerializer(EmbeddedDocumentSerializer):
+    class Meta:
+        model = TaskActionParameters
+        fields = '__all__'
+
+
 class TaskActionSerializer(BulkSerializerMixin, DocumentSerializer):
-    action_id = ActionSerializer()
+    parameters = TaskActionParametersSerializer()
 
     class Meta:
         model = TaskAction
@@ -123,13 +122,13 @@ class TaskActionSerializer(BulkSerializerMixin, DocumentSerializer):
         list_serializer_class = BulkListSerializer
 
     def create(self, validated_data):
-        action_data = validated_data.pop('action_id')
-        action = get_or_create_action(action_data)
+        action_data = validated_data.pop('parameters')
+        action = save_action(action_data)
 
         task_action = TaskAction(
-            action_id=action.pk,
-            acted = 0,
-            timestamp = time.time(),
+            acted=0,
+            timestamp=time.time(),
+            parameters=action_data,
             **validated_data
         )
         task_action.save()

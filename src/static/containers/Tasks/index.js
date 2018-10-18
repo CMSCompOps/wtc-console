@@ -514,7 +514,7 @@ class TasksView extends React.Component {
             return {
                 name: task.name,
                 workflow: task.workflow.name,
-                action_id: {
+                parameters: {
                     action: _.get(action, 'name.value'),
                     xrootd: action.xrootd ? 'enabled' : 'disabled',
                     secondary: action.secondary ? 'enabled' : 'disabled',

@@ -17,7 +17,7 @@ logger = get_task_logger(__name__)
 @celeryd_after_setup.connect
 def setup_direct_queue(sender, instance, **kwargs):
     logger.info('Fetch workflows from Unified on startup')
-    # fetch_new_workflows_from_unified.delay()
+    fetch_new_workflows_from_unified.delay()
     update_workflows_from_request_manager.delay()
 
 
