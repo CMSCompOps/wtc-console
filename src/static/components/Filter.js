@@ -14,6 +14,7 @@ const Input = styled.input`
     font-size: 14px;
     padding: 3px 6px;
     height: 24px;
+    width: 250px;
 `;
 
 const Button = styled.button`
