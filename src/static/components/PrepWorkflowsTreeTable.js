@@ -107,47 +107,6 @@ export default class PrepWorkflowsTreeTable extends React.Component {
         };
     }
 
-    afterSelectionUpdate = () => {
-        const {onSelectionChangeFn} = this.props;
-        onSelectionChangeFn && onSelectionChangeFn(this.state.selectedTasks);
-    };
-
-    isWorkflowSelected = (workflowName) => {
-        const {selectedWorkflows} = this.state;
-        return !!selectedWorkflows.find(elem => elem.name === workflowName);
-    };
-
-    toggleWorkflowSelection = (workflows, selected) => {
-        const {selectedWorkflows} = this.state;
-        const names = workflows.map(task => task.name);
-
-        this.setState({
-            ...this.state,
-            selectedWorkflows: selected
-                ? [...selectedWorkflows, ...workflows]
-                : selectedWorkflows.filter(elem => !names.includes(elem.name)),
-        }, this.afterSelectionUpdate);
-    };
-
-    isTaskSelected = (taskName) => {
-        const {selectedTasks} = this.state;
-        return !!selectedTasks.find(elem => elem.name === taskName);
-    };
-
-    toggleTasksSelection = (tasks, selected) => {
-        const {selectedTasks} = this.state;
-        const names = tasks.map(task => task.name);
-
-        console.log('tasks', selected, names);
-
-        this.setState({
-            ...this.state,
-            selectedTasks: selected
-                ? [...selectedTasks, ...tasks]
-                : selectedTasks.filter(elem => !names.includes(elem.name)),
-        }, this.afterSelectionUpdate);
-    };
-
     getAllWorkflowTasks = (workflow) => {
         const childrenTasks = workflow.children
             ? workflow.children.flatMap(this.getAllWorkflowTasks)
@@ -160,15 +119,44 @@ export default class PrepWorkflowsTreeTable extends React.Component {
 
     };
 
-    flattenWorkflows = (workflow) => {
-        return [
-            ...workflow.children,
-            workflow
-        ]
+    getAllPrepTasks = (prep) => prep.workflows.flatMap(this.getAllWorkflowTasks);
 
+    afterSelectionUpdate = () => {
+        const {onSelectionChangeFn} = this.props;
+        onSelectionChangeFn && onSelectionChangeFn(this.state.selectedTasks);
     };
 
-    getAllPrepTasks = (prep) => prep.workflows.flatMap(this.getAllWorkflowTasks);
+    isPrepSelected = (prep) => {
+        const {selectedTasks} = this.state;
+        const selectedTasksNames = selectedTasks.map(t => t.name);
+        const tasks = this.getAllPrepTasks(prep);
+        const uncheckedTasks = tasks.find(t => !selectedTasksNames.includes(t.name));
+        return !tasks.find(t => !selectedTasksNames.includes(t.name));
+    };
+
+    isWorkflowSelected = (workflow) => {
+        const {selectedTasks} = this.state;
+        const selectedTasksNames = selectedTasks.map(t => t.name);
+        const tasks = this.getAllWorkflowTasks(workflow);
+        return !tasks.find(t => !selectedTasksNames.includes(t.name));
+    };
+
+    isTaskSelected = (taskName) => {
+        const {selectedTasks} = this.state;
+        return !!selectedTasks.find(elem => elem.name === taskName);
+    };
+
+    toggleTasksSelection = (tasks, selected) => {
+        const {selectedTasks} = this.state;
+        const names = tasks.map(task => task.name);
+
+        this.setState({
+            ...this.state,
+            selectedTasks: selected
+                ? [...selectedTasks, ...tasks]
+                : selectedTasks.filter(elem => !names.includes(elem.name)),
+        }, this.afterSelectionUpdate);
+    };
 
     selectAll = (event) => {
         event.preventDefault();
@@ -217,11 +205,8 @@ export default class PrepWorkflowsTreeTable extends React.Component {
                     <Cell width={WORKFLOW_CELL_WIDTH - padding}>
                         <Value>
                             <Checkbox
-                                checked={this.isWorkflowSelected(workflow.name)}
-                                handleChange={checked => {
-                                    this.toggleWorkflowSelection(this.flattenWorkflows(workflow), checked);
-                                    this.toggleTasksSelection(this.getAllWorkflowTasks(workflow), checked);
-                                }}
+                                checked={this.isWorkflowSelected(workflow)}
+                                handleChange={checked => this.toggleTasksSelection(this.getAllWorkflowTasks(workflow), checked)}
                             />
                             {workflow.name}
                         </Value>
@@ -242,6 +227,7 @@ export default class PrepWorkflowsTreeTable extends React.Component {
                 <Cell width={300}>
                     <Value>
                         <Checkbox
+                            checked={this.isPrepSelected(prep)}
                             handleChange={checked => this.toggleTasksSelection(this.getAllPrepTasks(prep), checked)}
                         />
                         <Wide>
