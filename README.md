@@ -33,107 +33,6 @@ This app has a bit complicated architecture due to the nature of other systems i
 * WmStats - rest api from which we get all the info about workflow and errors. _To access this api you need grid certificate._
 
 
-## Setting up _local_ environment
-
-Prerequisites:
-* Python >=2.7
-
-### Setup steps
-
-Clone this project:
-
-* `git clone https://github.com/vined/wtc-console.git`
-* `cd wtc-console/`
-
-Frontend builds, MongoDB, PostgreSql and RabbitMQ are run in docker containers to shorten setup time
-
-* Install [Docker](https://www.docker.com/products/overview) and [Docker Compose](https://docs.docker.com/compose/install/).
-* `docker-compose build`
-
-Running oracle client in docker container is not solved yet. Because of this, client has to be installed locally.
-
-* Install [Oracle Instant Client](http://www.oracle.com/technetwork/database/database-technologies/instant-client/overview/index.html).
-    * Setup tns config by putting tnsnames.ora from _/afs/cern.ch/project/oracle/admin/_ to projects _oracle-admin_ folder.
-    Note: sometimes this config file changes, if you have problems connecting to oracle, then try to fetch a new version of this file
-    * Add these lines to your _.bashrc_, probably the path to client will be _/usr/lib/oracle/xx.x/client64_ on linux, but it might be different depending on installation type and OS.
-```
-export LD_LIBRARY_PATH=/path/to/instantclient_12_2
-```
-
-* Copy _src/djangoreactredux/settings/local_template.py_ setting file to _src/djangoreactredux/settings/local.py_ and update Oracle db credentials.
-* Copy your certificates to _cert_ folder. Required certificates are your Grid certificate and its key, both in _pem_ format, and cern certification authority (CERNRootCertificationAuthority2.crt).
-
-### Running and stopping
-
-To start up development environment after it is setup you need to run these two commands in separate console windows/tabs in this order
-
-* `docker-compose up`
-* `./bin/start_dev.sh`
-
-To stop the development server (order important):
-
-* `./bin/stop_dev.sh` - this will stop celery workers
-* `docker-compose stop` or _Ctrl+C_ if you have 'docker-compose up' running terminal. Make sure that you see stopping lines. If not, then use this command.
-
-Note: it might take some time for celery workers to stop if they are in longer process. You can check if they are still running by executing:
-
-`ps -ef | grep celery`
-
-If stopping takes too long, then kill them one by one with:
-
-`kill -9 pid`
-
-### Clean up
-
-Stop Docker development server and remove containers, networks, volumes, and images created by up (to make a fresh start).
-
-* `docker-compose down`
-
-### Misc
-
-You can access shell in a container
-
-* `docker ps` - get the name from the list of running containers
-* `docker exec -i -t wtc-console_rabbitmq_1 /bin/bash` - connects to container bash
-
-The mongo database can be accessed by connecting to docker instance with mongo client
-
-* `docker exec -i -t wtc-console_mongo_1 /bin/bash`
-* `mongo`
-
-
-## Accessing Website
-
-Go to [localhost:8000](http://localhost:8000)
-
-
-## Development guidelines
-
-When developing a new feature create your own branch and push your changes at least daily.
-
-Do not push directly to master. Create pull requests and assign someone to approve it. Go through your pull request your self, it helps to see if there is unwanted or commented-out code.
-
-
-## Adding new dependencies
-
-While working on project you might encounter situations where you want to add functionality from third parties. This is done by adding dependecies to external libraries.
-
-### Frontend
-
-Login to frontend container
-
-* `docker exec -i -t wtcconsole_frontend_1 /bin/bash`
-
-Intall dependency with yarn
-
-* `yarn add dependency-name`
-
-### Backend
-
-Since django is running on your machine, python package instalation is as usual with pypi
-
-* `pip install dependency-name`
-
 ## Installing on a new machine (prod, dev)
 
 Production/development setup uses nginx as reverse proxy and Gunicorn as an application server.
@@ -147,7 +46,9 @@ Use these instructions to setup a new production environment from scratch. By fo
 - Python >=2.7
 
 #### Install Node and NPM
-Follow this guide for [RHEL](https://tecadmin.net/install-latest-nodejs-and-npm-on-centos/)
+
+If you are using CERN managed machine then ask administrator to install latest Node version.
+If you are managing this machine, then follow this guide for [RHEL](https://tecadmin.net/install-latest-nodejs-and-npm-on-centos/)
 
 #### Install Oracle Instant Client
 
@@ -345,3 +246,27 @@ It will stop Gunicorn and Celery tasks
 #### Maintenance
 
 Logs are in /home/wtc-console/wtc-console/logs
+
+## Development guidelines
+
+When developing a new feature create your own branch and push your changes at least daily.
+
+Do not push directly to master. Create pull requests and assign someone to approve it. Go through your pull request your self, it helps to see if there is unwanted or commented-out code.
+
+
+## Adding new dependencies
+
+While working on project you might encounter situations where you want to add functionality from third parties. This is done by adding dependecies to external libraries.
+
+### Frontend
+
+Intall dependency with yarn
+
+* `yarn add dependency-name`
+
+### Backend
+
+Install dependency with pypi
+
+* `pip install dependency-name`
+
