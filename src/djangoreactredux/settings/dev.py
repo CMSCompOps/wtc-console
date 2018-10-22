@@ -63,7 +63,7 @@ LOGGER_WARNING = DEFAULT_LOGGER
 
 CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672/'
 
-WORKFLOWS_UPDATE_LIMIT = 10
+WORKFLOWS_UPDATE_LIMIT = 50
 WORKFLOWS_UPDATE_TIMEOUT = 2 # in hours
 
 CA_PATH = '../cert/CERNRootCertificationAuthority2.crt'
