@@ -9,53 +9,6 @@ from workflows.models import Action, TaskAction, TaskActionParameters, Prep, Sit
 logger = logging.getLogger(__name__)
 
 
-# Tasks
-
-class TaskSiteStatusSerializer(EmbeddedDocumentSerializer):
-    class Meta:
-        model = TaskSiteStatus
-        fields = '__all__'
-
-
-class TaskPrepSerializer(EmbeddedDocumentSerializer):
-    class Meta:
-        model = TaskPrep
-        fields = '__all__'
-
-
-class TaskSerializer(EmbeddedDocumentSerializer):
-    prep = TaskPrepSerializer()
-    statuses = TaskSiteStatusSerializer(many=True)
-
-    class Meta:
-        model = Task
-        fields = '__all__'
-
-
-class WorkflowSerializer(EmbeddedDocumentSerializer):
-    tasks = TaskSerializer(many=True)
-
-    class Meta:
-        model = Workflow
-        fields = '__all__'
-
-
-class PrepSerializer(EmbeddedDocumentSerializer):
-    workflows = WorkflowSerializer(many=True)
-
-    class Meta:
-        model = Prep
-        fields = '__all__'
-
-
-# Sites
-
-class SiteSerializer(DocumentSerializer):
-    class Meta:
-        model = Site
-        fields = '__all__'
-
-
 # Actions
 
 def get_list_values(key, data):
@@ -112,6 +65,16 @@ class TaskActionParametersSerializer(EmbeddedDocumentSerializer):
         fields = '__all__'
 
 
+def set_action_to_task(filter_task_name, task, task_action):
+    if (task.name == filter_task_name):
+        task.task_action = task_action
+    return task
+
+def set_action_to_tasks(filter_task_name, workflow, task_action):
+    workflow.tasks = list(map(lambda task: set_action_to_task(filter_task_name, task, task_action), workflow.tasks))
+    return workflow
+
+
 class TaskActionSerializer(BulkSerializerMixin, DocumentSerializer):
     parameters = TaskActionParametersSerializer()
 
@@ -134,4 +97,59 @@ class TaskActionSerializer(BulkSerializerMixin, DocumentSerializer):
         task_action.save()
         save_new_reasons(action.reasons)
 
+        # Ugly task action reference insert as mongo does not support multiple positional args ($)
+        preps = Prep.objects(workflows__tasks__name=task_action.name)
+        for prep in preps:
+            prep.workflows = list(map(lambda wf: set_action_to_tasks(task_action.name, wf, task_action), prep.workflows))
+            prep.save()
+
         return task_action
+
+
+# Tasks
+
+class TaskSiteStatusSerializer(EmbeddedDocumentSerializer):
+    class Meta:
+        model = TaskSiteStatus
+        fields = '__all__'
+
+
+class TaskPrepSerializer(EmbeddedDocumentSerializer):
+    class Meta:
+        model = TaskPrep
+        fields = '__all__'
+
+
+class TaskSerializer(EmbeddedDocumentSerializer):
+    prep = TaskPrepSerializer()
+    statuses = TaskSiteStatusSerializer(many=True)
+    task_action = TaskActionSerializer()
+
+    class Meta:
+        model = Task
+        fields = '__all__'
+        depth = 1
+
+
+class WorkflowSerializer(EmbeddedDocumentSerializer):
+    tasks = TaskSerializer(many=True)
+
+    class Meta:
+        model = Workflow
+        fields = '__all__'
+
+
+class PrepSerializer(EmbeddedDocumentSerializer):
+    workflows = WorkflowSerializer(many=True)
+
+    class Meta:
+        model = Prep
+        fields = '__all__'
+
+
+# Sites
+
+class SiteSerializer(DocumentSerializer):
+    class Meta:
+        model = Site
+        fields = '__all__'

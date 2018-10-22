@@ -14,48 +14,6 @@ class Site(Document):
     name = fields.StringField(max_length=400, primary_key=True)
 
 
-# Tasks
-
-class TaskSiteStatus(EmbeddedDocument):
-    site = fields.StringField()
-    dataset = fields.StringField()
-    success_count = fields.LongField(default=0)
-    failed_count = fields.LongField(default=0)
-
-
-class TaskPrep(EmbeddedDocument):
-    name = fields.StringField()
-    campaign = fields.StringField()
-    priority = fields.LongField(default=0)
-
-
-class Task(EmbeddedDocument):
-    name = fields.StringField(primary_key=True)
-    workflow = fields.StringField()
-    parent_workflow = fields.StringField()
-    job_type = fields.StringField()
-    failures_count = fields.LongField()
-
-    prep = fields.EmbeddedDocumentField(TaskPrep)
-    statuses = fields.EmbeddedDocumentListField(TaskSiteStatus)
-
-
-class Workflow(EmbeddedDocument):
-    name=fields.StringField()
-    parent_workflow = fields.StringField()
-
-    tasks=fields.EmbeddedDocumentListField(Task)
-
-
-class Prep(Document):
-    name=fields.StringField(primary_key=True)
-    campaign = fields.StringField()
-    priority = fields.LongField(default=0)
-    updated = fields.DateTimeField()
-
-    workflows=fields.EmbeddedDocumentListField(Workflow)
-
-
 # Actions
 
 class Action(Document):
@@ -94,3 +52,47 @@ class TaskAction(Document):
     acted = fields.IntField()
     timestamp = fields.LongField()
     parameters = fields.EmbeddedDocumentField(TaskActionParameters)
+
+
+# Tasks
+
+class TaskSiteStatus(EmbeddedDocument):
+    site = fields.StringField()
+    dataset = fields.StringField()
+    success_count = fields.LongField(default=0)
+    failed_count = fields.LongField(default=0)
+
+
+class TaskPrep(EmbeddedDocument):
+    name = fields.StringField()
+    campaign = fields.StringField()
+    priority = fields.LongField(default=0)
+
+
+class Task(EmbeddedDocument):
+    name = fields.StringField(primary_key=True)
+    short_name = fields.StringField()
+    workflow = fields.StringField()
+    parent_workflow = fields.StringField()
+    job_type = fields.StringField()
+    failures_count = fields.LongField()
+
+    prep = fields.EmbeddedDocumentField(TaskPrep)
+    statuses = fields.EmbeddedDocumentListField(TaskSiteStatus)
+    task_action = fields.ReferenceField(TaskAction)
+
+
+class Workflow(EmbeddedDocument):
+    name=fields.StringField()
+    parent_workflow = fields.StringField()
+
+    tasks=fields.EmbeddedDocumentListField(Task)
+
+
+class Prep(Document):
+    name=fields.StringField(primary_key=True)
+    campaign = fields.StringField()
+    priority = fields.LongField(default=0)
+    updated = fields.DateTimeField()
+
+    workflows=fields.EmbeddedDocumentListField(Workflow)

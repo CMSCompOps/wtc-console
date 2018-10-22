@@ -5,6 +5,9 @@ import CheckboxField from './fields/CheckboxField';
 import {getReadableTimestamp} from '../utils/dates';
 
 const WORKFLOW_CELL_WIDTH = 320;
+const GREEN = '#c5e0c5';
+const RED = '#ffbfbf';
+const YELLOW = '#ffffad';
 
 const Wrapper = styled.div`
     width: 100%;
@@ -45,7 +48,7 @@ const Row = styled.div`
     flex-direction: row;
     width: 100%;
     height: ${props => props.fill ? '100%' : 'auto'};
-    background: #efefef;
+    background: ${props => props.color || '#efefef'};
 `;
 
 const Col = styled.div`
@@ -176,16 +179,29 @@ export default class PrepWorkflowsTreeTable extends React.Component {
         }, this.afterSelectionUpdate);
     };
 
-    renderTask = (task, fill) => {
+    getTaskBgColor = (task) => {
+        if (task.failures_count) {
+            return task.task_action
+                ? task.task_action.acted
+                    ? GREEN
+                    : YELLOW
+                : RED
+        }
+        return null;
+    };
+
+    renderTask = (task, idx, fill) => {
+        const color = this.getTaskBgColor(task);
+
         return (
-            <Row fill={fill} key={task.name}>
+            <Row fill={fill} color={color} key={`${idx}_${task.name}`}>
                 <Cell flex={1}>
                     <Value>
                         <Checkbox
                             checked={this.isTaskSelected(task.name)}
                             handleChange={checked => this.toggleTasksSelection([task], checked)}
                         />
-                        {task.name}
+                        {task.short_name}
                     </Value>
                 </Cell>
                 <Cell width={200}><Value>{task.failures_count}</Value></Cell>
@@ -211,7 +227,7 @@ export default class PrepWorkflowsTreeTable extends React.Component {
                             {workflow.name}
                         </Value>
                     </Cell>
-                    <Cell flex={1}>{workflow.tasks.map(task => this.renderTask(task, fillTask))}</Cell>
+                    <Cell flex={1}>{workflow.tasks.map((task, idx) => this.renderTask(task, idx, fillTask))}</Cell>
                 </Row>
 
                 {!!workflow.children && workflow.children.map(child => this.renderWorkflow(child, level + 1))}
