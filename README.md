@@ -173,7 +173,9 @@ You can see current config with `sudo iptables --line -vnL` or `sudo less /etc/s
 
 ##### For development node
 
-Copy _src/djangoreactredux/settings/local_template.py_ setting file to _src/djangoreactredux/settings/local.py_ and update Oracle db credentials.
+* Copy `src/djangoreactredux/settings/local_template.py` setting file to `src/djangoreactredux/settings/local.py` and modify oracle db credentials through `UNIFIED_DB`  and `MONGODB_DATABASES` to reflect your development environment. Errors and debug information concerning celery workers and oracle db configuration will not be rendered through Django, instead always check `logs/celery.log` for errors: `grep ERROR logs/celery.log`.
+
+* Modify `TNS_ADMIN` located at `bin/start_dev.sh`, at cern use: `/afs/cern.ch/project/oracle/admin/`.
 
 ##### For production node
 
@@ -182,7 +184,7 @@ Create prod.py in `src/djangoreactredux/settings/` directory by using _prod_temp
 * `cp src/djangoreactredux/settings/prod_template.py src/djangoreactredux/settings/prod.py`
 * `vim src/djangoreactredux/settings/prod.py`
  
-Create certificates for this machine and copy them to _cert/_ directory.
+[Create certificates for this machine and copy them to _cert/_ directory](#certicates-placement).
 
 #### Next steps
 
@@ -192,6 +194,13 @@ Proceed to [Development on dev machine](#development-on-dev-machine) or [Product
 ### Development on remote machine
 
 Development on remote node requires to run three sessions (terminals). First one will have frontent watch running, second will have backend running. And third one is for developent with editor of your choise.
+
+##### Add your hostname to the list of allowed sites
+Modify `src/djangoreactredux/settings/base.py` to include the assigned hostname:
+
+```
+ALLOWED_HOSTS = ['localhost','myDevTestMachine.cern.ch']
+```
 
 ##### For all terminals
 Become wtc-console user:
@@ -211,6 +220,23 @@ Start Django backend and Celery workers:
 ##### In terminal 3
 Edit sources with an editor of you choise.
 
+### Certificates placement
+
+To install CERN Certification Authority and [User certificates](https://ca.cern.ch/ca/Help/?kbid=024100):
+
+```
+mkdir src/djangoreactredux/cert && cd wtc-console/src/djangoreactredux/cert
+wget -c "https://cafiles.cern.ch/cafiles/certificates/CERN%20Root%20Certification%20Authority%202.crt" -O CERNRootCertificationAuthority2.crt
+```
+
+And, depending on the location of your Key/Cert files:
+
+```
+cp ~/.globus/cert.pem crt.pem 
+cp ~/.globus/key.pem . 
+```
+
+The location of these files is specified via `src/djangoreactredux/settings/dev.py`
 
 ### Production deployment
 
