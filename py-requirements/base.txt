@@ -32,3 +32,6 @@ python-dateutil==2.6.1
 git+https://github.com/Seedstars/django-rest-logger.git
 
 requests==2.19.1
+
+# cmsweb
+cmstoolbox==0.11.2
