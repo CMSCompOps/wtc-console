@@ -470,7 +470,7 @@ class TasksView extends React.Component {
                     {action.tasks && action.tasks.length > 0
                         ? <ActionTasks>{action.tasks.map((task, idx) => <li key={idx}>{task.name}</li>)}</ActionTasks>
                         : <ul>
-                            <li>No tasks added, select tasks and click 'Apply action to selected tasks' button</li>
+                            <li>No tasks added, select tasks and click 'Apply to selected tasks' button</li>
                         </ul>}
                 </div>
 
