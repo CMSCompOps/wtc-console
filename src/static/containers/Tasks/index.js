@@ -271,16 +271,35 @@ class TasksView extends React.Component {
         });
     };
 
-    onSiteCheckboxClick = (idx, action, siteName, checked) => {
+
+    addSiteToAction = (action, siteName) => {
+        const {sites} = action;
+
+        let newSites = new Set(sites);
+        newSites.add(siteName);
+
+        this.onActionDataChange(action.idx, {'sites': newSites});
+    };
+
+    deleteSiteFromAction = (action, siteName) => {
+        const {sites} = action;
+
+        let newSites = new Set(sites);
+        newSites.delete(siteName);
+
+        this.onActionDataChange(action.idx, {'sites': newSites});
+    }
+
+
+    onSiteCheckboxClick = (action, siteName, checked) => {
         const {sites} = action;
 
         let newSites = new Set(sites);
 
         checked
-            ? newSites.add(siteName)
-            : newSites.delete(siteName);
+            ? this.addSiteToAction(action,siteName)
+            : this.deleteSiteFromAction(action,siteName);
 
-        this.onActionDataChange(idx, {'sites': newSites});
     };
 
     renderSites = (taskId, action) => {
@@ -298,7 +317,7 @@ class TasksView extends React.Component {
                                 <CheckboxField
                                     label={<SiteLabel>{site.name}</SiteLabel>}
                                     checked={action.sites && action.sites.has(site.name)}
-                                    handleChange={newValue => this.onSiteCheckboxClick(idx, action, site.name, newValue)}
+                                    handleChange={newValue => this.onSiteCheckboxClick(action, site.name, newValue)}
                                 />
                             </SiteField>
                         )
