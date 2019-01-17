@@ -2,13 +2,8 @@
 from __future__ import unicode_literals
 
 from django.shortcuts import render
-from django.http import JsonResponse
-
-from cmstoolbox.workflowinfo import WorkflowInfo
+from django.http import HttpResponse
 
 
 def workflow_sites(request, workflow_id):
-
-    wf = WorkflowInfo( workflow = workflow_id)
-
-    return JsonResponse(wf.get_recovery_info())
+    return HttpResponse("Workflow id: {}".format(workflow_id))
