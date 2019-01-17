@@ -30,7 +30,6 @@ INSTALLED_APPS = (
     'base',
     'unified',
     'workflows',
-    'cmsweb',
 )
 
 MIDDLEWARE_CLASSES = (
