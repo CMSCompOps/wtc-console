@@ -480,9 +480,9 @@ class TasksView extends React.Component {
         });
     };
 
-    applyActionToSelectedTasks = (actionIdx) => {
+    applyActionToSelectedTasks = (action) => {
         const {selectedTasks} = this.state;
-        this.onActionDataChange(actionIdx, {'tasks': selectedTasks});
+        this.onActionDataChange(action.idx, {'tasks': selectedTasks});
     };
 
     renderAction = (action, idx) => {
