@@ -304,6 +304,15 @@ class TasksView extends React.Component {
 
     renderSites = (taskId, action) => {
         const {sites: allSites} = this.props;
+        let siteList = new Set();
+
+        if (action.hasOwnProperty('tasks')) {
+            action.tasks.forEach( task => {
+                task.statuses.forEach(siteStatus => {
+                    siteList.add(siteStatus.site);
+                });
+            });
+        }
 
         return (
             <Sites>
@@ -316,7 +325,7 @@ class TasksView extends React.Component {
                             <SiteField key={checkboxId}>
                                 <CheckboxField
                                     label={<SiteLabel>{site.name}</SiteLabel>}
-                                    checked={action.sites && action.sites.has(site.name)}
+                                    checked={siteList.has(site.name)}
                                     handleChange={newValue => this.onSiteCheckboxClick(action, site.name, newValue)}
                                 />
                             </SiteField>
@@ -497,7 +506,7 @@ class TasksView extends React.Component {
 
                 <ButtonsPanel>
                     <Button onClick={() => this.addReason(idx, action)} title={'Add reason'}/>
-                    <Button onClick={() => this.applyActionToSelectedTasks(idx)} title={'Apply to selected tasks'}/>
+                    <Button onClick={() => this.applyActionToSelectedTasks(action)} title={'Apply to selected tasks'}/>
                     <Button onClick={() => this.removeAction(idx)} title={'Remove action'}/>
                 </ButtonsPanel>
             </ActionFoldingContent>
