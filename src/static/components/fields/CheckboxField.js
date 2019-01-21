@@ -17,7 +17,7 @@ export default class CheckboxField extends React.Component {
     static propTypes = {
         checked: PropTypes.bool,
         label: PropTypes.any,
-        handleChange: PropTypes.func,
+        handleChange: PropTypes.func.isRequired,
         className: PropTypes.string,
     };
 
@@ -32,7 +32,7 @@ export default class CheckboxField extends React.Component {
 
         return (
             <Wrapper className={className} onClick={this.toggleValue}>
-                <StyledCheckbox type={'checkbox'} checked={checked}/>
+                <StyledCheckbox type={'checkbox'} defaultChecked={checked}/>
                 {label}
             </Wrapper>
         )
