@@ -271,34 +271,30 @@ class TasksView extends React.Component {
         });
     };
 
-    onSiteCheckboxClick = (idx, action, siteName, checked) => {
-        const {sites} = action;
-
-        let newSites = new Set(sites);
-
-        checked
-            ? newSites.add(siteName)
-            : newSites.delete(siteName);
-
-        this.onActionDataChange(idx, {'sites': newSites});
+    onSiteCheckboxClick = (action, task, siteName, checked) => {
+        action.tasks.forEach( t => {
+            if ( t.name == task.name ) {
+                checked
+                    ? t.selected_sites.add(siteName)
+                    : t.selected_sites.delete(siteName);
+            }
+        });
     };
 
-    renderSites = (taskId, action) => {
+    renderSites = (action,task) => {
         const {sites: allSites} = this.props;
-
         return (
             <Sites>
                 <Label>Choose sites:</Label>
                 <SitesList>
                     {allSites.data.map(site => {
-                        const checkboxId = `${taskId}_${site.name}`;
-
+                        const checkboxId = `${task.name}_${site.name}`;
                         return (
                             <SiteField key={checkboxId}>
                                 <CheckboxField
                                     label={<SiteLabel>{site.name}</SiteLabel>}
-                                    checked={action.sites && action.sites.has(site.name)}
-                                    handleChange={newValue => this.onSiteCheckboxClick(idx, action, site.name, newValue)}
+                                    checked={task.selected_sites.has(site.name)}
+                                    handleChange={newValue => this.onSiteCheckboxClick(action, task, site.name, newValue)}
                                 />
                             </SiteField>
                         )
@@ -452,9 +448,18 @@ class TasksView extends React.Component {
         });
     };
 
-    applyActionToSelectedTasks = (actionIdx) => {
-        const {selectedTasks} = this.state;
-        this.onActionDataChange(actionIdx, {'tasks': selectedTasks});
+    applyActionToSelectedTasks = (action) => {
+        let {selectedTasks} = this.state;
+
+        selectedTasks.forEach( task => {
+            let siteList = new Set();
+            task.statuses.forEach(siteStatus => {
+                siteList.add(siteStatus.site);
+            });
+            task.selected_sites = siteList;
+        });
+
+        this.onActionDataChange(action.idx, {'tasks': selectedTasks});
     };
 
     renderAction = (action, idx) => {
@@ -462,15 +467,24 @@ class TasksView extends React.Component {
             <ActionFoldingContent>
                 <ActionAndSitesContainer key={idx}>
                     {this.renderActionForm(idx, action)}
-                    {this.shouldShowSites(action) && this.renderSites(idx, action)}
                 </ActionAndSitesContainer>
 
                 <div>
                     <Label>Applied to tasks:</Label>
                     {action.tasks && action.tasks.length > 0
-                        ? <ActionTasks>{action.tasks.map((task, idx) => <li key={idx}>{task.name}</li>)}</ActionTasks>
+                     ? <ActionTasks> {action.tasks.map(
+                             (task, idx) => { 
+                                 return (
+                                         <div key={task.name}>
+                                         <li key={idx}>{task.name}</li>
+                                         {this.shouldShowSites(action) && this.renderSites(action,task)}
+                                         </div>
+                                 )
+                             }
+                     )}
+                     </ActionTasks>
                         : <ul>
-                            <li>No tasks added, select tasks and click 'Apply action to selected tasks' button</li>
+                            <li>No tasks added, select tasks and click 'Apply to selected tasks' button</li>
                         </ul>}
                 </div>
 
@@ -478,7 +492,7 @@ class TasksView extends React.Component {
 
                 <ButtonsPanel>
                     <Button onClick={() => this.addReason(idx, action)} title={'Add reason'}/>
-                    <Button onClick={() => this.applyActionToSelectedTasks(idx)} title={'Apply to selected tasks'}/>
+                    <Button onClick={() => this.applyActionToSelectedTasks(action)} title={'Apply to selected tasks'}/>
                     <Button onClick={() => this.removeAction(idx)} title={'Remove action'}/>
                 </ButtonsPanel>
             </ActionFoldingContent>
