@@ -536,7 +536,7 @@ class TasksView extends React.Component {
                     cores: action.cores,
                     memory: action.memory,
                     group: action.group,
-                    sites: method === 'manual' ? action.sites : [],
+                    sites: method === 'manual' ? task.selected_sites : [],
                     reasons: action.reasons,
                 }
             }
