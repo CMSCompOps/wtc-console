@@ -30,6 +30,8 @@ INSTALLED_APPS = (
     'base',
     'unified',
     'workflows',
+
+    'misc',
 )
 
 MIDDLEWARE_CLASSES = (
