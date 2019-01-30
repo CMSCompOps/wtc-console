@@ -593,8 +593,8 @@ class TasksView extends React.Component {
     };
 
     render() {
-        const {tasks, sites} = this.props;
         const {filter} = this.state;
+        const {tasks, sites, sitesStatus} = this.props;
 
         return (
             <div className="protected">
@@ -604,7 +604,8 @@ class TasksView extends React.Component {
 
                     <Title>Tasks</Title>
 
-                    {tasks.isFetching || sites.isFetching || !tasks.data
+                    {tasks.isFetching || sites.isFetching
+                       || !tasks.data || sitesStatus.isFetching
                         ? <p className="text-center">Loading data...</p>
                         : <Details>
                             <PrepWorkflowsTreeTable
