@@ -21,7 +21,7 @@ import SliderField from '../../components/fields/SliderField';
 import DataTable from '../../components/DataTable';
 import PrepWorkflowsTreeTable from '../../components/PrepWorkflowsTreeTable';
 import Pager from '../../components/Pager';
-
+import SubmissionModal from '../../components/SubmissionModal';
 
 const DEFAULT_PAGE_SIZE = 10;
 const PATH = '/tasks';
@@ -581,11 +581,16 @@ class TasksView extends React.Component {
     };
 
     render() {
-        const {tasks, sites} = this.props;
+        const {tasks, sites, sitesStatus, takeAction} = this.props;
         const {filter} = this.state;
 
         return (
             <div className="protected">
+                {
+                <SubmissionModal showModal={takeAction.isPosting || takeAction.showModal}
+                                 msg={takeAction.msgModal}
+                                 onChangeVisibility={this.props.actions.flipModalVisibility} />
+                }
                 <div className="container">
 
                     {this.renderActions()}
@@ -625,6 +630,16 @@ const mapStateToProps = (state) => {
             data: state.sites.data,
             isFetching: state.sites.isFetching
         },
+        sitesStatus: {
+            data: state.sitesStatus.data,
+            isFetching: state.sitesStatus.isFetching
+        },
+        takeAction: {
+            data: state.takeAction.data,
+            isPosting: state.takeAction.isPosting,
+            msgModal: state.takeAction.msgModal,
+            showModal: state.takeAction.showModal,
+        }
     };
 };
 

@@ -5,9 +5,11 @@ import {
     FETCH_SITES_SUCCESS,
     SAVE_TASKS_ACTIONS_REQUEST,
     SAVE_TASKS_ACTIONS_SUCCESS,
+    FETCH_SITES_STATUS_REQUEST,
+    FETCH_SITES_STATUS_SUCCESS,
+    FLIP_MODAL_VISIBILITY,
 } from '../constants';
-import {fetchProtectedData, saveProtectedData} from './api'
-
+import {fetchProtectedData, saveProtectedData, flipModal} from './api'
 
 export function fetchTasks(page, size, filter, orderBy) {
     return fetchProtectedData(
@@ -32,4 +34,18 @@ export function fetchSites() {
         FETCH_SITES_REQUEST,
         FETCH_SITES_SUCCESS,
     );
+}
+
+export function fetchSitesStatus() {
+    return fetchProtectedData(
+	`/api/v1/misc/sites/status/`,
+	FETCH_SITES_STATUS_REQUEST,
+	FETCH_SITES_STATUS_SUCCESS,
+    );
+}
+
+export function flipModalVisibility() {
+    return flipModal(
+        FLIP_MODAL_VISIBILITY
+    )
 }

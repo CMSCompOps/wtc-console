@@ -77,3 +77,9 @@ export function saveProtectedData(url, data, requestType, successType) {
             });
     };
 }
+
+export function flipModal(requestType) {
+    return (dispatch,state) => {
+        dispatch(request(requestType));
+    }
+}
