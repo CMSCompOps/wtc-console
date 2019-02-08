@@ -38,9 +38,9 @@ export function fetchSites() {
 
 export function fetchSitesStatus() {
     return fetchProtectedData(
-	`/api/v1/misc/sites/status/`,
-	FETCH_SITES_STATUS_REQUEST,
-	FETCH_SITES_STATUS_SUCCESS,
+        `/api/v1/misc/sites/status/`,
+        FETCH_SITES_STATUS_REQUEST,
+        FETCH_SITES_STATUS_SUCCESS,
     );
 }
 
