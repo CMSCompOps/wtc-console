@@ -5,6 +5,16 @@ import ReactModal from 'react-modal';
 
 ReactModal.setAppElement('#root')
 
+const customStyle = {
+  content: {
+    top: '35%',
+    left: '30%',
+    right: 'auto',
+    bottom: 'auto',
+    width: '40%',
+  },
+};
+
 export default class SubmissionModal extends React.Component {
 
     static propTypes = {
@@ -29,6 +39,7 @@ export default class SubmissionModal extends React.Component {
             <ReactModal
             isOpen = { showModal }
             onRequestClose={onChangeVisibility}
+            style={ customStyle }
             >
             <p> { msg } </p>
             <button onClick = {onChangeVisibility} > Close </button>
