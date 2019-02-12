@@ -514,7 +514,9 @@ class TasksView extends React.Component {
                 />
                 <ButtonsPanel>
                     <Button onClick={this.addAction} title={'Add action'}/>
-                    <Button onClick={this.submitActions} title={'Submit actions'}/>
+                    <Button onClick={this.submitActions}
+                            title={'Submit actions'}
+                            disabled={ actions.length > 0 ? false : true }/>
                 </ButtonsPanel>
             </div>
         )
