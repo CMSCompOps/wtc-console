@@ -597,7 +597,6 @@ class TasksView extends React.Component {
     render() {
         const {tasks, sites, sitesStatus, takeAction} = this.props;
         const {filter} = this.state;
-        const {tasks, sites, sitesStatus} = this.props;
 
         return (
             <div className="protected">
