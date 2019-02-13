@@ -6,5 +6,6 @@ const StyledButton = styled.button`
 `;
 
 export default function Button(props) {
-    return <StyledButton classNames={'btn btn-default'} onClick={props.onClick}>{props.title}</StyledButton>;
+    return <StyledButton classNames={'btn btn-default'} 
+                         onClick={props.onClick} disabled={!!props.disabled}>{props.title}</StyledButton>;
 }

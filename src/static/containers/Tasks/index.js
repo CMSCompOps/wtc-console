@@ -21,7 +21,7 @@ import SliderField from '../../components/fields/SliderField';
 import DataTable from '../../components/DataTable';
 import PrepWorkflowsTreeTable from '../../components/PrepWorkflowsTreeTable';
 import Pager from '../../components/Pager';
-
+import SubmissionModal from '../../components/SubmissionModal';
 
 const DEFAULT_PAGE_SIZE = 10;
 const PATH = '/tasks';
@@ -526,7 +526,9 @@ class TasksView extends React.Component {
                 />
                 <ButtonsPanel>
                     <Button onClick={this.addAction} title={'Add action'}/>
-                    <Button onClick={this.submitActions} title={'Submit actions'}/>
+                    <Button onClick={this.submitActions}
+                            title={'Submit actions'}
+                            disabled={ actions.length > 0 ? false : true }/>
                 </ButtonsPanel>
             </div>
         )
@@ -593,11 +595,17 @@ class TasksView extends React.Component {
     };
 
     render() {
+        const {tasks, sites, sitesStatus, takeAction} = this.props;
         const {filter} = this.state;
         const {tasks, sites, sitesStatus} = this.props;
 
         return (
             <div className="protected">
+                {
+                <SubmissionModal showModal={takeAction.isPosting || takeAction.showModal}
+                                 msg={takeAction.msgModal}
+                                 onChangeVisibility={this.props.actions.flipModalVisibility} />
+                }
                 <div className="container">
 
                     {this.renderActions()}
@@ -641,6 +649,12 @@ const mapStateToProps = (state) => {
         sitesStatus: {
             data: state.sitesStatus.data,
             isFetching: state.sitesStatus.isFetching
+        },
+        takeAction: {
+            data: state.takeAction.data,
+            isPosting: state.takeAction.isPosting,
+            msgModal: state.takeAction.msgModal,
+            showModal: state.takeAction.showModal,
         }
     };
 };
