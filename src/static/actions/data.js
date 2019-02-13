@@ -11,6 +11,7 @@ import {
 } from '../constants';
 import {fetchProtectedData, saveProtectedData, flipModal} from './api'
 
+
 export function fetchTasks(page, size, filter, orderBy) {
     return fetchProtectedData(
         `/api/v1/workflows/tasks/?page=${page || 1}&page_size=${size || 20}&filter=${filter || ''}&order_key=${orderBy || ''}`,

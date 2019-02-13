@@ -183,6 +183,7 @@ class TasksView extends React.Component {
         actions: PropTypes.shape({
             fetchTasks: PropTypes.func.isRequired,
             fetchSites: PropTypes.func.isRequired,
+            fetchSitesStatus: PropTypes.func.isRequired,
             saveTasksActions: PropTypes.func.isRequired,
         }).isRequired,
         history: PropTypes.object.isRequired,
@@ -209,6 +210,7 @@ class TasksView extends React.Component {
 
     componentDidMount() {
         this.props.actions.fetchSites();
+        this.props.actions.fetchSitesStatus();
         this.fetchData();
     }
 
@@ -283,17 +285,27 @@ class TasksView extends React.Component {
 
     renderSites = (action,task) => {
         const {sites: allSites} = this.props;
+        const {sitesStatus} = this.props;
+
         return (
             <Sites>
                 <Label>Choose sites:</Label>
                 <SitesList>
                     {allSites.data.map(site => {
                         const checkboxId = `${task.name}_${site.name}`;
+
+                        let siteInfo =
+                            sitesStatus.data.find(
+                                info => info.VOName == site.name
+                            );
+
+                        let status = siteInfo ? siteInfo.Status : ("NoInfo");
+
                         return (
                             <SiteField key={checkboxId}>
                                 <CheckboxField
-                                    label={<SiteLabel>{site.name}</SiteLabel>}
-                                    checked={task.selected_sites.has(site.name)}
+                                    label={<SiteLabel>{site.name} [{status.toUpperCase()}]</SiteLabel>}
+                            checked={task.selected_sites.has(site.name)}
                                     handleChange={newValue => this.onSiteCheckboxClick(action, task, site.name, newValue)}
                                 />
                             </SiteField>
@@ -538,7 +550,7 @@ class TasksView extends React.Component {
                     cores: action.cores,
                     memory: action.memory,
                     group: action.group,
-                    sites: method === 'manual' ? action.sites : [],
+                    sites: method === 'manual' ? task.selected_sites : [],
                     reasons: action.reasons,
                 }
             }
@@ -585,6 +597,7 @@ class TasksView extends React.Component {
     render() {
         const {tasks, sites, sitesStatus, takeAction} = this.props;
         const {filter} = this.state;
+        const {tasks, sites, sitesStatus} = this.props;
 
         return (
             <div className="protected">
@@ -599,7 +612,8 @@ class TasksView extends React.Component {
 
                     <Title>Tasks</Title>
 
-                    {tasks.isFetching || sites.isFetching || !tasks.data
+                    {tasks.isFetching || sites.isFetching
+                       || !tasks.data || sitesStatus.isFetching
                         ? <p className="text-center">Loading data...</p>
                         : <Details>
                             <PrepWorkflowsTreeTable
