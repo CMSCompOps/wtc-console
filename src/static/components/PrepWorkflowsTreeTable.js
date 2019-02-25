@@ -252,9 +252,26 @@ export default class PrepWorkflowsTreeTable extends React.Component {
         )
     };
 
+    isPrepShown = (prep) => {
+
+        let isIt = false;
+
+        prep.workflows.forEach( wf => {
+            wf.tasks.forEach( task => {
+                if (task.failures_count > 0) isIt = true;
+            })
+        });
+
+        return isIt;
+    };
+
+
     renderPrep = (prep) => {
         const fill = prep.workflows.length === 1;
 
+	const {showAllTasks} = this.state;
+
+        if (!!showAllTasks || this.isPrepShown(prep)) {
         return (
             <Row key={prep.name}>
                 <Cell width={300}>
@@ -286,6 +303,9 @@ export default class PrepWorkflowsTreeTable extends React.Component {
                 <Cell flex={1}>{prep.workflows.map(w => this.renderWorkflow(w, 0, fill))}</Cell>
             </Row>
         )
+        } else {
+            return (null)
+        }
     };
 
     render() {
