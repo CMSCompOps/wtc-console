@@ -191,22 +191,27 @@ export default class PrepWorkflowsTreeTable extends React.Component {
     };
 
     renderTask = (task, idx, fill) => {
+
         const color = this.getTaskBgColor(task);
 
-        return (
-            <Row fill={fill} color={color} key={`${idx}_${task.name}`}>
-                <Cell flex={1}>
-                    <Value>
-                        <Checkbox
-                            checked={this.isTaskSelected(task.name)}
-                            handleChange={checked => this.toggleTasksSelection([task], checked)}
-                        />
-                        {task.short_name}
-                    </Value>
-                </Cell>
-                <Cell width={200}><Value>{task.failures_count}</Value></Cell>
-            </Row>
-        )
+        if ( task.failures_count > 0. ) {
+            return (
+                <Row fill={fill} color={color} key={`${idx}_${task.name}`}>
+                    <Cell flex={1}>
+                        <Value>
+                            <Checkbox
+                                checked={this.isTaskSelected(task.name)}
+                                handleChange={checked => this.toggleTasksSelection([task], checked)}
+                            />
+                            {task.short_name}
+                        </Value>
+                    </Cell>
+                    <Cell width={200}><Value><b>{task.failures_count}</b></Value></Cell>
+                </Row>
+            )
+        } else {
+            return (null);
+        }
     };
 
     renderWorkflow = (workflow, level, fill) => {
