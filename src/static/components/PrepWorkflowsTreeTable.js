@@ -179,6 +179,17 @@ export default class PrepWorkflowsTreeTable extends React.Component {
         }, this.afterSelectionUpdate);
     };
 
+    showAll = (event) => {
+
+        const {showAllTasks} = this.state;
+        event.preventDefault();
+
+        this.setState({
+            ...this.state,
+            showAllTasks: !showAllTasks,
+        });
+    }
+
     getTaskBgColor = (task) => {
         if (task.failures_count) {
             return task.task_action
@@ -193,8 +204,9 @@ export default class PrepWorkflowsTreeTable extends React.Component {
     renderTask = (task, idx, fill) => {
 
         const color = this.getTaskBgColor(task);
+        const {showAllTasks} = this.state;
 
-        if ( task.failures_count > 0. ) {
+        if ( task.failures_count > 0. || !!showAllTasks) {
             return (
                 <Row fill={fill} color={color} key={`${idx}_${task.name}`}>
                     <Cell flex={1}>
@@ -282,6 +294,8 @@ export default class PrepWorkflowsTreeTable extends React.Component {
             panelRenderer,
         } = this.props;
 
+        const {showAllTasks} = this.state;
+
         return (
             <Wrapper>
                 <LeftPanel>
@@ -290,6 +304,7 @@ export default class PrepWorkflowsTreeTable extends React.Component {
                 <RightPanel>
                     <a href="#" onClick={this.selectAll}>Select all</a>
                     <a href="#" onClick={this.clearAll}>Clear all</a>
+                    <a href="#" onClick={this.showAll}>{ !!showAllTasks ? "Only task errors" : "Show all tasks"}</a>
                 </RightPanel>
                 <Table>
                     <Rows>
