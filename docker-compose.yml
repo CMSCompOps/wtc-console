@@ -11,7 +11,10 @@ services:
             - ./django
     mongo:
         restart: always
-        image: mongo:4.0.0
+        build:
+            context: ./docker/mongo
+        volumes:
+            - ./docker/mongo:/to_restore
     backend:
         restart: always
         build:
@@ -34,7 +37,3 @@ services:
             - backend
         entrypoint:
             - /web-entrypoint.sh
-    rabbitmq:
-        restart: always
-        image: rabbitmq:alpine
-        hostname: "wtc-rabbit"
