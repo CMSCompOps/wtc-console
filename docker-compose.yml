@@ -11,6 +11,8 @@ services:
             - ./django
     mongo:
         restart: always
+        ports:
+            - 27017:27017
         image: dabercro/wtc-dev-mongo:190422
     backend:
         restart: always
