@@ -38,9 +38,6 @@ class TaskViewSet(viewsets.ReadOnlyModelViewSet):
         if filter_query:
             tasks = tasks.filter(
                 Q(name__icontains=filter_query)
-                | Q(campaign__icontains=filter_query)
-                | Q(workflows__name__icontains=filter_query)
-                | Q(workflows__tasks__name__icontains=filter_query)
             )
 
         page = self.paginate_queryset(tasks)
