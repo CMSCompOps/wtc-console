@@ -5,7 +5,7 @@ django-extensions==1.8.1
 whitenoise==3.3.0
 
 # Rest Framework
-djangorestframework==3.6.4
+djangorestframework==3.11.2
 djangorestframework-bulk==0.2.1
 
 # PostgresSQL
