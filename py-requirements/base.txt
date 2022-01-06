@@ -20,7 +20,7 @@ django-rest-framework-mongoengine==3.3.0
 cx_Oracle==6.4.1
 
 # Celery tasks
-celery==4.2.0
+celery==5.2.2
 
 # Sentry
 raven==6.1.0
